@@ -136,7 +136,6 @@
                 }
             }
 /*Карта в contacts.html*/
-
 .map-container {
   width: 100%;
   max-width: 1200px; /* Максимальная ширина контейнера */
@@ -173,6 +172,36 @@
     padding-bottom: 100%; /* Более квадратное соотношение на мобильных */
   }
 }
+ /* Cтили для page-header.html*/
+ .page-header {
+  background-color: #000;
+  color: #fff;
+  padding: 30px 0;
+  margin-bottom: 40px;
+}
+
+.page-header__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.page-header__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 20px 0;
+    margin-bottom: 30px;
+  }
+  
+  .page-header__title {
+    font-size: 1.5rem;
+  }
+}
  /* Базовые стили */
         :root {
             --primary: #2C3E50;
@@ -191,6 +220,7 @@
         body {
             font-family: 'Roboto', sans-serif;
             color: var(--text);
+            padding-top: 80px; /*для хедера*/
         }
         /* Стили футера*/
          footer {

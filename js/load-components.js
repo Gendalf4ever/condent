@@ -1,3 +1,22 @@
+function setPageHeader(title) {
+  // Проверяем, существует ли уже заголовок
+  let header = document.getElementById('dynamic-page-header');
+  
+  if (!header) {
+    // Если нет - создаем новый
+    document.body.insertAdjacentHTML('afterbegin', `
+      <section class="page-header" id="dynamic-page-header">
+        <div class="page-header__container">
+          <h1 class="page-header__title">${title}</h1>
+        </div>
+      </section>
+    `);
+  } else {
+    // Если есть - просто обновляем текст
+    header.querySelector('.page-header__title').textContent = title;
+  }
+}
+
 // Функция для загрузки и вставки HTML-компонентов
 async function loadComponent(componentPath, targetElement, position = 'beforeend') {
     try {
