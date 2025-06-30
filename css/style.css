@@ -1,4 +1,4 @@
- /* настройки конфиденциальности */
+ /* настройки конфиденциальности (страница privacy) */
 .privacy-policy {
             max-width: 900px;
             margin: 0 auto;
@@ -77,6 +77,102 @@
                 margin-left: 20px;
             }
         }
+ /* настройки контактов (страница contacts) */
+        .contacts-footer {
+                background-color: #000000;
+                padding: 40px 0;
+            }
+            
+            .footer-contacts-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 20px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+            }
+            
+            .contact-block {
+                margin-bottom: 20px;
+            }
+            
+            .contact-title {
+                font-weight: bold;
+                color: #ffffff;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+            
+            .contact-info {
+                color: #ffffff;
+                line-height: 1.6;
+            }
+            
+            .contact-link {
+                color: #ffffff;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+            
+            .contact-link:hover {
+                color: #ffffff;
+            }
+            
+            .map-container {
+                height: 400px;
+                margin-top: 30px;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            
+            @media (max-width: 768px) {
+                .footer-contacts-container {
+                    grid-template-columns: 1fr;
+                }
+                
+                .map-container {
+                    height: 300px;
+                }
+            }
+/*Карта в contacts.html*/
+
+.map-container {
+  width: 100%;
+  max-width: 1200px; /* Максимальная ширина контейнера */
+  margin: 30px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.map-wrapper {
+  position: relative;
+  padding-bottom: 75%; /* Соотношение сторон (высота/ширина) */
+  height: 0;
+  overflow: hidden;
+}
+
+.yandex-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .map-container {
+    margin: 20px auto;
+    border-radius: 4px;
+  }
+  
+  .map-wrapper {
+    padding-bottom: 100%; /* Более квадратное соотношение на мобильных */
+  }
+}
  /* Базовые стили */
         :root {
             --primary: #2C3E50;
