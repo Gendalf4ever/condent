@@ -3,19 +3,156 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
+        <title>CODENT - Техническая поддержка</title>
+        <meta name="description" content="Форма технической поддержки CODENT">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        
-                <script src="js/load-components.js"></script>
-             <script>
-    setPageHeader('Codent - Техническая поддержка');
-  </script>
-      <script>
-        loadComponent('includes/help-button.html', 'body');
-    </script>
+        <script src="js/load-components.js"></script>
+        <script>
+            setPageHeader('Техническая поддержка');
+            loadComponent('includes/help-button.html', 'body');
+        </script>
+
+        <main class="support-container">
+            <h1>Форма технической поддержки</h1>
+            <form id="supportForm" class="support-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Имя и фамилия*</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Номер телефона*</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="warranty">Гарантийный код (если знаете)</label>
+                    <input type="text" id="warranty" name="warranty">
+                </div>
+                
+                <div class="form-group">
+                    <label for="issue">Опишите вашу проблему*</label>
+                    <textarea id="issue" name="issue" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Прикрепите файлы (фото, документы)</label>
+                    <input type="file" id="attachments" name="attachments[]" multiple accept="image/*,.pdf,.doc,.docx">
+                    <div id="filePreview" class="file-preview"></div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">Отправить запрос</button>
+                
+                <div id="statusMessage" class="status-message"></div>
+            </form>
+        </main>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('supportForm');
+                const fileInput = document.getElementById('attachments');
+                const filePreview = document.getElementById('filePreview');
+                const submitBtn = document.getElementById('submitBtn');
+                const statusMessage = document.getElementById('statusMessage');
+                let files = [];
+                
+                // Обработка загрузки файлов
+                fileInput.addEventListener('change', function(e) {
+                    filePreview.innerHTML = '';
+                    files = Array.from(e.target.files);
+                    
+                    files.forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-preview-item';
+                        
+                        if (file.type.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = URL.createObjectURL(file);
+                            fileItem.appendChild(img);
+                        } else {
+                            fileItem.textContent = file.name.length > 10 
+                                ? file.name.substring(0, 7) + '...' + file.name.split('.').pop()
+                                : file.name;
+                        }
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-file';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            files.splice(index, 1);
+                            fileItem.remove();
+                            
+                            // Обновляем FileList
+                            const dataTransfer = new DataTransfer();
+                            files.forEach(f => dataTransfer.items.add(f));
+                            fileInput.files = dataTransfer.files;
+                        });
+                        
+                        fileItem.appendChild(removeBtn);
+                        filePreview.appendChild(fileItem);
+                    });
+                });
+                
+                // Обработка отправки формы
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Отправка...';
+                    statusMessage.style.display = 'none';
+                    
+                    // Создаем FormData
+                    const formData = new FormData(form);
+                    
+                    // Добавляем файлы
+                    files.forEach(file => {
+                        formData.append('attachments[]', file);
+                    });
+                    
+                    // Отправка данных
+                    fetch('mail.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Ошибка сети');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showStatus('Ваш запрос успешно отправлен! Мы свяжемся с вами в ближайшее время.', 'status-success');
+                            form.reset();
+                            filePreview.innerHTML = '';
+                            files = [];
+                        } else {
+                            throw new Error(data.message || 'Неизвестная ошибка');
+                        }
+                    })
+                    .catch(error => {
+                        showStatus('Ошибка при отправке: ' + error.message, 'status-error');
+                        console.error('Error:', error);
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Отправить запрос';
+                    });
+                });
+                
+                function showStatus(message, className) {
+                    statusMessage.textContent = message;
+                    statusMessage.className = 'status-message ' + className;
+                    statusMessage.style.display = 'block';
+                }
+            });
+        </script>
     </body>
 </html>

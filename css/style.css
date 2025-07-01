@@ -77,6 +77,118 @@
                 margin-left: 20px;
             }
         }
+
+/*Стили страницы поддержки*/
+            .support-container {
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 30px;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            }
+            
+            .support-form .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .support-form label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+            
+            .support-form input,
+            .support-form textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+            
+            .support-form textarea {
+                min-height: 150px;
+                resize: vertical;
+            }
+            
+            .file-preview {
+                margin-top: 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .file-preview-item {
+                position: relative;
+                width: 100px;
+                height: 100px;
+                border: 1px solid #eee;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            
+            .file-preview-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .remove-file {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: rgba(0,0,0,0.5);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+            }
+            
+            .submit-btn {
+                background-color: #2c3e50;
+                color: white;
+                padding: 14px 25px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.3s;
+                margin-top: 10px;
+            }
+            
+            .submit-btn:hover {
+                background-color: #1a252f;
+            }
+            
+            .submit-btn:disabled {
+                background-color: #95a5a6;
+                cursor: not-allowed;
+            }
+            
+            .status-message {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 4px;
+                display: none;
+            }
+            
+            .status-success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+                display: block;
+            }
+            
+            .status-error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+                display: block;
+            }
  /* настройки контактов (страница contacts) */
         .contacts-footer {
                 background-color: #000000;
