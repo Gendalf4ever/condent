@@ -28,35 +28,20 @@ async function loadComponent(componentPath, targetElement, position = 'beforeend
         const html = await response.text();
         
         // Вставляем HTML в указанное место
-        document.querySelector(targetElement).insertAdjacentHTML(position, html);
+        const target = document.querySelector(targetElement);
+        if (target) {
+            target.insertAdjacentHTML(position, html);
+            return true;
+        }
+        return false;
     } catch (error) {
         console.error(`Ошибка при загрузке ${componentPath}:`, error);
+        return false;
     }
 }
 
-// Загружаем хедер в начало body
-loadComponent('header.html', 'body', 'afterbegin').then(() => {
-    // Инициализация меню после загрузки хедера
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const navMenu = document.querySelector('.nav');
-    
-    if (mobileMenuBtn && navMenu) {
-        // Обработчик клика по кнопке мобильного меню
-        mobileMenuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-        
-        // Закрытие меню при клике вне его области
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav') && !e.target.closest('.mobile-menu-btn')) {
-                navMenu.classList.remove('active');
-            }
-        });
-    }
-});
-// Загрузка баннера внимания
-loadComponent('header.html', 'body', 'afterbegin').then(() => {
-    // Инициализация меню
+// Инициализация мобильного меню (вынесено в отдельную функцию)
+function initMobileMenu() {
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav');
     
@@ -71,30 +56,55 @@ loadComponent('header.html', 'body', 'afterbegin').then(() => {
             }
         });
     }
-    
-    // Добавляем баннер внимания после хедера
-    loadComponent('includes/attention-banner.html', '.page-header', 'afterend').then(() => {
-        // Добавляем обработчик закрытия баннера
-        const closeBtn = document.querySelector('.attention-banner__close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function() {
-                const banner = this.closest('.attention-banner');
-                banner.style.display = 'none';
-                
-                // Можно сохранить состояние в localStorage
-                localStorage.setItem('attentionBannerClosed', 'true');
-            });
-        }
-        
-        // Проверяем, был ли баннер закрыт ранее
-        if (localStorage.getItem('attentionBannerClosed') === 'true') {
-            const banner = document.querySelector('.attention-banner');
-            if (banner) banner.style.display = 'none';
-        }
-    });
-});
-// Загружаем футер перед закрывающим тегом body
-loadComponent('footer.html', 'body');
+}
 
-// Загружаем кнопку "Нужна помощь" перед закрывающим тегом body
-loadComponent('includes/help-button.html', 'body');
+//  Инициализация баннера внимания
+function initAttentionBanner() {
+    const closeBtn = document.querySelector('.attention-banner__close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            const banner = this.closest('.attention-banner');
+            if (banner) {
+                banner.style.display = 'none';
+                localStorage.setItem('attentionBannerClosed', 'true');
+            }
+        });
+    }
+    
+    if (localStorage.getItem('attentionBannerClosed') === 'true') {
+        const banner = document.querySelector('.attention-banner');
+        if (banner) banner.style.display = 'none';
+    }
+}
+
+// Основная функция загрузки компонентов
+async function loadAllComponents() {
+    try {
+        // Загружаем хедер
+        await loadComponent('header.html', 'body', 'afterbegin');
+        initMobileMenu();
+        
+        // Убеждаемся, что page-header существует
+        if (!document.querySelector('.page-header')) {
+            setPageHeader(''); // Создаем заголовок с пустым текстом, если его нет
+        }
+        
+        // Загружаем баннер внимания
+       await loadComponent('includes/attention-banner.html', 'body', 'beforeend');
+      initAttentionBanner();
+        
+        // Загружаем футер
+        await loadComponent('footer.html', 'body');
+        
+        // Загружаем кнопку помощи
+        await loadComponent('includes/help-button.html', 'body');
+        
+    } catch (error) {
+        console.error('Ошибка при загрузке компонентов:', error);
+    }
+}
+
+// Запускаем загрузку компонентов при полной загрузке DOM
+document.addEventListener('DOMContentLoaded', () => {
+    loadAllComponents();
+});
