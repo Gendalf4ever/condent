@@ -54,7 +54,45 @@ loadComponent('header.html', 'body', 'afterbegin').then(() => {
         });
     }
 });
-
+// Загрузка баннера внимания
+loadComponent('header.html', 'body', 'afterbegin').then(() => {
+    // Инициализация меню
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navMenu = document.querySelector('.nav');
+    
+    if (mobileMenuBtn && navMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav') && !e.target.closest('.mobile-menu-btn')) {
+                navMenu.classList.remove('active');
+            }
+        });
+    }
+    
+    // Добавляем баннер внимания после хедера
+    loadComponent('includes/attention-banner.html', '.page-header', 'afterend').then(() => {
+        // Добавляем обработчик закрытия баннера
+        const closeBtn = document.querySelector('.attention-banner__close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                const banner = this.closest('.attention-banner');
+                banner.style.display = 'none';
+                
+                // Можно сохранить состояние в localStorage
+                localStorage.setItem('attentionBannerClosed', 'true');
+            });
+        }
+        
+        // Проверяем, был ли баннер закрыт ранее
+        if (localStorage.getItem('attentionBannerClosed') === 'true') {
+            const banner = document.querySelector('.attention-banner');
+            if (banner) banner.style.display = 'none';
+        }
+    });
+});
 // Загружаем футер перед закрывающим тегом body
 loadComponent('footer.html', 'body');
 

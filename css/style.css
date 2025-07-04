@@ -40,7 +40,7 @@
 }
 
  /* настройки конфиденциальности (страница privacy) */
-.privacy-policy {
+        .privacy-policy {
             max-width: 900px;
             margin: 0 auto;
             padding: 30px 20px;
@@ -244,6 +244,40 @@
                 border: 1px solid #f5c6cb;
                 display: block;
             }
+            /* Стили для блока внимания */
+.attention-banner {
+  background-color: #e74c3c;
+  color: white;
+  padding: 12px 0;
+  position: relative;
+}
+
+.attention-banner__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.attention-banner__text {
+  font-weight: 500;
+}
+
+.attention-banner__close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 15px;
+}
+
+.attention-banner__close:hover {
+  opacity: 0.8;
+}
  /* настройки контактов (страница contacts) */
         .contacts-footer {
                 background-color: #000000;
