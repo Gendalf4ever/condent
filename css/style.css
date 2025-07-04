@@ -1,3 +1,44 @@
+ /*настройки главной страницы*/
+ .content-item{
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 2.5em;
+            text-indent: -1.5em;
+ }
+ .codent-slogan{
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #7f8c8d 100%)!important;
+    color: white!important; 
+    padding: 30px;
+    text-align: center;
+    margin: 40px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 80%; 
+    max-width: 1000px; 
+    min-width: 300px;
+    height: auto; 
+    min-height: 150px;
+ }
+ .codent-slogan p {
+    margin: 0;
+    font-size: 1.5em;
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.content-main{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    line-height: 1.6;
+    color: #333;
+    counter-reset: section;
+}
+
  /* настройки конфиденциальности (страница privacy) */
 .privacy-policy {
             max-width: 900px;
