@@ -77,7 +77,21 @@
                 margin-left: 20px;
             }
         }
-
+/*Стили для таблицы*/
+          
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+             .sheet-container {
+            width: 100%;
+            height: 80vh;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 /*Стили страницы поддержки*/
             .support-container {
                 max-width: 800px;
@@ -406,6 +420,8 @@
             font-family: 'Roboto', sans-serif;
             color: var(--text);
             padding-top: 80px; /*для хедера*/
+            margin: 0;
+            padding: 20px;
         }
         /* Стили футера*/
          footer {
