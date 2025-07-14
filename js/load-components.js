@@ -16,7 +16,33 @@ function setPageHeader(title) {
     header.querySelector('.page-header__title').textContent = title;
   }
 }
-
+// Функция для проверки, нужно ли показывать баннер на текущей странице
+function shouldShowCustomBanner() {
+    // Получаем текущую страницу
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    
+    // Список страниц, где должен отображаться баннер
+    const pagesWithBanner = [
+        '3d-printers.html',
+        '3d-scaners.html',
+        'photo-polymers.html',
+        'post-obrabotka.html',
+        '3d-consumables.html',
+        'milling.html',
+        'frezy.html',
+        'sinterising.html',
+        'zirkon.html',
+        'compressors.html'
+    ];
+    
+    return pagesWithBanner.includes(currentPage);
+}
+// Функция для загрузки кастомного баннера
+async function loadCustomBanner() {
+    if (shouldShowCustomBanner()) {
+        await loadComponent('includes/custom-banner.html', 'footer', 'beforebegin');
+    }
+}
 // Функция для загрузки и вставки HTML-компонентов
 async function loadComponent(componentPath, targetElement, position = 'beforeend') {
     try {
@@ -40,7 +66,7 @@ async function loadComponent(componentPath, targetElement, position = 'beforeend
     }
 }
 
-// Инициализация мобильного меню (вынесено в отдельную функцию)
+// Инициализация мобильного меню 
 function initMobileMenu() {
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav');
@@ -76,7 +102,10 @@ function initAttentionBanner() {
         if (banner) banner.style.display = 'none';
     }
 }
-
+// Глобальная функция для загрузки баннера
+window.loadPageBanner = async function() {
+    await loadComponent('includes/custom-banner.html', 'footer', 'beforebegin');
+};
 // Основная функция загрузки компонентов
 async function loadAllComponents() {
     try {
@@ -86,12 +115,15 @@ async function loadAllComponents() {
         
         // Убеждаемся, что page-header существует
         if (!document.querySelector('.page-header')) {
-            setPageHeader(''); // Создаем заголовок с пустым текстом, если его нет
+            setPageHeader('');
         }
         
         // Загружаем баннер внимания
-       await loadComponent('includes/attention-banner.html', 'body', 'beforeend');
-      initAttentionBanner();
+        await loadComponent('includes/banner.html', 'body', 'beforeend');
+        initAttentionBanner();
+        
+        // Загружаем кастомный баннер (если нужно)
+        await loadCustomBanner();
         
         // Загружаем футер
         await loadComponent('footer.html', 'body');

@@ -1,3 +1,46 @@
+ /*Настройки баннера*/
+ .company-banner {
+  background-color: #000000;
+  padding: 20px 0;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  margin: 20px 0;
+}
+
+.company-banner__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.company-banner__item {
+  padding: 15px;
+  background: rgb(0, 0, 0);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.company-banner__title {
+  color: #ffffff;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.company-banner__text {
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.company-banner__description {
+  color: #666;
+  font-size: 14px;
+}
+
  /*настройки главной страницы*/
  .content-item{
             margin-bottom: 12px;
