@@ -1,52 +1,55 @@
- /*Настройки баннера*/
- .company-banner {
-  background-color: #000000;
-  padding: 20px 0;
+/* Баннер компании */
+.company-banner {
+  background: #f8f9fa;
+  padding: 2rem 0;
+  margin: 2rem 0;
   border-top: 1px solid #e9ecef;
   border-bottom: 1px solid #e9ecef;
-  margin: 20px 0;
-}
-.company-banner__logo {
-  text-align: center;
-  width: 100%;
-  margin: 0 auto 20px;
-  font-size: 24px;
-  font-weight: bold;
-  color: #2c3e50;
 }
 
-.company-banner__container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-  position: relative;
+.company-banner__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.company-banner__logo {
+  font-size: 2rem;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.company-banner__content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .company-banner__item {
-  padding: 15px;
-  background: rgb(0, 0, 0);
+  background: white;
+  padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .company-banner__title {
-  color: #ffffff;
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 1.25rem;
+  color: #3498db;
+  margin-bottom: 0.5rem;
 }
 
 .company-banner__text {
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: 5px;
+  color: #7f8c8d;
+  line-height: 1.5;
 }
 
-.company-banner__description {
-  color: #666;
-  font-size: 14px;
+@media (max-width: 768px) {
+  .company-banner__content {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+  }
 }
 
  /*настройки главной страницы*/
