@@ -4,7 +4,8 @@ window.setPageHeader = function(title) {
     
     if (!header) {
       document.body.insertAdjacentHTML('afterbegin', `
-        <section class="page-header" id="dynamic-page-header">
+        <section class="page-header" id="dynamic-page-header">Ы
+        
           <div class="page-header__container">
             <h1 class="page-header__title">${title}</h1>
           </div>
@@ -47,7 +48,8 @@ const BannerSystem = {
       path: 'includes/attention-banner.html',
       target: 'body',
       position: 'beforeend',
-      storageKey: 'attentionBannerClosed'
+      storageKey: 'attentionBannerClosed',
+      cssClass: 'attention-banner--fixed'
     },
     custom: {
       path: 'includes/custom-banner.html',
@@ -70,18 +72,25 @@ const BannerSystem = {
 
   async loadAttentionBanner() {
     try {
-      const { path, target, position, storageKey } = this.config.attention;
+      // Проверяем, не был ли закрыт ранее
+      if (localStorage.getItem(this.config.attention.storageKey)) {
+        console.log('Attention banner was closed previously');
+        return;
+      }
+
+      const { path, target, position, cssClass } = this.config.attention;
       const loaded = await loadComponent(path, target, position);
       
       if (loaded) {
         const banner = document.querySelector('.attention-banner');
         if (banner) {
-          if (localStorage.getItem(storageKey)) {
-            banner.style.display = 'none';
-          } else {
-            banner.style.display = 'block';
-            this.initCloseButton(banner, storageKey);
-          }
+          // Добавляем класс для фиксированного позиционирования
+          banner.classList.add(cssClass);
+          
+          // Инициализируем кнопку закрытия
+          this.initCloseButton(banner, this.config.attention.storageKey);
+          
+          console.log('🛎️ Attention banner initialized');
         }
       }
     } catch (error) {
@@ -101,6 +110,7 @@ const BannerSystem = {
     }
     
     await loadComponent(path, target, position);
+    console.log('📢 Custom banner loaded');
   },
 
   shouldShowCustomBanner() {
@@ -112,27 +122,29 @@ const BannerSystem = {
     const closeBtn = banner.querySelector('.attention-banner__close');
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
-        banner.style.display = 'none';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+          banner.remove();
+        }, 300);
         localStorage.setItem(storageKey, 'true');
       });
     }
   }
 };
 
-// ==================== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ ====================
 async function initializePage() {
-  console.group('🚀 Initializing Page Components');
+  console.group('🚀 Page Initialization');
   
   try {
-    // 1. Загрузка основных компонентов
+    // 1. Загрузка хедера и меню
     await loadComponent('header.html', 'body', 'afterbegin');
     initMobileMenu();
     
-    // 2. Загрузка футера перед баннерами
+    // 2. Загрузка футера (должен содержать .footer-container)
     const footerLoaded = await loadComponent('footer.html', 'body');
     
+    // 3. Загрузка баннеров (только после футера)
     if (footerLoaded) {
-      // 3. Загрузка баннеров
       await BannerSystem.loadAttentionBanner();
       await BannerSystem.loadCustomBanner();
     }
@@ -166,6 +178,7 @@ function initMobileMenu() {
     });
   }
 }
+
 function runWhenReady() {
   if (document.readyState === 'complete') {
     setTimeout(initializePage, 0);
