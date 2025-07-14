@@ -1,9 +1,7 @@
 function setPageHeader(title) {
-  // Проверяем, существует ли уже заголовок
   let header = document.getElementById('dynamic-page-header');
   
   if (!header) {
-    // Если нет - создаем новый
     document.body.insertAdjacentHTML('afterbegin', `
       <section class="page-header" id="dynamic-page-header">
         <div class="page-header__container">
@@ -12,16 +10,18 @@ function setPageHeader(title) {
       </section>
     `);
   } else {
-    // Если есть - просто обновляем текст
     header.querySelector('.page-header__title').textContent = title;
   }
 }
-// Функция для проверки, нужно ли показывать баннер на текущей странице
+
 function shouldShowCustomBanner() {
-    // Получаем текущую страницу
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage = window.location.pathname.split('/').pop() || '';
     
-    // Список страниц, где должен отображаться баннер
+    // Никогда не показывать на главной странице
+    if (currentPage === '' || currentPage === 'index.html') {
+        return false;
+    }
+
     const pagesWithBanner = [
         '3d-printers.html',
         '3d-scaners.html',
@@ -37,24 +37,22 @@ function shouldShowCustomBanner() {
     
     return pagesWithBanner.includes(currentPage);
 }
-// Функция для загрузки кастомного баннера
+
 async function loadCustomBanner() {
     if (shouldShowCustomBanner()) {
-        await loadComponent('includes/custom-banner.html', 'footer', 'beforebegin');
+        console.log('Loading custom banner for:', window.location.pathname);
+        await loadComponent('includes/banner.html', 'footer', 'beforebegin');
     }
 }
-// Функция для загрузки и вставки HTML-компонентов
+
 async function loadComponent(componentPath, targetElement, position = 'beforeend') {
     try {
-        // Загружаем HTML-файл компонента
         const response = await fetch(componentPath);
         if (!response.ok) throw new Error(`Ошибка загрузки: ${response.status}`);
         
-        // Получаем текст HTML
         const html = await response.text();
-        
-        // Вставляем HTML в указанное место
         const target = document.querySelector(targetElement);
+        
         if (target) {
             target.insertAdjacentHTML(position, html);
             return true;
@@ -66,7 +64,6 @@ async function loadComponent(componentPath, targetElement, position = 'beforeend
     }
 }
 
-// Инициализация мобильного меню 
 function initMobileMenu() {
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navMenu = document.querySelector('.nav');
@@ -84,46 +81,22 @@ function initMobileMenu() {
     }
 }
 
-//  Инициализация баннера внимания
-function initAttentionBanner() {
-    const closeBtn = document.querySelector('.attention-banner__close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            const banner = this.closest('.attention-banner');
-            if (banner) {
-                banner.style.display = 'none';
-                localStorage.setItem('attentionBannerClosed', 'true');
-            }
-        });
-    }
-    
-    if (localStorage.getItem('attentionBannerClosed') === 'true') {
-        const banner = document.querySelector('.attention-banner');
-        if (banner) banner.style.display = 'none';
-    }
-}
-// Глобальная функция для загрузки баннера
 window.loadPageBanner = async function() {
-    await loadComponent('includes/custom-banner.html', 'footer', 'beforebegin');
+    if (shouldShowCustomBanner()) {
+        await loadComponent('includes/banner.html', 'footer', 'beforebegin');
+    }
 };
-// Основная функция загрузки компонентов
+
 async function loadAllComponents() {
     try {
-        // Загружаем хедер
+        // Загружаем основные компоненты
         await loadComponent('header.html', 'body', 'afterbegin');
         initMobileMenu();
         
-        // Убеждаемся, что page-header существует
+        // Устанавливаем заголовок страницы если нужно
         if (!document.querySelector('.page-header')) {
             setPageHeader('');
         }
-        
-        // Загружаем баннер внимания
-        await loadComponent('includes/banner.html', 'body', 'beforeend');
-        initAttentionBanner();
-        
-        // Загружаем кастомный баннер (если нужно)
-        await loadCustomBanner();
         
         // Загружаем футер
         await loadComponent('footer.html', 'body');
@@ -131,12 +104,15 @@ async function loadAllComponents() {
         // Загружаем кнопку помощи
         await loadComponent('includes/help-button.html', 'body');
         
+        // Загружаем кастомный баннер (только на указанных страницах)
+        await loadCustomBanner();
+        
     } catch (error) {
         console.error('Ошибка при загрузке компонентов:', error);
     }
 }
 
-// Запускаем загрузку компонентов при полной загрузке DOM
+// Автоматическая загрузка при готовности DOM
 document.addEventListener('DOMContentLoaded', () => {
     loadAllComponents();
 });
