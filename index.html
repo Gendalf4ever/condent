@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
     <head>
         <meta charset="utf-8">
@@ -7,48 +6,53 @@
         <title>CODENT.PRO - CAD/CAM системы для профессионалов</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-         <link rel="stylesheet" href="css/style.css">
-        </head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
     <body>
-
        <!-- основной контент -->
-       
-            <div class="content-main">
-                <div class="content-item">CO[D]ENT - лучшее цифровое оборудование CO[D]ENT - это лучшее цифровое оборудование и материалы, персонально адаптируемое под ваши цели</div>
-                <p></p>
-                <p>CO[D]ENT - это поддержка и обучение по всем направлениям цифровой стоматологии:</p>
-                <ul class="content-main-list">
-                    <li>3D моделирование</li>
-                    <li>Навигационная хирургия</li>
-                    <li>Моделирование элайнеров</li>
-                </ul>
-                <p>CO[D]ENT - это оптимизация CAM-процессов, таких как печать и фрезеровка. Глубокое знание технологий позволит получать качественный и стабильный результат.</p>
-                <p>CO[D]ENT - лучшее оборудование для интроорального и лабораторного сканирования! А наши специалисты смогут интегрировать цифровые процессы в вашу ежедневную практику</p>
-            </div>
+       <div class="content-main">
+           <div class="content-item">CO[D]ENT - лучшее цифровое оборудование CO[D]ENT - это лучшее цифровое оборудование и материалы, персонально адаптируемое под ваши цели</div>
+           <p></p>
+           <p>CO[D]ENT - это поддержка и обучение по всем направлениям цифровой стоматологии:</p>
+           <ul class="content-main-list">
+               <li>3D моделирование</li>
+               <li>Навигационная хирургия</li>
+               <li>Моделирование элайнеров</li>
+           </ul>
+           <p>CO[D]ENT - это оптимизация CAM-процессов, таких как печать и фрезеровка.</p>
+           <p>CO[D]ENT - лучшее оборудование для интроорального и лабораторного сканирования!</p>
+       </div>
 
-            <div class="codent-slogan">
-                <p>Выходите за собственные рамки с CO[D]ENT. А мы обеспечим настройку и сервис Ваших цифровых протоколов </p>
-            </div>
-       
-   
-    <script>
-        // Мобильное меню
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('.nav').classList.toggle('active');
-        });
-        
-        // Закрытие меню при клике вне его области
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.nav') && !e.target.closest('.mobile-menu-btn')) {
-                document.querySelector('.nav').classList.remove('active');
-            }
-        });
-    </script>
-        <!--Футер + хедер-->
-         <script src="js/load-components.js"></script>
-             <script>
-        loadComponent('includes/help-button.html', 'body');
-    </script>
+       <div class="codent-slogan">
+           <p>Выходите за собственные рамки с CO[D]ENT. А мы обеспечим настройку и сервис Ваших цифровых протоколов</p>
+       </div>
+
+       <!-- Подключаем скрипты -->
+       <script src="js/load-components.js"></script>
+       <script>
+           // Ждем загрузки всех компонентов
+           document.addEventListener('DOMContentLoaded', () => {
+               // Инициализация мобильного меню после загрузки хедера
+               const initMenu = setInterval(() => {
+                   const menuBtn = document.querySelector('.mobile-menu-btn');
+                   const navMenu = document.querySelector('.nav');
+                   
+                   if (menuBtn && navMenu) {
+                       clearInterval(initMenu);
+                       
+                       menuBtn.addEventListener('click', () => {
+                           navMenu.classList.toggle('active');
+                       });
+                       
+                       document.addEventListener('click', (e) => {
+                           if (!e.target.closest('.nav') && !e.target.closest('.mobile-menu-btn')) {
+                               navMenu.classList.remove('active');
+                           }
+                       });
+                   }
+               }, 100);
+           });
+       </script>
     </body>
-</html> 
+</html>
