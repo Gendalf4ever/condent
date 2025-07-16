@@ -1,14 +1,18 @@
-/**
- * CO[D]ENT - Components Loader v3.1
- * - Упрощённая система баннеров
- * - Логотип компании в начале баннера
- * - Чёткое разделение элементов
- */
+const CONFIG = {
+  paths: {
+    components: {
+      header: 'header.html',
+      footer: 'footer.html',
+      helpButton: 'includes/help-button.html',
+      attentionBanner: 'includes/attention-banner.html'
+    },
+    content: 'content/' // Папка со статьями
+  },
+  blogContainerId: 'article-container' // ID контейнера для статей
+};
 
-// ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
 window.setPageHeader = function(title) {
-  const header = document.getElementById('dynamic-page-header');
-  if (!header) {
+  const header = document.getElementById('dynamic-page-header') || 
     document.body.insertAdjacentHTML('afterbegin', `
       <section class="page-header" id="dynamic-page-header">
         <div class="page-header__container">
@@ -16,10 +20,9 @@ window.setPageHeader = function(title) {
         </div>
       </section>
     `);
-  } else {
-    const titleElement = header.querySelector('.page-header__title');
-    if (titleElement) titleElement.textContent = title;
-  }
+  
+  const titleElement = header.querySelector?.('.page-header__title');
+  if (titleElement) titleElement.textContent = title;
 };
 
 window.loadComponent = async function(componentPath, targetSelector = 'body', position = 'beforeend') {
@@ -31,7 +34,7 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
     const target = document.querySelector(targetSelector);
     
     if (!target) {
-      console.warn(`Target "${targetSelector}" not found for ${componentPath}`);
+      console.warn(`Target "${targetSelector}" not found`);
       return false;
     }
     
@@ -43,93 +46,109 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
   }
 };
 
-// ==================== СИСТЕМА БАННЕРОВ ====================
-const BannerSystem = {
-  config: {
-    attention: {
-      path: 'includes/attention-banner.html',
-      target: 'body',
-      position: 'beforeend',
-      storageKey: 'attentionBannerClosed'
-    },
-    custom: {
-      path: 'includes/company-banner.html', // Переименовано для ясности
-      target: 'main', // Лучше вставлять в main
-      position: 'beforeend',
-      pages: [
-        '3d-printers.html',
-        '3d-scaners.html',
-        'photo-polymers.html',
-        'post-obrabotka.html',
-        '3d-consumables.html',
-        'milling.html',
-        'frezy.html',
-        'sinterising.html',
-        'zirkon.html',
-        'compressors.html'
-      ]
+window.loadArticle = async function(articleName) {
+  try {
+    const articlePath = `${CONFIG.paths.content}${articleName}.html`;
+    const response = await fetch(articlePath);
+    
+    if (!response.ok) {
+      showBlogListing();
+      throw new Error(`Article not found: ${articleName}`);
     }
-  },
+    
+    const content = await response.text();
+    const container = document.getElementById(CONFIG.blogContainerId);
+    
+    if (container) {
+      container.innerHTML = content;
+      document.title = `${articleName} | Блог CO[D]ENT`;
+      return true;
+    }
+    
+    throw new Error('Article container not found');
+  } catch (error) {
+    console.error('Article load error:', error);
+    return false;
+  }
+};
 
+function showBlogListing() {
+  const container = document.getElementById(CONFIG.blogContainerId);
+  if (container) {
+    container.innerHTML = `
+      <div class="blog-listing">
+        <h2>Статьи блога</h2>
+        <ul>
+          <li><a href="korea.html">Постобработка полимерной печати, что это и  с чем едят</a></li>
+                    <li><a href="korea.html">Корея как бренд</a></li>
+                    <li><a href="korea.html"> 3D принтер в окно</a></li>
+                    <li><a href="korea.html">Продайте мне 3D принтер</a></li>
+                    <li><a href="korea.html">Чье имя на бирке моих трусов?</a></li>
+        </ul>
+      </div>
+    `;
+  }
+}
+
+const BannerSystem = {
   async loadAttentionBanner() {
-    if (localStorage.getItem(this.config.attention.storageKey)) return;
-
-    const { path, target, position } = this.config.attention;
-    const loaded = await loadComponent(path, target, position);
+    if (localStorage.getItem('attentionBannerClosed')) return;
+    
+    const loaded = await loadComponent(
+      CONFIG.paths.attentionBanner, 
+      'body', 
+      'beforeend'
+    );
     
     if (loaded) {
       const banner = document.querySelector('.attention-banner');
       if (banner) {
         banner.style.display = 'block';
-        this.initCloseButton(banner, this.config.attention.storageKey);
+        this.initCloseButton(banner);
       }
     }
   },
 
-  async loadCompanyBanner() {
-    if (!this.shouldShowCompanyBanner()) return;
-    
-    const { path, target, position } = this.config.custom;
-    await loadComponent(path, target, position);
-  },
-
-  shouldShowCompanyBanner() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    return this.config.custom.pages.includes(currentPage);
-  },
-
-  initCloseButton(banner, storageKey) {
+  initCloseButton(banner) {
     const closeBtn = banner.querySelector('.attention-banner__close');
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
         banner.style.display = 'none';
-        localStorage.setItem(storageKey, 'true');
+        localStorage.setItem('attentionBannerClosed', 'true');
       });
     }
   }
 };
 
-// ==================== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ ====================
 async function initializePage() {
   try {
-    // 1. Основные компоненты
-    await loadComponent('header.html', 'body', 'afterbegin');
+    // 1. Загрузка основных компонентов
+    await loadComponent(CONFIG.paths.header, 'body', 'afterbegin');
     initMobileMenu();
     
-    // 2. Баннеры
+    // 2. Загрузка баннеров
     await BannerSystem.loadAttentionBanner();
-    await BannerSystem.loadCompanyBanner(); // Переименовано для ясности
     
-    // 3. Футер и дополнительные элементы
-    await loadComponent('footer.html', 'body');
-    await loadComponent('includes/help-button.html', 'body');
+    // 3. Загрузка футера
+    await loadComponent(CONFIG.paths.footer, 'body');
+    
+    // 4. Загрузка кнопки помощи
+    await loadComponent(CONFIG.paths.helpButton, 'body');
+    
+    // 5. Загрузка статьи (если это страница статьи)
+    const articleName = getArticleNameFromUrl();
+    if (articleName) {
+      await loadArticle(articleName);
+    } else if (window.location.pathname.includes('blog.html')) {
+      showBlogListing();
+    }
     
   } catch (error) {
-    console.error('Initialization error:', error);
+    console.error('Initialization failed:', error);
   }
 }
 
-// ==================== МОБИЛЬНОЕ МЕНЮ ====================
+
 function initMobileMenu() {
   const menuBtn = document.querySelector('.mobile-menu-btn');
   const navMenu = document.querySelector('.nav');
@@ -149,9 +168,15 @@ function initMobileMenu() {
   }
 }
 
-// ==================== ЗАПУСК СИСТЕМЫ ====================
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializePage);
-} else {
+function getArticleNameFromUrl() {
+  const path = window.location.pathname.split('/').pop();
+  return path.endsWith('.html') && !['index.html', 'blog.html'].includes(path) 
+    ? path.replace('.html', '') 
+    : null;
+}
+
+if (document.readyState === 'complete') {
   setTimeout(initializePage, 0);
+} else {
+  document.addEventListener('DOMContentLoaded', initializePage);
 }
