@@ -1,3 +1,42 @@
+/* Стили для даты */
+.article-date {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  display: block;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.blog-article-item .article-date {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+}
+
+
+.article-header {
+  margin-bottom: 2rem;
+}
+
+.blog-articles-list {
+  list-style: none;
+  padding: 0;
+}
+
+.blog-article-item {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.article-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-title {
+  margin: 0;
+  color: #2c3e50;
+}
 /* Баннер компании */
 .company-banner {
   background: #f8f9fa;

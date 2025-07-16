@@ -9,26 +9,15 @@
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <!-- Контейнер для статей -->
-        <main class="blog-container" id="article-container">
-            <!-- Содержимое будет загружено динамически -->
-            <div class="blog-placeholder">
-                <h2>Выберите статью из блога</h2>
-                <ul class="blog-articles-list">
-                    <li><a href="korea.html">Постобработка полимерной печати, что это и  с чем едят</a></li>
-                    <li><a href="korea.html">Корея как бренд</a></li>
-                    <li><a href="korea.html"> 3D принтер в окно</a></li>
-                    <li><a href="korea.html">Продайте мне 3D принтер</a></li>
-                    <li><a href="korea.html">Чье имя на бирке моих трусов?</a></li>
-
-                </ul>
-            </div>
-        </main>
+        <!-- Контейнер будет заполнен автоматически -->
+        <main class="blog-container" id="article-container"></main>
 
         <script src="js/load-components.js"></script>
         <script>
-            setPageHeader('Блог');
-            loadComponent('includes/help-button.html', 'body');
+            document.addEventListener('DOMContentLoaded', () => {
+                setPageHeader('Блог');
+                loadComponent('includes/help-button.html', 'body');
+            });
         </script>
     </body>
 </html>
