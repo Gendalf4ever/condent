@@ -1,3 +1,64 @@
+/*Стили реквизитов*/
+.company-details {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin: 20px 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.company-details__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  background-color: #e9ecef;
+}
+
+.company-details__title {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.company-details__toggle {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.company-details__toggle i {
+  color: #333;
+}
+
+.company-details__content {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 15px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.company-details.expanded .company-details__content {
+  max-height: 500px;
+  padding: 15px;
+}
+
+.company-details.expanded .company-details__toggle i {
+  transform: rotate(45deg);
+}
+
+.company-details__item {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.company-details__item:last-child {
+  margin-bottom: 0;
+}
 /* Стили для даты */
 .article-date {
   color: #7f8c8d;
