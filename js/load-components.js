@@ -1,10 +1,3 @@
-/**
- * CO[D]ENT - Components Loader v3.4
- * - Универсальная система загрузки компонентов
- * - Автоматическая загрузка реквизитов на странице контактов
- * - Поддержка блога и баннеров
- */
-
 const CONFIG = {
   basePath: '/',
   paths: {
@@ -13,28 +6,28 @@ const CONFIG = {
       footer: 'footer.html',
       helpButton: 'includes/help-button.html',
       attentionBanner: 'includes/attention-banner.html',
-      companyDetails: 'includes/company-details.html'
+      companyDetails: 'includes/company-details.html',
+      relatedArticles: 'includes/related-articles.html',
+      testMeButton: 'includes/test-me-button.html'
     },
     content: 'content/'
   },
   blog: {
     containerId: 'article-container',
+    relatedCount: 3,
     articles: [
-      { id: 'what_is_post_processing', title: 'Постобработка полимерной печати', date: '25.08.2023' },
-      { id: 'korea', title: 'Корея как бренд', date: '26.01.2023' },
-      { id: '3D-printed-in-window', title: '3D принтер в окно', date: '19.01.2023' },
-      { id: 'sell_me_3d_printer', title: 'Продайте мне 3D принтер', date: '12.01.2023' },
-      { id: 'name_on_my_underwear', title: 'Чье имя на бирке моих трусов?', date: '05.01.2023' }
+      { id: 'what_is_post_processing', title: 'Постобработка полимерной печати', date: '25.08.2023', tags: ['3D-печать', 'технологии'] },
+      { id: 'korea', title: 'Корея как бренд', date: '26.01.2023', tags: ['брендинг', 'аналитика'] },
+      { id: '3D-printed-in-window', title: '3D принтер в окно', date: '19.01.2023', tags: ['3D-печать', 'оборудование'] },
+      { id: 'sell_me_3d_printer', title: 'Продайте мне 3D принтер', date: '12.01.2023', tags: ['оборудование', 'советы'] },
+      { id: 'name_on_my_underwear', title: 'Чье имя на бирке моих трусов?', date: '05.01.2023', tags: ['аналитика', 'брендинг'] }
     ]
   }
 };
 
-// ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
 
-// Установка заголовка страницы
 window.setPageHeader = function(title) {
-  let header = document.getElementById('dynamic-page-header');
-  if (!header) {
+  const header = document.getElementById('dynamic-page-header') || 
     document.body.insertAdjacentHTML('afterbegin', `
       <section class="page-header" id="dynamic-page-header">
         <div class="page-header__container">
@@ -42,13 +35,11 @@ window.setPageHeader = function(title) {
         </div>
       </section>
     `);
-    header = document.getElementById('dynamic-page-header');
-  }
+  
   const titleElement = header.querySelector('.page-header__title');
   if (titleElement) titleElement.textContent = title;
 };
 
-// Загрузка компонента
 window.loadComponent = async function(componentPath, targetSelector = 'body', position = 'beforeend') {
   try {
     const response = await fetch(`${CONFIG.basePath}${componentPath}`);
@@ -69,43 +60,51 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
   }
 };
 
-// ==================== СИСТЕМА РЕКВИЗИТОВ ====================
 
-const CompanyDetails = {
+const TestMeButton = {
   async load() {
     if (!this.shouldLoad()) return false;
     
     const loaded = await loadComponent(
-      CONFIG.paths.components.companyDetails,
-      '.footer-contacts-container',
+      CONFIG.paths.components.testMeButton,
+      'body',
       'beforeend'
     );
     
-    if (loaded) this.initToggle();
+    if (loaded) this.initButton();
     return loaded;
   },
 
   shouldLoad() {
-    return window.location.pathname.includes('contacts.html');
+    return window.location.pathname.includes('printers-set.html');
   },
 
-  initToggle() {
-    const details = document.querySelector('.company-details');
-    if (!details) return;
-
-    const toggleBtn = details.querySelector('.company-details__toggle');
-    if (!toggleBtn) return;
-
-    toggleBtn.addEventListener('click', () => {
-      details.classList.toggle('expanded');
-      const icon = toggleBtn.querySelector('i');
-      icon.classList.toggle('fa-plus');
-      icon.classList.toggle('fa-minus');
-    });
+  initButton() {
+    const button = document.querySelector('.test-button');
+    if (button) {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Здесь будет открытие pdf файла
+        console.log('Красная тестовая кнопка нажата!');
+      });
+    }
   }
 };
 
-// ==================== СИСТЕМА БАННЕРОВ ====================
+
+const CompanyDetails = {
+  async load() {
+    if (!this.shouldLoad()) return false;
+    return await loadComponent(
+      CONFIG.paths.components.companyDetails,
+      '.footer-contacts-container'
+    );
+  },
+
+  shouldLoad() {
+    return window.location.pathname.includes('contacts.html');
+  }
+};
 
 const BannerSystem = {
   async loadAttentionBanner() {
@@ -113,10 +112,9 @@ const BannerSystem = {
     
     const loaded = await loadComponent(
       CONFIG.paths.components.attentionBanner,
-      'body',
-      'beforeend'
+      'body'
     );
-    
+
     if (loaded) {
       const banner = document.querySelector('.attention-banner');
       if (banner) {
@@ -138,8 +136,6 @@ const BannerSystem = {
   }
 };
 
-// ==================== СИСТЕМА БЛОГА ====================
-
 window.loadArticle = async function(articleId) {
   try {
     const article = CONFIG.blog.articles.find(a => a.id === articleId);
@@ -159,9 +155,11 @@ window.loadArticle = async function(articleId) {
             <time class="article-date">${article.date}</time>
           </header>
           <div class="article-content">${content}</div>
+          <div class="related-articles-container"></div>
         </article>
       `;
       document.title = `${article.title} | Блог CO[D]ENT`;
+      await RelatedArticles.load(articleId);
       return true;
     }
     throw new Error('Article container not found');
@@ -172,26 +170,72 @@ window.loadArticle = async function(articleId) {
   }
 };
 
+const RelatedArticles = {
+  async load(currentArticleId) {
+    const related = this.getRelatedArticles(currentArticleId);
+    if (related.length === 0) return;
+
+    const container = document.querySelector('.related-articles-container');
+    if (!container) return;
+
+    await loadComponent(CONFIG.paths.components.relatedArticles, container);
+    this.renderArticles(related);
+  },
+
+  getRelatedArticles(currentArticleId) {
+    return CONFIG.blog.articles
+      .filter(article => article.id !== currentArticleId)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, CONFIG.blog.relatedCount);
+  },
+
+  renderArticles(articles) {
+    const container = document.querySelector('.related-articles');
+    if (!container) return;
+
+    container.innerHTML = `
+      <h3 class="related-title">Смотрите также</h3>
+      <div class="related-articles-grid">
+        ${articles.map(article => `
+          <article class="related-article">
+            <h4><a href="blog.html?article=${article.id}" class="related-link">${article.title}</a></h4>
+            <time class="related-date">${article.date}</time>
+          </article>
+        `).join('')}
+      </div>
+    `;
+    this.initLinks();
+  },
+
+  initLinks() {
+    document.querySelectorAll('.related-link').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const articleId = new URL(link.href).searchParams.get('article');
+        history.pushState({ articleId }, '', `blog.html?article=${articleId}`);
+        await loadArticle(articleId);
+      });
+    });
+  }
+};
+
 function showBlogListing() {
   const container = document.getElementById(CONFIG.blog.containerId);
   if (!container) return;
-  
+
   container.innerHTML = `
     <div class="blog-listing">
-      <h2>Статьи блога</h2>
-      <ul class="blog-articles-list">
+      <h2>Все статьи</h2>
+      <div class="articles-grid">
         ${CONFIG.blog.articles.map(article => `
-          <li class="blog-article-item">
-            <a href="blog.html?article=${article.id}" class="article-link">
-              <h3 class="article-title">${article.title}</h3>
-              <time class="article-date">${article.date}</time>
-            </a>
-          </li>
+          <article class="article-card">
+            <h3><a href="blog.html?article=${article.id}" class="article-link">${article.title}</a></h3>
+            <time class="article-date">${article.date}</time>
+          </article>
         `).join('')}
-      </ul>
+      </div>
     </div>
   `;
-  document.title = 'Блог CO[D]ENT';
   setupArticleLinks();
 }
 
@@ -205,8 +249,6 @@ function setupArticleLinks() {
     });
   });
 }
-
-// ==================== МОБИЛЬНОЕ МЕНЮ ====================
 
 function initMobileMenu() {
   const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -227,7 +269,6 @@ function initMobileMenu() {
   }
 }
 
-// ==================== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ ====================
 
 async function initializePage() {
   try {
@@ -238,24 +279,23 @@ async function initializePage() {
     // 2. Баннеры
     await BannerSystem.loadAttentionBanner();
     
-    // 3. Футер и доп. элементы
+    // 3. Футер и кнопка помощи
     await loadComponent(CONFIG.paths.components.footer, 'body');
     await loadComponent(CONFIG.paths.components.helpButton, 'body');
     
-    // 4. Реквизиты (только для контактов)
+    // 4. Специальные компоненты
     await CompanyDetails.load();
+    await TestMeButton.load();
     
-    // 5. Блог (если требуется)
+    // 5. Обработка блога
     if (window.location.pathname.includes('blog.html')) {
       const articleId = new URL(window.location.href).searchParams.get('article');
       articleId ? await loadArticle(articleId) : showBlogListing();
     }
   } catch (error) {
-    console.error('Initialization error:', error);
+    console.error('Initialization failed:', error);
   }
 }
-
-// ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
 
 window.addEventListener('popstate', () => {
   if (window.location.pathname.includes('blog.html')) {
@@ -263,8 +303,6 @@ window.addEventListener('popstate', () => {
     articleId ? loadArticle(articleId) : showBlogListing();
   }
 });
-
-// ==================== ЗАПУСК СИСТЕМЫ ====================
 
 if (document.readyState === 'complete') {
   setTimeout(initializePage, 0);
