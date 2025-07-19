@@ -8,7 +8,9 @@ const CONFIG = {
       attentionBanner: 'includes/attention-banner.html',
       companyDetails: 'includes/company-details.html',
       relatedArticles: 'includes/related-articles.html',
-      testMeButton: 'includes/test-me-button.html'
+      testMeButton: 'includes/test-me-button.html',
+      postProccessingTable: 'includes/tables/post-processing-table.html',
+      printersSetTable: 'includes/tables/printers-set-table.html'
     },
     content: 'content/'
   },
