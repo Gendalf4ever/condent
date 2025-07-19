@@ -1,3 +1,23 @@
+/*Стили для таблицы в  printers-set.htmlы*/
+.printers-set-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 30px 0;
+                font-size: 0.9em;
+            }
+            .printers-set-table th, 
+            .printers-set-table td {
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+            .printers-set-table th {
+                background-color: #f5f5f5;
+                font-weight: bold;
+            }
+            .printers-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
 /*Стили для кнопки just test me*/
 .test-button-container {
   position: fixed;
