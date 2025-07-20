@@ -10,7 +10,8 @@ const CONFIG = {
       relatedArticles: 'includes/related-articles.html',
       testMeButton: 'includes/test-me-button.html',
       mighty8kTable: 'includes/tables/phrozen-sonic-mighty8k.html',
-      mini8kTable: 'includes/tables/phrozen-sonic-mini8k.html'
+      mini8kTable: 'includes/tables/phrozen-sonic-mini8k.html',
+      postProcessingTable: 'includes/tables/post-processing-table.html'
     },
     content: 'content/'
   },
@@ -90,7 +91,6 @@ const TestMeButton = {
   }
 };
 
-
 const PrinterTables = {
   async load() {
     if (!this.shouldLoad()) return false;
@@ -124,6 +124,27 @@ const CompanyDetails = {
   }
 };
 
+const PostProcessingTable = {
+  async load() {
+    if (!this.shouldLoad()) return false;
+    
+    try {
+      await loadComponent(
+        CONFIG.paths.components.postProcessingTable,
+        '.post-processing-content table.post-processing-table',
+        'afterend'
+      );
+      return true;
+    } catch (error) {
+      console.error('Ошибка загрузки таблицы постобработки:', error);
+      return false;
+    }
+  },
+
+  shouldLoad() {
+    return window.location.pathname.includes('post-processing.html');
+  }
+};
 
 const BannerSystem = {
   async loadAttentionBanner() {
@@ -154,7 +175,6 @@ const BannerSystem = {
     }
   }
 };
-
 
 window.loadArticle = async function(articleId) {
   try {
@@ -289,7 +309,6 @@ function initMobileMenu() {
   }
 }
 
-
 async function initializePage() {
   try {
     // 1. Основные компоненты
@@ -307,6 +326,7 @@ async function initializePage() {
     await CompanyDetails.load();
     await TestMeButton.load();
     await PrinterTables.load();
+    await PostProcessingTable.load();
     
     // 5. Обработка блога
     if (window.location.pathname.includes('blog.html')) {
@@ -318,15 +338,12 @@ async function initializePage() {
   }
 }
 
-
 window.addEventListener('popstate', () => {
   if (window.location.pathname.includes('blog.html')) {
     const articleId = new URL(window.location.href).searchParams.get('article');
     articleId ? loadArticle(articleId) : showBlogListing();
   }
 });
-
-
 
 if (document.readyState === 'complete') {
   setTimeout(initializePage, 0);
