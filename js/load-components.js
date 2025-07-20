@@ -9,8 +9,8 @@ const CONFIG = {
       companyDetails: 'includes/company-details.html',
       relatedArticles: 'includes/related-articles.html',
       testMeButton: 'includes/test-me-button.html',
-      postProccessingTable: 'includes/tables/post-processing-table.html',
-      printersSetTable: 'includes/tables/printers-set-table.html'
+      mighty8kTable: 'includes/tables/phrozen-sonic-mighty8k.html',
+      mini8kTable: 'includes/tables/phrozen-sonic-mini8k.html'
     },
     content: 'content/'
   },
@@ -26,7 +26,6 @@ const CONFIG = {
     ]
   }
 };
-
 
 window.setPageHeader = function(title) {
   const header = document.getElementById('dynamic-page-header') || 
@@ -62,7 +61,6 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
   }
 };
 
-
 const TestMeButton = {
   async load() {
     if (!this.shouldLoad()) return false;
@@ -86,13 +84,31 @@ const TestMeButton = {
     if (button) {
       button.addEventListener('click', (e) => {
         e.preventDefault();
-        // Здесь будет открытие pdf файла
-        console.log('Красная тестовая кнопка нажата!');
+        console.log('Тестовая кнопка нажата');
       });
     }
   }
 };
 
+
+const PrinterTables = {
+  async load() {
+    if (!this.shouldLoad()) return false;
+    
+    try {
+      await loadComponent(CONFIG.paths.components.mighty8kTable, '#mighty8k-table');
+      await loadComponent(CONFIG.paths.components.mini8kTable, '#mini8k-table');
+      return true;
+    } catch (error) {
+      console.error('Ошибка загрузки таблиц:', error);
+      return false;
+    }
+  },
+
+  shouldLoad() {
+    return window.location.pathname.includes('printers-set.html');
+  }
+};
 
 const CompanyDetails = {
   async load() {
@@ -107,6 +123,7 @@ const CompanyDetails = {
     return window.location.pathname.includes('contacts.html');
   }
 };
+
 
 const BannerSystem = {
   async loadAttentionBanner() {
@@ -137,6 +154,7 @@ const BannerSystem = {
     }
   }
 };
+
 
 window.loadArticle = async function(articleId) {
   try {
@@ -288,6 +306,7 @@ async function initializePage() {
     // 4. Специальные компоненты
     await CompanyDetails.load();
     await TestMeButton.load();
+    await PrinterTables.load();
     
     // 5. Обработка блога
     if (window.location.pathname.includes('blog.html')) {
@@ -299,12 +318,15 @@ async function initializePage() {
   }
 }
 
+
 window.addEventListener('popstate', () => {
   if (window.location.pathname.includes('blog.html')) {
     const articleId = new URL(window.location.href).searchParams.get('article');
     articleId ? loadArticle(articleId) : showBlogListing();
   }
 });
+
+
 
 if (document.readyState === 'complete') {
   setTimeout(initializePage, 0);
