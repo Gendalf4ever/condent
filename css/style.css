@@ -303,45 +303,53 @@
 }
 
  /*настройки главной страницы*/
- .content-item{
-            margin-bottom: 12px;
-            position: relative;
-            padding-left: 2.5em;
-            text-indent: -1.5em;
- }
- .codent-slogan{
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #7f8c8d 100%)!important;
-    color: white!important; 
-    padding: 30px;
-    text-align: center;
-    margin: 40px 0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 80%; 
-    max-width: 1000px; 
-    min-width: 300px;
-    height: auto; 
-    min-height: 150px;
- }
- .codent-slogan p {
-    margin: 0;
-    font-size: 1.5em;
-    line-height: 1.6;
-    font-weight: 300;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+ /* Основные стили для хедера и контента */
+:root {
+  --header-height: 80px; /* Будет обновлено JS */
 }
 
-
-.content-main{
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 30px 20px;
-    line-height: 1.6;
-    color: #333;
-    counter-reset: section;
+.body {
+  padding: 0;
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
+
+/* Хедер должен быть фиксированным или иметь правильные отступы */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Основной контент */
+.main-content-wrapper {
+  padding-top: var(--header-height); /*Отступ перед хедером*/
+  min-height: calc(100vh - var(--header-height) - 100px); /* 100px - примерная высота футера */
+}
+
+.content-main {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Мобильные стили */
+@media (max-width: 768px) {
+  .content-main {
+    padding: 1rem;
+    margin-top: 60px; /* Меньший отступ для мобильных */
+  }
+  
+  :root {
+    --header-height: 60px;
+  }
+}
+
 
  /* настройки конфиденциальности (страница privacy) */
         .privacy-policy {

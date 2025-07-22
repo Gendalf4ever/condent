@@ -11,13 +11,101 @@
     </head>
     <body>
        <!-- основной контент -->
-        <!-- pre release -->
+        <!
        <div class="content-main">
            <div class="content-item">CO[D]ENT - лучшее цифровое оборудование CO[D]ENT - это лучшее цифровое оборудование и материалы, персонально адаптируемое под ваши цели</div>
            <p></p>
            <p>CO[D]ENT - это поддержка и обучение по всем направлениям цифровой стоматологии:</p>
            <ul class="content-main-list">
-               <li>3D моделирование</li>
+    <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>CODENT.PRO - CAD/CAM системы для профессионалов</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <style>
+            /* Временные стили (лучше перенести в style.css) */
+            .content-main {
+                padding: 2rem;
+                margin-top: 80px; /* Отступ под хедер */
+                max-width: 1200px;
+                margin-left: auto;
+                margin-right: auto;
+                line-height: 1.6;
+            }
+            
+            .content-main-list {
+                margin: 1rem 0;
+                padding-left: 2rem;
+            }
+            
+            .content-main-list li {
+                margin-bottom: 0.5rem;
+            }
+            
+            .codent-slogan {
+                background-color: #f5f5f5;
+                padding: 2rem;
+                text-align: center;
+                font-style: italic;
+                margin: 2rem 0;
+                font-size: 1.2rem;
+            }
+        </style>
+    </head>
+    <body>
+       <!-- Хедер будет загружен динамически -->
+       
+       <!-- основной контент -->
+       <main class="main-content-wrapper">
+           <div class="content-main">
+               <div class="content-item">CO[D]ENT - лучшее цифровое оборудование CO[D]ENT - это лучшее цифровое оборудование и материалы, персонально адаптируемое под ваши цели</div>
+               <p>CO[D]ENT - это поддержка и обучение по всем направлениям цифровой стоматологии:</p>
+               <ul class="content-main-list">
+                   <li>3D моделирование</li>
+                   <li>Навигационная хирургия</li>
+                   <li>Моделирование элайнеров</li>
+               </ul>
+               <p>CO[D]ENT - это оптимизация CAM-процессов, таких как печать и фрезеровка.</p>
+               <p>CO[D]ENT - лучшее оборудование для интроорального и лабораторного сканирования!</p>
+           </div>
+
+           <div class="codent-slogan">
+               <p>Выходите за собственные рамки с CO[D]ENT. А мы обеспечим настройку и сервис Ваших цифровых протоколов</p>
+           </div>
+       </main>
+
+       <!-- Футер будет загружен динамически -->
+       
+       <!-- Подключаем скрипты -->
+       <script src="js/load-components.js"></script>
+       <script>
+           // Упрощенная инициализация - вся логика теперь в load-components.js
+           document.addEventListener('DOMContentLoaded', () => {
+               // Установка заголовка
+               if (typeof setPageHeader === 'function') {
+                   setPageHeader('CAD/CAM системы для профессионалов', 'Лучшее цифровое оборудование');
+               }
+               
+               // Добавляем отступ при загрузке хедера
+               const checkHeader = setInterval(() => {
+                   const header = document.querySelector('header');
+                   if (header) {
+                       clearInterval(checkHeader);
+                       document.documentElement.style.setProperty(
+                           '--header-height', 
+                           `${header.offsetHeight}px`
+                       );
+                   }
+               }, 100);
+           });
+       </script>
+    </body>
+</html>           <li>3D моделирование</li>
                <li>Навигационная хирургия</li>
                <li>Моделирование элайнеров</li>
            </ul>
