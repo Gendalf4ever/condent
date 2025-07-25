@@ -1,5 +1,12 @@
 const CONFIG = {
-  basePath: '/',
+  basePath: (function() {
+    if (window.location.hostname.includes('github.io')) {
+      const repoName = window.location.pathname.split('/')[1];
+      return repoName ? `/${repoName}/` : '/';
+    }
+    return '/';
+  })(),
+  
   paths: {
     components: {
       header: 'header.html',
@@ -15,6 +22,7 @@ const CONFIG = {
     },
     content: 'content/'
   },
+  
   blog: {
     containerId: 'article-container',
     relatedCount: 3,
@@ -28,26 +36,55 @@ const CONFIG = {
   }
 };
 
-window.setPageHeader = function(title) {
-  const header = document.getElementById('dynamic-page-header') || 
+window.setPageHeader = function(title, subtitle = '') {
+  let header = document.getElementById('dynamic-page-header');
+  
+  if (!header) {
     document.body.insertAdjacentHTML('afterbegin', `
       <section class="page-header" id="dynamic-page-header">
         <div class="page-header__container">
           <h1 class="page-header__title">${title}</h1>
+          ${subtitle ? `<p class="page-header__subtitle">${subtitle}</p>` : ''}
         </div>
       </section>
     `);
+    header = document.getElementById('dynamic-page-header');
+  }
   
   const titleElement = header.querySelector('.page-header__title');
   if (titleElement) titleElement.textContent = title;
+  
+  const subtitleElement = header.querySelector('.page-header__subtitle');
+  if (subtitleElement && subtitle) {
+    subtitleElement.textContent = subtitle;
+  }
 };
+
+const componentCache = new Map();
 
 window.loadComponent = async function(componentPath, targetSelector = 'body', position = 'beforeend') {
   try {
-    const response = await fetch(`${CONFIG.basePath}${componentPath}`);
+    const fullPath = `${CONFIG.basePath}${componentPath}`.replace(/([^:]\/)\/+/g, '$1');
+    
+    if (componentCache.has(fullPath)) {
+      const html = componentCache.get(fullPath);
+      return insertHtml(html, targetSelector, position);
+    }
+    
+    const response = await fetch(fullPath);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const html = await response.text();
+    componentCache.set(fullPath, html);
+    
+    return insertHtml(html, targetSelector, position);
+    
+  } catch (error) {
+    console.error(`Failed to load ${componentPath}:`, error);
+    return false;
+  }
+  
+  function insertHtml(html, targetSelector, position) {
     const target = document.querySelector(targetSelector);
     if (!target) {
       console.warn(`Target "${targetSelector}" not found`);
@@ -56,9 +93,6 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
     
     target.insertAdjacentHTML(position, html);
     return true;
-  } catch (error) {
-    console.error(`Failed to load ${componentPath}:`, error);
-    return false;
   }
 };
 
@@ -72,7 +106,10 @@ const TestMeButton = {
       'beforeend'
     );
     
-    if (loaded) this.initButton();
+    if (loaded) {
+      this.initModal();
+      this.initButton();
+    }
     return loaded;
   },
 
@@ -80,14 +117,48 @@ const TestMeButton = {
     return window.location.pathname.includes('printers-set.html');
   },
 
+  initModal() {
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="drive-modal" id="driveModal">
+        <div class="drive-modal-content">
+          <span class="drive-modal-close">&times;</span>
+          <iframe src="https://drive.google.com/file/d/1hOyFB8BwHky61gXlMITJrkhBdacrU7OB/preview" 
+                  frameborder="0" 
+                  allowfullscreen
+                  class="drive-iframe"></iframe>
+        </div>
+      </div>
+    `);
+    
+    const modal = document.getElementById('driveModal');
+    const closeBtn = modal.querySelector('.drive-modal-close');
+    
+    closeBtn.addEventListener('click', () => this.closeModal());
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) this.closeModal();
+    });
+  },
+
   initButton() {
     const button = document.querySelector('.test-button');
     if (button) {
       button.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('Тестовая кнопка нажата');
+        this.openModal();
       });
     }
+  },
+
+  openModal() {
+    const modal = document.getElementById('driveModal');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  },
+
+  closeModal() {
+    const modal = document.getElementById('driveModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
   }
 };
 
@@ -96,8 +167,10 @@ const PrinterTables = {
     if (!this.shouldLoad()) return false;
     
     try {
-      await loadComponent(CONFIG.paths.components.mighty8kTable, '#mighty8k-table');
-      await loadComponent(CONFIG.paths.components.mini8kTable, '#mini8k-table');
+      await Promise.all([
+        loadComponent(CONFIG.paths.components.mighty8kTable, '#mighty8k-table'),
+        loadComponent(CONFIG.paths.components.mini8kTable, '#mini8k-table')
+      ]);
       return true;
     } catch (error) {
       console.error('Ошибка загрузки таблиц:', error);
@@ -152,7 +225,8 @@ const BannerSystem = {
     
     const loaded = await loadComponent(
       CONFIG.paths.components.attentionBanner,
-      'body'
+      'body',
+      'afterbegin'
     );
 
     if (loaded) {
@@ -223,9 +297,16 @@ const RelatedArticles = {
   },
 
   getRelatedArticles(currentArticleId) {
+    const currentArticle = CONFIG.blog.articles.find(a => a.id === currentArticleId);
+    const currentTags = currentArticle?.tags || [];
+    
     return CONFIG.blog.articles
       .filter(article => article.id !== currentArticleId)
-      .sort(() => 0.5 - Math.random())
+      .sort((a, b) => {
+        const aCommonTags = a.tags.filter(tag => currentTags.includes(tag)).length;
+        const bCommonTags = b.tags.filter(tag => currentTags.includes(tag)).length;
+        return bCommonTags - aCommonTags || Math.random() - 0.5;
+      })
       .slice(0, CONFIG.blog.relatedCount);
   },
 
@@ -240,6 +321,9 @@ const RelatedArticles = {
           <article class="related-article">
             <h4><a href="blog.html?article=${article.id}" class="related-link">${article.title}</a></h4>
             <time class="related-date">${article.date}</time>
+            <div class="article-tags">
+              ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
           </article>
         `).join('')}
       </div>
@@ -254,6 +338,7 @@ const RelatedArticles = {
         const articleId = new URL(link.href).searchParams.get('article');
         history.pushState({ articleId }, '', `blog.html?article=${articleId}`);
         await loadArticle(articleId);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
   }
@@ -271,6 +356,9 @@ function showBlogListing() {
           <article class="article-card">
             <h3><a href="blog.html?article=${article.id}" class="article-link">${article.title}</a></h3>
             <time class="article-date">${article.date}</time>
+            <div class="article-tags">
+              ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
           </article>
         `).join('')}
       </div>
@@ -286,6 +374,7 @@ function setupArticleLinks() {
       const articleId = new URL(link.href).searchParams.get('article');
       history.pushState({ articleId }, '', `blog.html?article=${articleId}`);
       await loadArticle(articleId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
 }
@@ -295,15 +384,18 @@ function initMobileMenu() {
   const navMenu = document.querySelector('.nav');
   
   if (menuBtn && navMenu) {
-    menuBtn.addEventListener('click', () => {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       navMenu.classList.toggle('active');
       document.body.classList.toggle('no-scroll');
+      menuBtn.classList.toggle('active');
     });
     
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.nav') && !e.target.closest('.mobile-menu-btn')) {
+      if (!e.target.closest('.nav') && navMenu.classList.contains('active')) {
         navMenu.classList.remove('active');
         document.body.classList.remove('no-scroll');
+        menuBtn?.classList.remove('active');
       }
     });
   }
@@ -312,27 +404,33 @@ function initMobileMenu() {
 async function initializePage() {
   try {
     // 1. Основные компоненты
-    await loadComponent(CONFIG.paths.components.header, 'body', 'afterbegin');
+    await Promise.all([
+      loadComponent(CONFIG.paths.components.header, 'body', 'afterbegin'),
+      loadComponent(CONFIG.paths.components.footer, 'body', 'beforeend'),
+      loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend')
+    ]);
+    
     initMobileMenu();
     
     // 2. Баннеры
     await BannerSystem.loadAttentionBanner();
     
-    // 3. Футер и кнопка помощи
-    await loadComponent(CONFIG.paths.components.footer, 'body');
-    await loadComponent(CONFIG.paths.components.helpButton, 'body');
+    // 3. Специальные компоненты
+    await Promise.all([
+      CompanyDetails.load(),
+      TestMeButton.load(),
+      PrinterTables.load(),
+      PostProcessingTable.load()
+    ]);
     
-    // 4. Специальные компоненты
-    await CompanyDetails.load();
-    await TestMeButton.load();
-    await PrinterTables.load();
-    await PostProcessingTable.load();
-    
-    // 5. Обработка блога
+    // 4. Обработка блога
     if (window.location.pathname.includes('blog.html')) {
       const articleId = new URL(window.location.href).searchParams.get('article');
       articleId ? await loadArticle(articleId) : showBlogListing();
     }
+    
+    document.documentElement.classList.add('page-loaded');
+    
   } catch (error) {
     console.error('Initialization failed:', error);
   }
