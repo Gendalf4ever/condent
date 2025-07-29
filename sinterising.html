@@ -1,21 +1,155 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>CODENT - Печи для синтеризации</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="css/style.css">
-    </head>
-    <body> 
-            <div class="sheet-container">
-        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS97tQq9UW9U-355W9yq-kpOAyzm0dgH99R-NZSOBvM3acCk4hYgjCkD3fb_wkRUc93GOQaZ4cFX2Qq/pubhtml?gid=26528899&single=true&widget=false&headers=false&chrome=false"></iframe>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CODENT - 3D принтеры</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/catalog.css">
+</head>
+<body>
+    <div id="page-header" class="page-header">Загрузка...</div>
+    <div id="products-container" class="products-grid">
+        <div class="loading">Загружаем каталог печей для синтеризации...</div>
     </div>
-          <script src="js/load-components.js"></script>
-          <script>
-    setPageHeader('Печи для синтеризации');
-    loadComponent('includes/help-button.html', 'body');
-  </script>
-    </body>
+    
+    <script src="js/load-components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Устанавливаем заголовок страницы
+            document.getElementById('page-header').textContent = 'Печи для синтеризации';
+            
+            // Загружаем дополнительные компоненты
+            loadComponent('includes/help-button.html', 'body');
+            
+            // Загрузка данных из Google Sheets
+            loadProducts();
+        });
+        
+        function loadProducts() {
+            const container = document.getElementById('products-container');
+            
+            // Показываем состояние загрузки
+            container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
+            
+            // URL  Google таблицы в CSV формате
+            const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS97tQq9UW9U-355W9yq-kpOAyzm0dgH99R-NZSOBvM3acCk4hYgjCkD3fb_wkRUc93GOQaZ4cFX2Qq/pub?output=csv';
+            
+            fetch(sheetUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка сети: ' + response.status);
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('Получены CSV данные:', data);
+                    const products = parseCSV(data);
+
+                    if (products.length > 0) {
+                        renderProducts(products);
+                    } else {
+                        throw new Error('Таблица пуста или формат данных неверный');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки:', error);
+                    showError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
+                });
+        }
+        
+        function parseCSV(csvText) {
+            // Удаляем BOM символ если есть
+            if (csvText.charCodeAt(0) === 0xFEFF) {
+                csvText = csvText.substring(1);
+            }
+            
+            const lines = csvText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            if (lines.length < 2) return []; // Нужна как минимум строка заголовков и одна строка данных
+            
+            // Получаем заголовки и приводим к lowercase
+            const headers = lines[0].split(',')
+                .map(header => header.trim().toLowerCase());
+            
+            const products = [];
+            
+            // Обрабатываем строки данных
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const product = {};
+                
+                // Сопоставляем значения с заголовками
+                for (let j = 0; j < headers.length; j++) {
+                    if (j < values.length) {
+                        product[headers[j]] = values[j].trim();
+                    } else {
+                        product[headers[j]] = '';
+                    }
+                }
+                
+                // Добавляем только если есть название и цена
+                if (product['наименование'] && product['цена']) {
+                    products.push(product);
+                }
+            }
+            
+            console.log('Распарсенные товары:', products);
+            return products;
+        }
+        
+        function renderProducts(products) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            products.forEach(product => {
+                const name = product['наименование'] || 'Без названия';
+                let price = product['цена'] || '';
+                const promoPrice = product['акционная цена'] || '';
+                
+                // Очищаем цену от лишних символов
+                price = price.replace(/[^0-9]/g, '');
+                if (price) price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
+                
+                // Создаем карточку товара
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                // Формируем HTML для цены (если есть акционная)
+                let priceHtml = '';
+                if (promoPrice) {
+                    const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
+                    priceHtml = `
+                        <div class="product-price">
+                            <span class="product-old-price">${price}</span>
+                            ${parseInt(cleanPromoPrice).toLocaleString('ru-RU')} ₽
+                        </div>
+                    `;
+                } else if (price) {
+                    priceHtml = `<div class="product-price">${price}</div>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="product-name">${name}</div>
+                    ${priceHtml}
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            // Если ничего не добавили
+            if (container.children.length === 0) {
+                showError('Нет товаров для отображения');
+            }
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('products-container');
+
+            container.innerHTML = `<div class="error">${message}</div>`;
+        }
+    </script>
+</body>
 </html>
