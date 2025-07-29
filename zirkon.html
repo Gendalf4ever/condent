@@ -2,15 +2,15 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>CODENT - 3D принтеры</title>
-    <meta name="description" content="">
+    <title>CODENT - Циркониевые диски</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
+    <!-- Подключаем конфиг -->
+    <script src="js/sheet-config.js"></script>
 </head>
 <body>
-    <div id="page-header" class="page-header">Загрузка...</div>
+    <div id="page-header" class="page-header"></div>
     <div id="products-container" class="products-grid">
         <div class="loading">Загружаем каталог циркониевых дисков...</div>
     </div>
@@ -18,8 +18,8 @@
     <script src="js/load-components.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Устанавливаем заголовок страницы
-            document.getElementById('page-header').textContent = 'Циркониевые диски';
+            // Устанавливаем заголовок страницы через конфиг
+            window.sheetConfig.setPageTitle();
             
             // Загружаем дополнительные компоненты
             loadComponent('includes/help-button.html', 'body');
@@ -30,12 +30,11 @@
         
         function loadProducts() {
             const container = document.getElementById('products-container');
-            
-            // Показываем состояние загрузки
             container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
             
-            // URL  Google таблицы в CSV формате
-            const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS97tQq9UW9U-355W9yq-kpOAyzm0dgH99R-NZSOBvM3acCk4hYgjCkD3fb_wkRUc93GOQaZ4cFX2Qq/pub?output=csv';
+            // Получаем URL из конфига (автоматически подставится gid=1680226557)
+            const sheetUrl = window.sheetConfig.getExportUrl();
+            console.log('Загружаем данные по URL:', sheetUrl);
             
             fetch(sheetUrl)
                 .then(response => {
@@ -43,13 +42,14 @@
                     return response.text();
                 })
                 .then(data => {
-                    console.log('Получены CSV данные:', data);
+                    console.log('Получены сырые данные:', data);
                     const products = parseCSV(data);
-
+                    console.log('Распарсенные товары:', products);
+                    
                     if (products.length > 0) {
                         renderProducts(products);
                     } else {
-                        throw new Error('Таблица пуста или формат данных неверный');
+                        showError('Нет товаров для отображения. Проверьте данные в таблице.');
                     }
                 })
                 .catch(error => {
@@ -68,35 +68,34 @@
                 .map(line => line.trim())
                 .filter(line => line.length > 0);
             
-            if (lines.length < 2) return []; // Нужна как минимум строка заголовков и одна строка данных
+            if (lines.length < 2) return [];
             
-            // Получаем заголовки и приводим к lowercase
+            // Обрабатываем заголовки
             const headers = lines[0].split(',')
-                .map(header => header.trim().toLowerCase());
+                .map(header => header.trim().toLowerCase().replace(/"/g, ''));
             
             const products = [];
             
             // Обрабатываем строки данных
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',');
-                const product = {};
+                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+                    .map(val => val.trim().replace(/^"(.*)"$/, '$1'));
                 
-                // Сопоставляем значения с заголовками
+                const product = {};
+                let hasData = false;
+                
                 for (let j = 0; j < headers.length; j++) {
-                    if (j < values.length) {
-                        product[headers[j]] = values[j].trim();
-                    } else {
-                        product[headers[j]] = '';
-                    }
+                    const value = j < values.length ? values[j] : '';
+                    product[headers[j]] = value;
+                    if (value) hasData = true;
                 }
                 
-                // Добавляем только если есть название и цена
-                if (product['наименование'] && product['цена']) {
+                // Добавляем товар, если есть название
+                if (hasData && product['наименование']) {
                     products.push(product);
                 }
             }
             
-            console.log('Распарсенные товары:', products);
             return products;
         }
         
@@ -107,30 +106,38 @@
             products.forEach(product => {
                 const name = product['наименование'] || 'Без названия';
                 let price = product['цена'] || '';
-                const promoPrice = product['акционная цена'] || '';
+                const promoPrice = product['аукционная цена'] || product['акционная цена'] || '';
                 
-                // Очищаем цену от лишних символов
-                price = price.replace(/[^0-9]/g, '');
-                if (price) price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
+                // Форматируем цену
+                let priceHtml = '';
+                if (price) {
+                    price = price.replace(/[^0-9]/g, '');
+                    if (price) {
+                        price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
+                        
+                        if (promoPrice) {
+                            const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
+                            if (cleanPromoPrice) {
+                                priceHtml = `
+                                    <div class="product-price">
+                                        <span class="product-old-price">${price}</span>
+                                        ${parseInt(cleanPromoPrice).toLocaleString('ru-RU')} ₽
+                                    </div>
+                                `;
+                            }
+                        } else {
+                            priceHtml = `<div class="product-price">${price}</div>`;
+                        }
+                    }
+                }
+                
+                if (!priceHtml) {
+                    priceHtml = '<div class="product-price">Цена по запросу</div>';
+                }
                 
                 // Создаем карточку товара
                 const card = document.createElement('div');
                 card.className = 'product-card';
-                
-                // Формируем HTML для цены (если есть акционная)
-                let priceHtml = '';
-                if (promoPrice) {
-                    const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
-                    priceHtml = `
-                        <div class="product-price">
-                            <span class="product-old-price">${price}</span>
-                            ${parseInt(cleanPromoPrice).toLocaleString('ru-RU')} ₽
-                        </div>
-                    `;
-                } else if (price) {
-                    priceHtml = `<div class="product-price">${price}</div>`;
-                }
-                
                 card.innerHTML = `
                     <div class="product-name">${name}</div>
                     ${priceHtml}
@@ -139,7 +146,6 @@
                 container.appendChild(card);
             });
             
-            // Если ничего не добавили
             if (container.children.length === 0) {
                 showError('Нет товаров для отображения');
             }
@@ -147,9 +153,25 @@
         
         function showError(message) {
             const container = document.getElementById('products-container');
-
-            container.innerHTML = `<div class="error">${message}</div>`;
+            container.innerHTML = `
+                <div class="error">${message}</div>
+                <button class="retry-button" onclick="loadProducts()">Попробовать снова</button>
+            `;
         }
     </script>
+    <style>
+        .retry-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .retry-button:hover {
+            background: #3367d6;
+        }
+    </style>
 </body>
 </html>

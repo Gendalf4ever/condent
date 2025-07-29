@@ -28,84 +28,76 @@
             loadProducts();
         });
         
-      function loadProducts() {
-    const container = document.getElementById('products-container');
-    container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
-    
-    // Получаем URL из конфига
-    const sheetUrl = window.sheetConfig.getExportUrl();
-    console.log('Загружаем данные по URL:', sheetUrl); // Отладочное сообщение
-    
-    fetch(sheetUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка сети: ' + response.status);
-            return response.text();
-        })
-        .then(data => {
-            console.log('Получены сырые данные:', data); // Отладочное сообщение
-            const products = parseCSV(data);
-            console.log('Распарсенные товары:', products); // Отладочное сообщение
+        function loadProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
             
-            if (products.length > 0) {
-                renderProducts(products);
-            } else {
-                throw new Error('Таблица пуста или формат данных неверный. Проверьте структуру таблицы.');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка загрузки:', error);
-            showError('Не удалось загрузить данные. Пожалуйста, проверьте консоль для подробностей.');
-        });
-}
-
-function parseCSV(csvText) {
-    // Удаляем BOM символ если есть
-    if (csvText.charCodeAt(0) === 0xFEFF) {
-        csvText = csvText.substring(1);
-    }
-    
-    const lines = csvText.split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
-    
-    if (lines.length < 2) {
-        console.warn('CSV содержит менее 2 строк (заголовок + данные)');
-        return [];
-    }
-    
-    // Улучшенный парсинг заголовков
-    const headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-        .map(header => header.trim().toLowerCase().replace(/"/g, ''));
-    console.log('Заголовки:', headers);
-    
-    const products = [];
-    
-    // Обрабатываем строки данных
-    for (let i = 1; i < lines.length; i++) {
-        try {
-            // Улучшенный парсинг строк с учетом кавычек
-            const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-                .map(val => val.trim().replace(/^"(.*)"$/, '$1'));
+            // Получаем URL из конфига
+            const sheetUrl = window.sheetConfig.getExportUrl();
+            console.log('Загружаем данные по URL:', sheetUrl);
             
-            const product = {};
-            let hasData = false;
-            
-            for (let j = 0; j < headers.length; j++) {
-                const value = j < values.length ? values[j] : '';
-                product[headers[j]] = value;
-                if (value) hasData = true;
-            }
-            
-            if (hasData && product['наименование'] && product['цена']) {
-                products.push(product);
-            }
-        } catch (e) {
-            console.error('Ошибка парсинга строки', i, ':', lines[i], e);
+            fetch(sheetUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка сети: ' + response.status);
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('Получены сырые данные:', data);
+                    const products = parseCSV(data);
+                    console.log('Распарсенные товары:', products);
+                    
+                    if (products.length > 0) {
+                        renderProducts(products);
+                    } else {
+                        showError('Нет товаров для отображения. Проверьте данные в таблице.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки:', error);
+                    showError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
+                });
         }
-    }
-    
-    return products;
-}
+        
+        function parseCSV(csvText) {
+            // Удаляем BOM символ если есть
+            if (csvText.charCodeAt(0) === 0xFEFF) {
+                csvText = csvText.substring(1);
+            }
+            
+            const lines = csvText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            if (lines.length < 2) return [];
+            
+            // Обрабатываем заголовки
+            const headers = lines[0].split(',')
+                .map(header => header.trim().toLowerCase().replace(/"/g, ''));
+            
+            const products = [];
+            
+            // Обрабатываем строки данных
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+                    .map(val => val.trim().replace(/^"(.*)"$/, '$1'));
+                
+                const product = {};
+                let hasData = false;
+                
+                for (let j = 0; j < headers.length; j++) {
+                    const value = j < values.length ? values[j] : '';
+                    product[headers[j]] = value;
+                    if (value) hasData = true;
+                }
+                
+                // Добавляем товар, если есть название
+                if (hasData && product['наименование']) {
+                    products.push(product);
+                }
+            }
+            
+            return products;
+        }
         
         function renderProducts(products) {
             const container = document.getElementById('products-container');
@@ -114,27 +106,38 @@ function parseCSV(csvText) {
             products.forEach(product => {
                 const name = product['наименование'] || 'Без названия';
                 let price = product['цена'] || '';
-                const promoPrice = product['акционная цена'] || '';
+                const promoPrice = product['аукционная цена'] || product['акционная цена'] || '';
                 
-                price = price.replace(/[^0-9]/g, '');
-                if (price) price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
-                
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                
+                // Форматируем цену
                 let priceHtml = '';
-                if (promoPrice) {
-                    const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
-                    priceHtml = `
-                        <div class="product-price">
-                            <span class="product-old-price">${price}</span>
-                            ${parseInt(cleanPromoPrice).toLocaleString('ru-RU')} ₽
-                        </div>
-                    `;
-                } else if (price) {
-                    priceHtml = `<div class="product-price">${price}</div>`;
+                if (price) {
+                    price = price.replace(/[^0-9]/g, '');
+                    if (price) {
+                        price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
+                        
+                        if (promoPrice) {
+                            const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
+                            if (cleanPromoPrice) {
+                                priceHtml = `
+                                    <div class="product-price">
+                                        <span class="product-old-price">${price}</span>
+                                        ${parseInt(cleanPromoPrice).toLocaleString('ru-RU')} ₽
+                                    </div>
+                                `;
+                            }
+                        } else {
+                            priceHtml = `<div class="product-price">${price}</div>`;
+                        }
+                    }
                 }
                 
+                if (!priceHtml) {
+                    priceHtml = '<div class="product-price">Цена по запросу</div>';
+                }
+                
+                // Создаем карточку товара
+                const card = document.createElement('div');
+                card.className = 'product-card';
                 card.innerHTML = `
                     <div class="product-name">${name}</div>
                     ${priceHtml}
@@ -150,8 +153,25 @@ function parseCSV(csvText) {
         
         function showError(message) {
             const container = document.getElementById('products-container');
-            container.innerHTML = `<div class="error">${message}</div>`;
+            container.innerHTML = `
+                <div class="error">${message}</div>
+                <button class="retry-button" onclick="loadProducts()">Попробовать снова</button>
+            `;
         }
     </script>
+    <style>
+        .retry-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .retry-button:hover {
+            background: #3367d6;
+        }
+    </style>
 </body>
 </html>

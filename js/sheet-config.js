@@ -15,7 +15,7 @@ window.sheetConfig = {
       title: '3D принтеры',
       gid: '0'
     },
-    '3d-scanners': {
+    '3d-scaners': {
       title: '3D сканеры',
       gid: '784720976'
     },
@@ -23,7 +23,7 @@ window.sheetConfig = {
       title: 'Пост-обработка',
       gid: '1591086335'
     },
-    'photopolymers': {
+    'photo-polymers': {
       title: 'Фотополимеры',
       gid: '324737883'
     },
