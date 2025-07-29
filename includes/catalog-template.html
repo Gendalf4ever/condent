@@ -1,0 +1,160 @@
+<div class="catalog-container">
+  <div class="catalog-header">
+    <h1 id="catalog-title">Каталог</h1>
+    <button id="refresh-btn" class="refresh-btn">Обновить</button>
+  </div>
+
+  <div id="products-container" class="products-grid">
+    <div class="loading-message">
+      <div class="spinner"></div>
+      <p>Загружаем каталог...</p>
+    </div>
+  </div>
+
+  <div id="error-message" class="error-message" style="display: none;"></div>
+</div>
+
+<style>
+  
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('catalogConfigReady', function(e) {
+      initCatalog(e.detail);
+    });
+  });
+
+  function initCatalog(config) {
+    console.log('Инициализация каталога с конфигом:', config);
+    
+    const catalog = {
+      elements: {
+        container: document.getElementById('products-container'),
+        title: document.getElementById('catalog-title'),
+        error: document.getElementById('error-message')
+      },
+      
+      loadData: async function() {
+        try {
+          this.showLoading(true);
+          
+          const response = await fetch(config.sheetUrl);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          
+          const csvData = await response.text();
+          const products = this.parseCSV(csvData);
+          
+          if (products.length === 0) throw new Error('Нет данных для отображения');
+          
+          this.renderProducts(products);
+        } catch (error) {
+          console.error('Ошибка:', error);
+          this.showError(error.message);
+        } finally {
+          this.showLoading(false);
+        }
+      },
+      
+      parseCSV: function(csvText) {
+        // Удаляем BOM символ если есть
+        if (csvText.charCodeAt(0) === 0xFEFF) {
+          csvText = csvText.substring(1);
+        }
+        
+        const lines = csvText.split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0);
+        
+        if (lines.length < 2) return [];
+        
+        const headers = lines[0].split(',')
+          .map(header => header.trim().toLowerCase());
+        
+        const products = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',');
+          const product = {};
+          
+          for (let j = 0; j < headers.length; j++) {
+            product[headers[j]] = j < values.length ? values[j].trim() : '';
+          }
+          
+          // Добавляем только если есть название и цена
+          if (product['наименование'] && product['цена']) {
+            products.push(product);
+          }
+        }
+        
+        return products;
+      },
+      
+      renderProducts: function(products) {
+        this.elements.container.innerHTML = '';
+        
+        products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          
+          const name = product['наименование'].trim();
+          const price = this.formatPrice(product['цена']);
+          const promoPrice = product['акционная цена'] 
+            ? this.formatPrice(product['акционная цена'])
+            : null;
+          
+          card.innerHTML = `
+            <div class="product-name">${name}</div>
+            <div class="product-price">
+              ${promoPrice ? `
+                <span class="product-old-price">${price} ₽</span>
+                ${promoPrice} ₽
+              ` : `${price} ₽`}
+            </div>
+          `;
+          
+          this.elements.container.appendChild(card);
+        });
+      },
+      
+      formatPrice: function(priceStr) {
+        // Удаляем все нечисловые символы, кроме точки и запятой
+        const cleanStr = priceStr.replace(/[^\d,.]/g, '');
+        const number = parseFloat(cleanStr.replace(',', '.'));
+        
+        // Форматируем с разделением тысяч и добавляем ₽
+        return isNaN(number) ? 'Цена не указана' : 
+          number.toLocaleString('ru-RU');
+      },
+      
+      showLoading: function(show) {
+        const loader = document.querySelector('.loading-message');
+        if (loader) loader.style.display = show ? 'flex' : 'none';
+      },
+      
+      showError: function(message) {
+        this.elements.error.innerHTML = `
+          <p>${message}</p>
+          <button onclick="window.catalog.loadData()">
+            Попробовать снова
+          </button>
+        `;
+        this.elements.error.style.display = 'block';
+      }
+    };
+    
+    // Устанавливаем заголовок
+    if (config.title) {
+      catalog.elements.title.textContent = config.title;
+    }
+    
+    // Назначаем обработчик кнопки обновления
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+      catalog.loadData();
+    });
+    
+    // Загружаем данные и делаем каталог доступным глобально
+    catalog.loadData();
+    window.catalog = catalog;
+  }
+</script>
