@@ -2,24 +2,24 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>CODENT - 3D принтеры</title>
-    <meta name="description" content="">
+    <title>CODENT - Компрессоры</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
+    <!-- Подключаем конфиг -->
+    <script src="js/sheet-config.js"></script>
 </head>
 <body>
-    <div id="page-header" class="page-header">Загрузка...</div>
+    <div id="page-header" class="page-header"></div>
     <div id="products-container" class="products-grid">
-        <div class="loading">Загружаем каталог компрессоров...</div>
+        <div class="loading">Загружаем каталог...</div>
     </div>
     
     <script src="js/load-components.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Устанавливаем заголовок страницы
-            document.getElementById('page-header').textContent = 'Компрессоры';
+            // Устанавливаем заголовок страницы через конфиг
+            window.sheetConfig.setPageTitle();
             
             // Загружаем дополнительные компоненты
             loadComponent('includes/help-button.html', 'body');
@@ -28,77 +28,84 @@
             loadProducts();
         });
         
-        function loadProducts() {
-            const container = document.getElementById('products-container');
+      function loadProducts() {
+    const container = document.getElementById('products-container');
+    container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
+    
+    // Получаем URL из конфига
+    const sheetUrl = window.sheetConfig.getExportUrl();
+    console.log('Загружаем данные по URL:', sheetUrl); // Отладочное сообщение
+    
+    fetch(sheetUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка сети: ' + response.status);
+            return response.text();
+        })
+        .then(data => {
+            console.log('Получены сырые данные:', data); // Отладочное сообщение
+            const products = parseCSV(data);
+            console.log('Распарсенные товары:', products); // Отладочное сообщение
             
-            // Показываем состояние загрузки
-            container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
-            
-            // URL  Google таблицы в CSV формате
-            const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS97tQq9UW9U-355W9yq-kpOAyzm0dgH99R-NZSOBvM3acCk4hYgjCkD3fb_wkRUc93GOQaZ4cFX2Qq/pub?output=csv';
-            
-            fetch(sheetUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error('Ошибка сети: ' + response.status);
-                    return response.text();
-                })
-                .then(data => {
-                    console.log('Получены CSV данные:', data);
-                    const products = parseCSV(data);
+            if (products.length > 0) {
+                renderProducts(products);
+            } else {
+                throw new Error('Таблица пуста или формат данных неверный. Проверьте структуру таблицы.');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки:', error);
+            showError('Не удалось загрузить данные. Пожалуйста, проверьте консоль для подробностей.');
+        });
+}
 
-                    if (products.length > 0) {
-                        renderProducts(products);
-                    } else {
-                        throw new Error('Таблица пуста или формат данных неверный');
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки:', error);
-                    showError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
-                });
-        }
-        
-        function parseCSV(csvText) {
-            // Удаляем BOM символ если есть
-            if (csvText.charCodeAt(0) === 0xFEFF) {
-                csvText = csvText.substring(1);
+function parseCSV(csvText) {
+    // Удаляем BOM символ если есть
+    if (csvText.charCodeAt(0) === 0xFEFF) {
+        csvText = csvText.substring(1);
+    }
+    
+    const lines = csvText.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    
+    if (lines.length < 2) {
+        console.warn('CSV содержит менее 2 строк (заголовок + данные)');
+        return [];
+    }
+    
+    // Улучшенный парсинг заголовков
+    const headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+        .map(header => header.trim().toLowerCase().replace(/"/g, ''));
+    console.log('Заголовки:', headers);
+    
+    const products = [];
+    
+    // Обрабатываем строки данных
+    for (let i = 1; i < lines.length; i++) {
+        try {
+            // Улучшенный парсинг строк с учетом кавычек
+            const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+                .map(val => val.trim().replace(/^"(.*)"$/, '$1'));
+            
+            const product = {};
+            let hasData = false;
+            
+            for (let j = 0; j < headers.length; j++) {
+                const value = j < values.length ? values[j] : '';
+                product[headers[j]] = value;
+                if (value) hasData = true;
             }
             
-            const lines = csvText.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
-            
-            if (lines.length < 2) return []; // Нужна как минимум строка заголовков и одна строка данных
-            
-            // Получаем заголовки и приводим к lowercase
-            const headers = lines[0].split(',')
-                .map(header => header.trim().toLowerCase());
-            
-            const products = [];
-            
-            // Обрабатываем строки данных
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',');
-                const product = {};
-                
-                // Сопоставляем значения с заголовками
-                for (let j = 0; j < headers.length; j++) {
-                    if (j < values.length) {
-                        product[headers[j]] = values[j].trim();
-                    } else {
-                        product[headers[j]] = '';
-                    }
-                }
-                
-                // Добавляем только если есть название и цена
-                if (product['наименование'] && product['цена']) {
-                    products.push(product);
-                }
+            if (hasData && product['наименование'] && product['цена']) {
+                products.push(product);
             }
-            
-            console.log('Распарсенные товары:', products);
-            return products;
+        } catch (e) {
+            console.error('Ошибка парсинга строки', i, ':', lines[i], e);
         }
+    }
+    
+    return products;
+}
         
         function renderProducts(products) {
             const container = document.getElementById('products-container');
@@ -109,15 +116,12 @@
                 let price = product['цена'] || '';
                 const promoPrice = product['акционная цена'] || '';
                 
-                // Очищаем цену от лишних символов
                 price = price.replace(/[^0-9]/g, '');
                 if (price) price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
                 
-                // Создаем карточку товара
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 
-                // Формируем HTML для цены (если есть акционная)
                 let priceHtml = '';
                 if (promoPrice) {
                     const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
@@ -139,7 +143,6 @@
                 container.appendChild(card);
             });
             
-            // Если ничего не добавили
             if (container.children.length === 0) {
                 showError('Нет товаров для отображения');
             }
@@ -147,7 +150,6 @@
         
         function showError(message) {
             const container = document.getElementById('products-container');
-
             container.innerHTML = `<div class="error">${message}</div>`;
         }
     </script>
