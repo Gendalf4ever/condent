@@ -19,7 +19,7 @@ window.sheetConfig = {
       title: '3D сканеры',
       gid: '784720976'
     },
-    'post-processing': {
+    'post-obrabotka': {
       title: 'Пост-обработка',
       gid: '1591086335'
     },

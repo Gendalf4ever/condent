@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>CODENT - Циркониевые диски</title>
+    <title>CODENT - Циркониевых диски</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
@@ -13,6 +13,26 @@
     <div id="page-header" class="page-header"></div>
     <div id="products-container" class="products-grid">
         <div class="loading">Загружаем каталог циркониевых дисков...</div>
+    </div>
+
+    <!-- Модальное окно для описания товара -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modal-product-name"></h2>
+            </div>
+            <div class="modal-body">
+                <div class="product-image-container">
+                    <img id="modal-product-image" class="product-image" src="" alt="">
+                </div>
+                <div class="product-info">
+                    <div class="product-price-container" id="modal-product-price"></div>
+                    <div class="product-description" id="modal-product-description"></div>
+                    <div class="specs-list" id="modal-product-specs"></div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="js/load-components.js"></script>
@@ -26,13 +46,25 @@
             
             // Загрузка данных из Google Sheets
             loadProducts();
+            
+            // Закрытие модального окна
+            document.querySelector('.close-modal').onclick = function() {
+                document.getElementById('productModal').style.display = 'none';
+            }
+            
+            // Закрытие при клике вне окна
+            window.onclick = function(event) {
+                if (event.target == document.getElementById('productModal')) {
+                    document.getElementById('productModal').style.display = 'none';
+                }
+            }
         });
         
         function loadProducts() {
             const container = document.getElementById('products-container');
             container.innerHTML = '<div class="loading">Загружаем данные о товарах...</div>';
             
-            // Получаем URL из конфига (автоматически подставится gid=1680226557)
+            // Получаем URL из конфига (gid=784720976 для 3D сканеров)
             const sheetUrl = window.sheetConfig.getExportUrl();
             console.log('Загружаем данные по URL:', sheetUrl);
             
@@ -64,34 +96,81 @@
                 csvText = csvText.substring(1);
             }
             
-            const lines = csvText.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
+            const lines = [];
+            let currentLine = '';
+            let inQuotes = false;
+            
+            // Обрабатываем текст с учетом многострочных значений в кавычках
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === '\n' && !inQuotes) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                    continue;
+                }
+                
+                currentLine += char;
+            }
+            lines.push(currentLine.trim());
             
             if (lines.length < 2) return [];
             
-            // Обрабатываем заголовки
+            // Получаем заголовки
             const headers = lines[0].split(',')
-                .map(header => header.trim().toLowerCase().replace(/"/g, ''));
+                .map(header => header.trim().toLowerCase());
             
             const products = [];
             
             // Обрабатываем строки данных
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-                    .map(val => val.trim().replace(/^"(.*)"$/, '$1'));
+                const line = lines[i];
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
                 
                 const product = {};
-                let hasData = false;
                 
+                // Сопоставляем значения с заголовками
                 for (let j = 0; j < headers.length; j++) {
-                    const value = j < values.length ? values[j] : '';
-                    product[headers[j]] = value;
-                    if (value) hasData = true;
+                    if (j < values.length) {
+                        let value = values[j];
+                        // Удаляем окружающие кавычки если есть
+                        if (value.startsWith('"') && value.endsWith('"')) {
+                            value = value.slice(1, -1);
+                        }
+                        product[headers[j]] = value;
+                    } else {
+                        product[headers[j]] = '';
+                    }
                 }
                 
-                // Добавляем товар, если есть название
-                if (hasData && product['наименование']) {
+                // Очищаем цену от лишних символов
+                if (product['цена']) {
+                    product['цена'] = product['цена'].replace(/[^0-9]/g, '');
+                }
+                if (product['акционная цена']) {
+                    product['акционная цена'] = product['акционная цена'].replace(/[^0-9]/g, '');
+                }
+                
+                // Добавляем только если есть название и цена
+                if (product['наименование'] && product['цена']) {
                     products.push(product);
                 }
             }
@@ -105,43 +184,50 @@
             
             products.forEach(product => {
                 const name = product['наименование'] || 'Без названия';
-                let price = product['цена'] || '';
-                const promoPrice = product['аукционная цена'] || product['акционная цена'] || '';
+                const price = product['цена'] || '';
+                const promoPrice = product['акционная цена'] || '';
+                const imageUrl = product['изображение'] || '';
                 
                 // Форматируем цену
                 let priceHtml = '';
                 if (price) {
-                    price = price.replace(/[^0-9]/g, '');
-                    if (price) {
-                        price = parseInt(price).toLocaleString('ru-RU') + ' ₽';
-                        
-                        if (promoPrice) {
-                            const cleanPromoPrice = promoPrice.replace(/[^0-9]/g, '');
-                            if (cleanPromoPrice) {
-                                priceHtml = `
-                                    <div class="product-price">
-                                        <span class="product-old-price">${price}</span>
-                                        ${parseInt(cleanPromoPrice).toLocaleString('ru-RU')} ₽
-                                    </div>
-                                `;
-                            }
-                        } else {
-                            priceHtml = `<div class="product-price">${price}</div>`;
-                        }
+                    const formattedPrice = parseInt(price).toLocaleString('ru-RU') + ' ₽';
+                    
+                    if (promoPrice) {
+                        const formattedPromoPrice = parseInt(promoPrice).toLocaleString('ru-RU') + ' ₽';
+                        priceHtml = `
+                            <div class="product-price">
+                                <span class="product-old-price">${formattedPrice}</span>
+                                ${formattedPromoPrice}
+                            </div>
+                        `;
+                    } else {
+                        priceHtml = `<div class="product-price">${formattedPrice}</div>`;
                     }
-                }
-                
-                if (!priceHtml) {
+                } else {
                     priceHtml = '<div class="product-price">Цена по запросу</div>';
                 }
                 
                 // Создаем карточку товара
                 const card = document.createElement('div');
                 card.className = 'product-card';
+                
+                // Добавляем превью изображения если есть
+                let imageHtml = '';
+                if (imageUrl) {
+                    imageHtml = `<img src="${imageUrl}" alt="${name}" class="product-thumbnail" loading="lazy">`;
+                }
+                
                 card.innerHTML = `
+                    ${imageHtml}
                     <div class="product-name">${name}</div>
                     ${priceHtml}
                 `;
+                
+                // Добавляем обработчик клика для открытия модального окна
+                card.addEventListener('click', function() {
+                    openProductModal(product);
+                });
                 
                 container.appendChild(card);
             });
@@ -149,6 +235,81 @@
             if (container.children.length === 0) {
                 showError('Нет товаров для отображения');
             }
+        }
+        
+        function openProductModal(product) {
+            const modal = document.getElementById('productModal');
+            const name = product['наименование'] || 'Без названия';
+            const price = product['цена'] || '';
+            const promoPrice = product['акционная цена'] || '';
+            const description = product['описание'] || 'Описание отсутствует';
+            const imageUrl = product['изображение'] || '';
+            const specsText = product['характеристики'] || '';
+            
+            // Устанавливаем название товара
+            document.getElementById('modal-product-name').textContent = name;
+            
+            // Устанавливаем изображение (если есть)
+            const productImage = document.getElementById('modal-product-image');
+            if (imageUrl) {
+                productImage.src = imageUrl;
+                productImage.alt = name;
+                productImage.style.display = 'block';
+            } else {
+                productImage.style.display = 'none';
+            }
+            
+            // Форматируем и устанавливаем цену
+            const priceContainer = document.getElementById('modal-product-price');
+            if (price) {
+                const formattedPrice = parseInt(price).toLocaleString('ru-RU') + ' ₽';
+                
+                if (promoPrice) {
+                    const formattedPromoPrice = parseInt(promoPrice).toLocaleString('ru-RU') + ' ₽';
+                    priceContainer.innerHTML = `
+                        <div class="product-price">
+                            <span class="product-old-price">${formattedPrice}</span>
+                            ${formattedPromoPrice}
+                        </div>
+                    `;
+                } else {
+                    priceContainer.innerHTML = `<div class="product-price">${formattedPrice}</div>`;
+                }
+            } else {
+                priceContainer.innerHTML = '<div class="product-price">Цена по запросу</div>';
+            }
+            
+            // Устанавливаем описание
+            document.getElementById('modal-product-description').textContent = description;
+            
+            // Парсим и отображаем характеристики
+            const specsContainer = document.getElementById('modal-product-specs');
+            specsContainer.innerHTML = '';
+            
+            if (specsText) {
+                // Разбиваем характеристики по строкам
+                const specs = specsText.split('\n').filter(spec => spec.trim() !== '');
+                
+                specs.forEach(spec => {
+                    // Разделяем название и значение характеристики
+                    const specParts = spec.split(':').map(part => part.trim());
+                    const specName = specParts[0];
+                    const specValue = specParts.slice(1).join(': ');
+                    
+                    if (specName && specValue) {
+                        const specItem = document.createElement('div');
+                        specItem.className = 'spec-item';
+                        specItem.innerHTML = `
+                            <div class="spec-name">${specName}:</div>
+                            <div class="spec-value">${specValue}</div>
+                        `;
+                        specsContainer.appendChild(specItem);
+                    }
+                });
+            }
+            
+            // Показываем модальное окно
+            modal.style.display = 'block';
         }
         
         function showError(message) {
