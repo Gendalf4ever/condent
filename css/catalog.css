@@ -80,3 +80,103 @@
         .retry-button:hover {
             background: #3367d6;
         }
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            overflow-y: auto;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 30px auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .modal-header {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        .modal-body {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .product-image-container {
+            flex: 0 0 40%;
+            padding-right: 20px;
+        }
+        .product-info {
+            flex: 0 0 60%;
+        }
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .product-price-container {
+            margin: 15px 0;
+            font-size: 1.2em;
+        }
+        .product-old-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-right: 10px;
+        }
+        .product-description {
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        .specs-list {
+            margin-top: 20px;
+        }
+        .spec-item {
+            margin-bottom: 8px;
+            display: flex;
+        }
+        .spec-name {
+            font-weight: bold;
+            min-width: 200px;
+        }
+        .spec-value {
+            flex: 1;
+            white-space: pre-line;
+        }
+        
+        /* Адаптация для мобильных */
+        @media (max-width: 768px) {
+            .modal-body {
+                flex-direction: column;
+            }
+            .product-image-container,
+            .product-info {
+                flex: 0 0 100%;
+                padding-right: 0;
+            }
+            .product-image-container {
+                margin-bottom: 20px;
+            }
+            .spec-name {
+                min-width: 150px;
+            }
+        }
