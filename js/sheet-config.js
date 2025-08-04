@@ -71,7 +71,7 @@ window.sheetConfig = {
       .split('/')
       .pop()
       .replace('.html', '')
-      .replace('catalog-', ''); // если у вас URLs вида catalog-3d-printers.html
+      .replace('catalog-', ''); // если URLs вида catalog-3d-printers.html
   },
   
   /**

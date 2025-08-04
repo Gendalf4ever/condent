@@ -3,9 +3,9 @@
     margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
-  }
-  
-  .catalog-header {
+}
+
+.catalog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -14,48 +14,82 @@
     background: #1976d2;
     color: white;
     border-radius: 8px;
-  }
-  
-  .products-grid {
+}
+
+.products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
-  }
-  
-  .product-card {
+}
+
+.product-card {
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 20px;
     transition: all 0.3s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  
-  .product-card:hover {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+}
+
+.product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  }
-  
-  .product-name {
+}
+
+/* Новые стили для изображений товаров */
+.product-image-wrapper {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -20px -20px 15px -20px; /* Вытягиваем на поля карточки */
+    overflow: hidden;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.product-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-thumbnail {
+    transform: scale(1.05);
+}
+
+.product-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
     font-weight: 600;
     margin-bottom: 15px;
     font-size: 1.1em;
     color: #333;
-  }
-  
-  .product-price {
+    flex-grow: 1;
+}
+
+.product-price {
     color: #d32f2f;
     font-size: 1.3em;
     font-weight: 700;
-  }
-  
-  .product-old-price {
+    margin-top: auto; /* Прижимаем цену к низу */
+}
+
+.product-old-price {
     color: #757575;
     text-decoration: line-through;
     margin-right: 10px;
-  }
-  
-  .spinner {
+}
+
+.spinner {
     width: 40px;
     height: 40px;
     border: 4px solid rgba(25, 118, 210, 0.2);
@@ -63,120 +97,167 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 15px;
-  }
-  
-  @keyframes spin {
+}
+
+@keyframes spin {
     to { transform: rotate(360deg); }
-  }
-  .retry-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .retry-button:hover {
-            background: #3367d6;
-        }
-        /* Стили для модального окна */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            overflow-y: auto;
-        }
-        .modal-content {
-            background-color: #fff;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 800px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .close-modal {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        .close-modal:hover {
-            color: #333;
-        }
-        .modal-header {
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-        .modal-body {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .product-image-container {
-            flex: 0 0 40%;
-            padding-right: 20px;
-        }
-        .product-info {
-            flex: 0 0 60%;
-        }
-        .product-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .product-price-container {
-            margin: 15px 0;
-            font-size: 1.2em;
-        }
-        .product-old-price {
-            text-decoration: line-through;
-            color: #999;
-            margin-right: 10px;
-        }
-        .product-description {
-            margin: 20px 0;
-            line-height: 1.6;
-        }
-        .specs-list {
-            margin-top: 20px;
-        }
-        .spec-item {
-            margin-bottom: 8px;
-            display: flex;
-        }
-        .spec-name {
-            font-weight: bold;
-            min-width: 200px;
-        }
-        .spec-value {
-            flex: 1;
-            white-space: pre-line;
-        }
-        
-        /* Адаптация для мобильных */
-        @media (max-width: 768px) {
-            .modal-body {
-                flex-direction: column;
-            }
-            .product-image-container,
-            .product-info {
-                flex: 0 0 100%;
-                padding-right: 0;
-            }
-            .product-image-container {
-                margin-bottom: 20px;
-            }
-            .spec-name {
-                min-width: 150px;
-            }
-        }
+}
+
+.retry-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.retry-button:hover {
+    background: #3367d6;
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.modal-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.modal-body {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.product-image-container {
+    flex: 0 0 40%;
+    padding-right: 20px;
+}
+
+.product-info {
+    flex: 0 0 60%;
+}
+
+.product-image {
+    max-width: 100%;
+    max-height: 400px;
+    height: auto;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 5px;
+    object-fit: contain;
+}
+
+.product-price-container {
+    margin: 15px 0;
+    font-size: 1.2em;
+}
+
+.product-old-price {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 10px;
+}
+
+.product-description {
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+.specs-list {
+    margin-top: 20px;
+}
+
+.spec-item {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.spec-name {
+    font-weight: bold;
+    min-width: 200px;
+}
+
+.spec-value {
+    flex: 1;
+    white-space: pre-line;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .modal-body {
+        flex-direction: column;
+    }
+    
+    .product-image-container,
+    .product-info {
+        flex: 0 0 100%;
+        padding-right: 0;
+    }
+    
+    .product-image-container {
+        margin-bottom: 20px;
+    }
+    
+    .spec-name {
+        min-width: 150px;
+    }
+    
+    .product-image-wrapper {
+        height: 180px;
+    }
+}
+
+/* Дополнительные стили для состояний */
+.loading {
+    text-align: center;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
+
+.error {
+    color: #d32f2f;
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 20px;
+}
