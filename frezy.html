@@ -8,59 +8,7 @@
     <link rel="stylesheet" href="css/catalog.css">
     <script src="js/sheet-config.js"></script>
     <style>
-        /* Стили для параметров фрез */
-        .product-params {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border: 1px solid #eee;
-        }
-        
-        .param-group {
-            margin-bottom: 15px;
-        }
-        
-        .param-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .param-select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background-color: #fff;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        
-        .param-select:focus {
-            border-color: #1976d2;
-            outline: none;
-        }
-        
-        .add-to-cart {
-            display: block;
-            width: 100%;
-            margin-top: 25px;
-            padding: 12px;
-            background: #1976d2;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: background 0.3s;
-        }
-        
-        .add-to-cart:hover {
-            background: #1565c0;
-        }
+       
     </style>
 </head>
 <body>
@@ -90,28 +38,28 @@
                         <div class="param-group">
                             <label class="param-label">Материал:</label>
                             <select class="param-select" id="param-material">
-                                <option value="">Загрузка материалов...</option>
+                                <option value="">Выберите материал...</option>
                             </select>
                         </div>
                         
                         <div class="param-group">
                             <label class="param-label">Тип (T):</label>
                             <select class="param-select" id="param-t">
-                                <option value="">Загрузка типов...</option>
+                                <option value="">Выберите тип...</option>
                             </select>
                         </div>
                         
                         <div class="param-group">
                             <label class="param-label">Наконечник:</label>
                             <select class="param-select" id="param-tip">
-                                <option value="">Загрузка наконечников...</option>
+                                <option value="">Выберите наконечник...</option>
                             </select>
                         </div>
                         
                         <div class="param-group">
                             <label class="param-label">Высота (мм):</label>
                             <select class="param-select" id="param-height">
-                                <option value="">Загрузка высот...</option>
+                                <option value="">Выберите высоту...</option>
                             </select>
                         </div>
                         
@@ -124,7 +72,6 @@
     
     <script src="js/load-components.js"></script>
     <script>
-        // Текущий выбранный продукт
         let currentProduct = null;
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -132,7 +79,6 @@
             loadComponent('includes/help-button.html', 'body');
             loadProducts();
             
-            // Обработчики модального окна
             document.querySelector('.close-modal').onclick = closeModal;
             window.onclick = function(event) {
                 if (event.target == document.getElementById('productModal')) {
@@ -140,7 +86,6 @@
                 }
             };
             
-            // Обработчик кнопки "Добавить в корзину"
             document.querySelector('.add-to-cart').addEventListener('click', addToCart);
         });
         
@@ -208,7 +153,6 @@
                     product[headers[j]] = value;
                 }
                 
-                // Очистка цен
                 if (product['цена']) product['цена'] = product['цена'].replace(/[^0-9]/g, '');
                 if (product['акционная цена']) {
                     product['акционная цена'] = product['акционная цена'].replace(/[^0-9]/g, '');
@@ -254,7 +198,6 @@
                 const promoPrice = product['акционная цена'] || '';
                 const imageUrl = product['изображение'] || '';
                 
-                // Форматирование цены
                 let priceHtml = '';
                 if (price) {
                     const formattedPrice = parseInt(price).toLocaleString('ru-RU') + ' ₽';
@@ -273,7 +216,6 @@
                     priceHtml = '<div class="product-price">Цена по запросу</div>';
                 }
                 
-                // Создание карточки
                 card.innerHTML = `
                     ${imageUrl ? `<img src="${imageUrl}" alt="${name}" class="product-thumbnail" loading="lazy">` : ''}
                     <div class="product-name">${name}</div>
@@ -346,28 +288,43 @@
                 });
             }
             
-            // Заполняем параметры фрезы
-            fillSelect('param-material', product['материалы']);
-            fillSelect('param-t', product['типы t'] || product['типы']);
-            fillSelect('param-tip', product['наконечники']);
-            fillSelect('param-height', product['высоты']);
+            // Заполняем параметры фрезы из вашей структуры данных
+            fillSelectOptions('param-material', product['материал']);
+            fillSelectOptions('param-t', product['т']);
+            fillSelectOptions('param-tip', product['наконечник']);
+            fillSelectOptions('param-height', product['высота(мм)']);
             
-            // Показываем модальное окно
             document.getElementById('productModal').style.display = 'block';
         }
         
-        function fillSelect(selectId, optionsString) {
+        function fillSelectOptions(selectId, optionsString) {
             const select = document.getElementById(selectId);
             select.innerHTML = '<option value="">Выберите...</option>';
             
             if (!optionsString) return;
             
-            optionsString.split(',').map(o => o.trim()).forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option.toLowerCase().replace(/\s+/g, '-');
-                opt.textContent = option;
-                select.appendChild(opt);
-            });
+            // Обработка разных форматов данных для каждого типа параметра
+            let optionsArray;
+            try {
+                optionsArray = optionsString.split(',').map(item => item.trim());
+                
+                // Специальная обработка для числовых значений (высоты)
+                if (selectId === 'param-height') {
+                    optionsArray = optionsArray.sort((a, b) => parseFloat(a) - parseFloat(b));
+                }
+                
+                // Добавляем варианты в select
+                optionsArray.forEach(option => {
+                    if (option) {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option;
+                        optionElement.textContent = option;
+                        select.appendChild(optionElement);
+                    }
+                });
+            } catch (e) {
+                console.error('Ошибка обработки параметров:', e);
+            }
         }
         
         function addToCart() {
@@ -389,8 +346,7 @@
             };
             
             console.log('Добавлено в корзину:', cartItem);
-            // Здесь должна быть ваша логика добавления в корзину
-            // Например: addToCartFunction(cartItem);
+            //логика добавления в корзину
             
             alert(`Фреза "${currentProduct['наименование']}" добавлена в корзину`);
             closeModal();

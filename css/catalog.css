@@ -261,3 +261,56 @@
     grid-column: 1 / -1;
     padding: 20px;
 }
+/*Фрезы*/
+ .product-params {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        .param-group {
+            margin-bottom: 15px;
+        }
+        
+        .param-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .param-select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .param-select:focus {
+            border-color: #1976d2;
+            outline: none;
+        }
+        
+        .add-to-cart {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            background: #1565c0;
+        }
