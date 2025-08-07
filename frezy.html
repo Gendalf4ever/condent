@@ -7,9 +7,6 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
     <script src="js/sheet-config.js"></script>
-    <style>
-       
-    </style>
 </head>
 <body>
     <div id="page-header" class="page-header"></div>
@@ -17,7 +14,15 @@
         <div class="loading">Загружаем каталог фрез...</div>
     </div>
 
-    <!-- Модальное окно с параметрами -->
+    <!-- Кнопка корзины -->
+    <div class="cart-button-container">
+        <button id="cart-button" class="cart-button">
+            <span class="cart-icon">🛒</span>
+            <span id="cart-count" class="cart-count">0</span>
+        </button>
+    </div>
+
+    <!-- Модальное окно товара -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -32,37 +37,11 @@
                     <div class="product-price-container" id="modal-product-price"></div>
                     <div class="product-description" id="modal-product-description"></div>
                     <div class="specs-list" id="modal-product-specs"></div>
-                    
-                    <!-- Блок параметров фрезы -->
                     <div class="product-params">
                         <div class="param-group">
-                            <label class="param-label">Материал:</label>
-                            <select class="param-select" id="param-material">
-                                <option value="">Выберите материал...</option>
-                            </select>
+                            <label class="param-label">Количество:</label>
+                            <input type="number" id="param-quantity" class="param-quantity" min="1" value="1">
                         </div>
-                        
-                        <div class="param-group">
-                            <label class="param-label">Тип (T):</label>
-                            <select class="param-select" id="param-t">
-                                <option value="">Выберите тип...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="param-group">
-                            <label class="param-label">Наконечник:</label>
-                            <select class="param-select" id="param-tip">
-                                <option value="">Выберите наконечник...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="param-group">
-                            <label class="param-label">Высота (мм):</label>
-                            <select class="param-select" id="param-height">
-                                <option value="">Выберите высоту...</option>
-                            </select>
-                        </div>
-                        
                         <button class="add-to-cart">Добавить в корзину</button>
                     </div>
                 </div>
@@ -70,295 +49,29 @@
         </div>
     </div>
     
+    <!-- Модальное окно корзины -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Ваша корзина</h2>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items-container" class="cart-items-container">
+                    <div class="empty-cart-message">Ваша корзина пуста</div>
+                </div>
+                <div class="cart-total">
+                    <div class="total-row">
+                        <span>Итого:</span>
+                        <span id="cart-total-price">0 ₽</span>
+                    </div>
+                    <button id="checkout-button" class="checkout-button">Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="js/load-components.js"></script>
-    <script>
-        let currentProduct = null;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            window.sheetConfig.setPageTitle();
-            loadComponent('includes/help-button.html', 'body');
-            loadProducts();
-            
-            document.querySelector('.close-modal').onclick = closeModal;
-            window.onclick = function(event) {
-                if (event.target == document.getElementById('productModal')) {
-                    closeModal();
-                }
-            };
-            
-            document.querySelector('.add-to-cart').addEventListener('click', addToCart);
-        });
-        
-        function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
-        }
-        
-        function loadProducts() {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '<div class="loading">Загружаем каталог фрез...</div>';
-            
-            const sheetUrl = window.sheetConfig.getExportUrl();
-            console.log('Загружаем данные фрез по URL:', sheetUrl);
-            
-            fetch(sheetUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error('Ошибка загрузки: ' + response.status);
-                    return response.text();
-                })
-                .then(data => {
-                    const products = parseCSV(data);
-                    if (products.length > 0) {
-                        renderProducts(products);
-                    } else {
-                        showError('Нет данных о фрезах. Проверьте таблицу.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                    showError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
-                });
-        }
-        
-        function parseCSV(csvText) {
-            if (csvText.charCodeAt(0) === 0xFEFF) csvText = csvText.substring(1);
-            
-            const lines = [];
-            let currentLine = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === '\n' && !inQuotes) {
-                    lines.push(currentLine.trim());
-                    currentLine = '';
-                    continue;
-                }
-                currentLine += char;
-            }
-            lines.push(currentLine.trim());
-            
-            if (lines.length < 2) return [];
-            
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const products = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseCSVLine(lines[i]);
-                const product = {};
-                
-                for (let j = 0; j < headers.length; j++) {
-                    let value = j < values.length ? values[j] : '';
-                    if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
-                    product[headers[j]] = value;
-                }
-                
-                if (product['цена']) product['цена'] = product['цена'].replace(/[^0-9]/g, '');
-                if (product['акционная цена']) {
-                    product['акционная цена'] = product['акционная цена'].replace(/[^0-9]/g, '');
-                }
-                
-                if (product['наименование'] && product['цена']) {
-                    products.push(product);
-                }
-            }
-            
-            return products;
-        }
-        
-        function parseCSVLine(line) {
-            const values = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let j = 0; j < line.length; j++) {
-                const char = line[j];
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) {
-                    values.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            values.push(current.trim());
-            return values;
-        }
-        
-        function renderProducts(products) {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
-            
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                
-                const name = product['наименование'] || 'Фреза без названия';
-                const price = product['цена'];
-                const promoPrice = product['акционная цена'] || '';
-                const imageUrl = product['изображение'] || '';
-                
-                let priceHtml = '';
-                if (price) {
-                    const formattedPrice = parseInt(price).toLocaleString('ru-RU') + ' ₽';
-                    if (promoPrice) {
-                        const formattedPromoPrice = parseInt(promoPrice).toLocaleString('ru-RU') + ' ₽';
-                        priceHtml = `
-                            <div class="product-price">
-                                <span class="product-old-price">${formattedPrice}</span>
-                                ${formattedPromoPrice}
-                            </div>
-                        `;
-                    } else {
-                        priceHtml = `<div class="product-price">${formattedPrice}</div>`;
-                    }
-                } else {
-                    priceHtml = '<div class="product-price">Цена по запросу</div>';
-                }
-                
-                card.innerHTML = `
-                    ${imageUrl ? `<img src="${imageUrl}" alt="${name}" class="product-thumbnail" loading="lazy">` : ''}
-                    <div class="product-name">${name}</div>
-                    ${priceHtml}
-                `;
-                
-                card.addEventListener('click', () => {
-                    currentProduct = product;
-                    openProductModal(product);
-                });
-                
-                container.appendChild(card);
-            });
-            
-            if (container.children.length === 0) {
-                showError('Нет фрез для отображения');
-            }
-        }
-        
-        function openProductModal(product) {
-            // Основная информация
-            document.getElementById('modal-product-name').textContent = product['наименование'] || 'Фреза без названия';
-            
-            // Изображение
-            const imgElement = document.getElementById('modal-product-image');
-            if (product['изображение']) {
-                imgElement.src = product['изображение'];
-                imgElement.alt = product['наименование'];
-                imgElement.style.display = 'block';
-            } else {
-                imgElement.style.display = 'none';
-            }
-            
-            // Цена
-            const priceContainer = document.getElementById('modal-product-price');
-            if (product['цена']) {
-                const formattedPrice = parseInt(product['цена']).toLocaleString('ru-RU') + ' ₽';
-                if (product['акционная цена']) {
-                    const promoPrice = parseInt(product['акционная цена']).toLocaleString('ru-RU') + ' ₽';
-                    priceContainer.innerHTML = `
-                        <div class="product-price">
-                            <span class="product-old-price">${formattedPrice}</span>
-                            ${promoPrice}
-                        </div>
-                    `;
-                } else {
-                    priceContainer.innerHTML = `<div class="product-price">${formattedPrice}</div>`;
-                }
-            } else {
-                priceContainer.innerHTML = '<div class="product-price">Цена по запросу</div>';
-            }
-            
-            // Описание и характеристики
-            document.getElementById('modal-product-description').textContent = product['описание'] || 'Описание отсутствует';
-            
-            const specsContainer = document.getElementById('modal-product-specs');
-            specsContainer.innerHTML = '';
-            if (product['характеристики']) {
-                product['характеристики'].split('\n').forEach(spec => {
-                    const [name, value] = spec.split(':').map(s => s.trim());
-                    if (name && value) {
-                        const specItem = document.createElement('div');
-                        specItem.className = 'spec-item';
-                        specItem.innerHTML = `
-                            <div class="spec-name">${name}:</div>
-                            <div class="spec-value">${value}</div>
-                        `;
-                        specsContainer.appendChild(specItem);
-                    }
-                });
-            }
-            
-            // Заполняем параметры фрезы из вашей структуры данных
-            fillSelectOptions('param-material', product['материал']);
-            fillSelectOptions('param-t', product['т']);
-            fillSelectOptions('param-tip', product['наконечник']);
-            fillSelectOptions('param-height', product['высота(мм)']);
-            
-            document.getElementById('productModal').style.display = 'block';
-        }
-        
-        function fillSelectOptions(selectId, optionsString) {
-            const select = document.getElementById(selectId);
-            select.innerHTML = '<option value="">Выберите...</option>';
-            
-            if (!optionsString) return;
-            
-            // Обработка разных форматов данных для каждого типа параметра
-            let optionsArray;
-            try {
-                optionsArray = optionsString.split(',').map(item => item.trim());
-                
-                // Специальная обработка для числовых значений (высоты)
-                if (selectId === 'param-height') {
-                    optionsArray = optionsArray.sort((a, b) => parseFloat(a) - parseFloat(b));
-                }
-                
-                // Добавляем варианты в select
-                optionsArray.forEach(option => {
-                    if (option) {
-                        const optionElement = document.createElement('option');
-                        optionElement.value = option;
-                        optionElement.textContent = option;
-                        select.appendChild(optionElement);
-                    }
-                });
-            } catch (e) {
-                console.error('Ошибка обработки параметров:', e);
-            }
-        }
-        
-        function addToCart() {
-            if (!currentProduct) return;
-            
-            const material = document.getElementById('param-material').value;
-            const tType = document.getElementById('param-t').value;
-            const tip = document.getElementById('param-tip').value;
-            const height = document.getElementById('param-height').value;
-            
-            if (!material || !tType || !tip || !height) {
-                alert('Пожалуйста, выберите все параметры фрезы');
-                return;
-            }
-            
-            const cartItem = {
-                product: currentProduct,
-                selectedParams: { material, tType, tip, height }
-            };
-            
-            console.log('Добавлено в корзину:', cartItem);
-            //логика добавления в корзину
-            
-            alert(`Фреза "${currentProduct['наименование']}" добавлена в корзину`);
-            closeModal();
-        }
-        
-        function showError(message) {
-            const container = document.getElementById('products-container');
-            container.innerHTML = `
-                <div class="error">${message}</div>
-                <button class="retry-button" onclick="loadProducts()">Попробовать снова</button>
-            `;
-        }
-    </script>
+    <script src="js/catalog.js"></script>
 </body>
 </html>

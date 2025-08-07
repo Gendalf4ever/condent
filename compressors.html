@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
-    <!-- Подключаем конфиг -->
     <script src="js/sheet-config.js"></script>
 </head>
 <body>
@@ -15,7 +14,15 @@
         <div class="loading">Загружаем каталог компрессоров...</div>
     </div>
 
-    <!-- Модальное окно для описания товара -->
+    <!-- Кнопка корзины -->
+    <div class="cart-button-container">
+        <button id="cart-button" class="cart-button">
+            <span class="cart-icon">🛒</span>
+            <span id="cart-count" class="cart-count">0</span>
+        </button>
+    </div>
+
+    <!-- Модальное окно товара -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -30,287 +37,41 @@
                     <div class="product-price-container" id="modal-product-price"></div>
                     <div class="product-description" id="modal-product-description"></div>
                     <div class="specs-list" id="modal-product-specs"></div>
+                    <div class="product-params">
+                        <div class="param-group">
+                            <label class="param-label">Количество:</label>
+                            <input type="number" id="param-quantity" class="param-quantity" min="1" value="1">
+                        </div>
+                        <button class="add-to-cart">Добавить в корзину</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно корзины -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Ваша корзина</h2>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items-container" class="cart-items-container">
+                    <div class="empty-cart-message">Ваша корзина пуста</div>
+                </div>
+                <div class="cart-total">
+                    <div class="total-row">
+                        <span>Итого:</span>
+                        <span id="cart-total-price">0 ₽</span>
+                    </div>
+                    <button id="checkout-button" class="checkout-button">Оформить заказ</button>
                 </div>
             </div>
         </div>
     </div>
     
     <script src="js/load-components.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Устанавливаем заголовок страницы через конфиг
-            window.sheetConfig.setPageTitle();
-            
-            // Загружаем дополнительные компоненты
-            loadComponent('includes/help-button.html', 'body');
-            
-            // Загрузка данных из Google Sheets
-            loadProducts();
-            
-            // Закрытие модального окна
-            document.querySelector('.close-modal').onclick = function() {
-                document.getElementById('productModal').style.display = 'none';
-            }
-            
-            // Закрытие при клике вне окна
-            window.onclick = function(event) {
-                if (event.target == document.getElementById('productModal')) {
-                    document.getElementById('productModal').style.display = 'none';
-                }
-            }
-        });
-        
-        function loadProducts() {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '<div class="loading">Загружаем данные о компрессорах...</div>';
-            
-            // Получаем URL из конфига (явно указываем 'compressors')
-            const sheetUrl = window.sheetConfig.getExportUrl('compressors');
-            console.log('Загружаем данные компрессоров по URL:', sheetUrl);
-            
-            if (!sheetUrl) {
-                showError('Не удалось определить источник данных для компрессоров');
-                return;
-            }
-            
-            fetch(sheetUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
-                    return response.text();
-                })
-                .then(data => {
-                    console.log('Получены данные компрессоров:', data);
-                    const products = parseCSV(data);
-                    
-                    if (products.length > 0) {
-                        renderProducts(products);
-                    } else {
-                        showError('Нет данных о компрессорах. Проверьте таблицу.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                    showError(`Ошибка загрузки компрессоров: ${error.message}`);
-                });
-        }
-        
-        function parseCSV(csvText) {
-            // Удаляем BOM символ если есть
-            if (csvText.charCodeAt(0) === 0xFEFF) {
-                csvText = csvText.substring(1);
-            }
-            
-            const lines = [];
-            let currentLine = '';
-            let inQuotes = false;
-            
-            // Обрабатываем текст с учетом кавычек
-            for (let i = 0; i < csvText.length; i++) {
-                const char = csvText[i];
-                
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === '\n' && !inQuotes) {
-                    lines.push(currentLine.trim());
-                    currentLine = '';
-                    continue;
-                }
-                
-                currentLine += char;
-            }
-            lines.push(currentLine.trim());
-            
-            if (lines.length < 2) return [];
-            
-            // Получаем заголовки
-            const headers = lines[0].split(',')
-                .map(header => header.trim().toLowerCase().replace(/"/g, ''));
-            
-            const products = [];
-            
-            // Обрабатываем строки данных
-            for (let i = 1; i < lines.length; i++) {
-                const values = [];
-                let current = '';
-                let inQuotes = false;
-                
-                for (let j = 0; j < lines[i].length; j++) {
-                    const char = lines[i][j];
-                    
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        values.push(current.trim().replace(/^"(.*)"$/, '$1'));
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                values.push(current.trim().replace(/^"(.*)"$/, '$1'));
-                
-                const product = {};
-                let hasData = false;
-                
-                for (let j = 0; j < headers.length; j++) {
-                    const value = j < values.length ? values[j] : '';
-                    product[headers[j]] = value;
-                    if (value) hasData = true;
-                }
-                
-                // Очищаем и проверяем цены
-                ['цена', 'акционная цена', 'аукционная цена'].forEach(field => {
-                    if (product[field]) {
-                        product[field] = product[field].replace(/[^0-9]/g, '');
-                    }
-                });
-                
-                // Добавляем товар, если есть название
-                if (hasData && product['наименование']) {
-                    products.push(product);
-                }
-            }
-            
-            return products;
-        }
-        
-        function renderProducts(products) {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
-            
-            products.forEach(product => {
-                const name = product['наименование'] || 'Компрессор без названия';
-                const price = product['цена'];
-                const promoPrice = product['акционная цена'] || product['аукционная цена'] || '';
-                const imageUrl = product['изображение'] || product['фото'] || '';
-                
-                // Форматируем цену
-                let priceHtml = '';
-                if (price) {
-                    const formattedPrice = parseInt(price).toLocaleString('ru-RU') + ' ₽';
-                    
-                    if (promoPrice) {
-                        const formattedPromoPrice = parseInt(promoPrice).toLocaleString('ru-RU') + ' ₽';
-                        priceHtml = `
-                            <div class="product-price">
-                                <span class="product-old-price">${formattedPrice}</span>
-                                ${formattedPromoPrice}
-                            </div>
-                        `;
-                    } else {
-                        priceHtml = `<div class="product-price">${formattedPrice}</div>`;
-                    }
-                } else {
-                    priceHtml = '<div class="product-price">Цена по запросу</div>';
-                }
-                
-                // Создаем карточку товара
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                
-                // Добавляем изображение, если есть
-                let imageHtml = '';
-                if (imageUrl) {
-                    imageHtml = `<img src="${imageUrl}" alt="${name}" class="product-thumbnail" loading="lazy">`;
-                }
-                
-                card.innerHTML = `
-                    ${imageHtml}
-                    <div class="product-name">${name}</div>
-                    ${priceHtml}
-                `;
-                
-                // Добавляем обработчик для модального окна
-                card.addEventListener('click', () => openProductModal(product));
-                
-                container.appendChild(card);
-            });
-            
-            if (container.children.length === 0) {
-                showError('Нет компрессоров для отображения');
-            }
-        }
-        
-        function openProductModal(product) {
-            const modal = document.getElementById('productModal');
-            const name = product['наименование'] || 'Компрессор без названия';
-            const price = product['цена'];
-            const promoPrice = product['акционная цена'] || product['аукционная цена'] || '';
-            const description = product['описание'] || 'Описание отсутствует';
-            const imageUrl = product['изображение'] || product['фото'] || '';
-            const specsText = product['характеристики'] || product['технические характеристики'] || '';
-            
-            // Устанавливаем название
-            document.getElementById('modal-product-name').textContent = name;
-            
-            // Устанавливаем изображение
-            const imgElement = document.getElementById('modal-product-image');
-            if (imageUrl) {
-                imgElement.src = imageUrl;
-                imgElement.alt = name;
-                imgElement.style.display = 'block';
-            } else { 
-                imgElement.style.display = 'none';
-            }
-            
-            // Устанавливаем цену
-            const priceContainer = document.getElementById('modal-product-price');
-            if (price) {
-                const formattedPrice = parseInt(price).toLocaleString('ru-RU') + ' ₽';
-                
-                if (promoPrice) {
-                    const formattedPromoPrice = parseInt(promoPrice).toLocaleString('ru-RU') + ' ₽';
-                    priceContainer.innerHTML = `
-                        <div class="product-price">
-                            <span class="product-old-price">${formattedPrice}</span>
-                            ${formattedPromoPrice}
-                        </div>
-                    `;
-                } else {
-                    priceContainer.innerHTML = `<div class="product-price">${formattedPrice}</div>`;
-                }
-            } else {
-                priceContainer.innerHTML = '<div class="product-price">Цена по запросу</div>';
-            }
-            
-            // Устанавливаем описание
-            document.getElementById('modal-product-description').textContent = description;
-            
-            // Обрабатываем характеристики
-            const specsContainer = document.getElementById('modal-product-specs');
-            specsContainer.innerHTML = '';
-            
-            if (specsText) {
-                const specs = specsText.split('\n')
-                    .map(spec => spec.trim())
-                    .filter(spec => spec.length > 0);
-                
-                specs.forEach(spec => {
-                    const [name, ...valueParts] = spec.split(':');
-                    const value = valueParts.join(':').trim();
-                    
-                    if (name && value) {
-                        const specItem = document.createElement('div');
-                        specItem.className = 'spec-item';
-                        specItem.innerHTML = `
-                            <div class="spec-name">${name.trim()}:</div>
-                            <div class="spec-value">${value}</div>
-                        `;
-                        specsContainer.appendChild(specItem);
-                    }
-                });
-            }
-            
-            // Показываем модальное окно
-            modal.style.display = 'block';
-        }
-        
-        function showError(message) {
-            const container = document.getElementById('products-container');
-            container.innerHTML = `
-                <div class="error">${message}</div>
-                <button class="retry-button" onclick="loadProducts()">Попробовать снова</button>
-            `;
-        }
-    </script>
+    <script src="js/catalog.js"></script>
 </body>
 </html>
