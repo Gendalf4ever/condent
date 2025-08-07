@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Блог</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="css/style.css">
-    </head>
-    <body>
-        <!-- Контейнер будет заполнен автоматически -->
-        <main class="blog-container" id="article-container"></main>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Блог CO[D]ENT</title>
+    <meta name="description" content="Блог о 3D печати и технологиях">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/blog.css">
+</head>
+<body>
+    <div id="page-header" class="page-header"></div>
+    
+    <main class="blog-container" id="article-container">
+        <div class="loading">Загрузка блога...</div>
+    </main>
 
-        <script src="js/load-components.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                setPageHeader('Блог');
-                loadComponent('includes/help-button.html', 'body');
-            });
-        </script>
-    </body>
+    <script src="js/load-components.js"></script>
+    <script src="js/blog.js"></script>
+    <script>
+        // Установка заголовка страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('page-header')) {
+                document.getElementById('page-header').textContent = 'Блог';
+            }
+            loadComponent('includes/help-button.html', 'body');
+        });
+    </script>
+</body>
 </html>
