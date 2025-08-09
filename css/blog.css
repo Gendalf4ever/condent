@@ -250,3 +250,26 @@
   padding: 50px;
   color: #666;
 }
+/* Дополнительные стили для новой структуры */
+.article-subheader {
+  font-size: 1.5em;
+  margin: 25px 0 15px;
+  color: #444;
+  font-weight: 600;
+}
+
+.article-thesis {
+  font-size: 1.2em;
+  line-height: 1.5;
+  margin: 0 0 30px;
+  padding: 15px;
+  background: #f8f8f8;
+  border-left: 4px solid #0066cc;
+}
+
+.article-excerpt {
+  font-size: 1em;
+  margin: 10px 0 15px;
+  line-height: 1.4;
+}
+
