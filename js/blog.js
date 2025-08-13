@@ -9,20 +9,16 @@ const BLOG_CONFIG = {
 let blogArticles = [];
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', () => {
-  initializeBlog();
-});
-
-async function initializeBlog() {
+document.addEventListener('DOMContentLoaded', async () => {
   try {
     await loadBlogData();
-    setupEventDelegation();
+    setupNavigation();
     handleInitialRoute();
   } catch (error) {
     console.error('Initialization error:', error);
-    showError('Failed to initialize blog');
+    showError('Не удалось загрузить блог');
   }
-}
+});
 
 // Загрузка данных
 async function loadBlogData() {
@@ -58,8 +54,8 @@ function handleInitialRoute() {
   }
 }
 
-// Настройка делегирования событий
-function setupEventDelegation() {
+// Настройка навигации
+function setupNavigation() {
   document.addEventListener('click', (e) => {
     // Обработка кликов по карточкам статей
     const card = e.target.closest('.article-card');
@@ -71,22 +67,13 @@ function setupEventDelegation() {
     }
     
     // Обработка кнопки "Назад"
-    if (e.target.matches('.back-button, .back-to-blog')) {
+    if (e.target.matches('.back-button')) {
       e.preventDefault();
       navigateToList();
       return;
     }
-    
-    // Обработка ссылок "Читать"
-    const readLink = e.target.closest('a[href^="blog.html?id="]');
-    if (readLink) {
-      e.preventDefault();
-      const articleId = new URL(readLink.href).searchParams.get('id');
-      navigateToArticle(articleId);
-    }
   });
   
-  // Обработка навигации по истории
   window.addEventListener('popstate', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const articleId = urlParams.get('id');
@@ -115,7 +102,7 @@ function navigateToList() {
 function showArticle(articleId, shouldPushState = true) {
   const article = blogArticles.find(a => a.id === articleId);
   if (!article) {
-    showError('Article not found');
+    showError('Статья не найдена');
     return showArticleList();
   }
   
@@ -128,23 +115,27 @@ function showArticle(articleId, shouldPushState = true) {
         <img src="${article.url || BLOG_CONFIG.defaultImage}" 
              alt="${escapeHtml(article.название)}" 
              class="article-image">
-        <h1>${escapeHtml(article.название)}</h1>
-        <time class="article-date">${formatDate(article.дата)}</time>
+        <div class="article-meta">
+          <h1>${escapeHtml(article.название)}</h1>
+          <time class="article-date">${formatDate(article.дата)}</time>
+        </div>
       </header>
       
-      ${article.заголовок ? `<h2 class="article-subtitle">${escapeHtml(article.заголовок)}</h2>` : ''}
-      
-      ${article.тезис ? `<div class="article-thesis"><strong>${escapeHtml(article.тезис)}</strong></div>` : ''}
-      
-      <div class="article-content">
-        ${formatContent(article.контент)}
+      <div class="article-body">
+        ${article.заголовок ? `<h2 class="article-subtitle">${escapeHtml(article.заголовок)}</h2>` : ''}
+        
+        <div class="article-content">
+          ${formatContent(article.контент)}
+        </div>
+        
+        <div class="article-footer">
+          <a href="blog.html" class="back-button">← Вернуться к списку статей</a>
+        </div>
       </div>
-      
-      <a href="blog.html" class="back-button">← Back to list</a>
     </article>
   `;
   
-  document.title = `${article.название} | Blog`;
+  document.title = `${article.название} | Блог CO[D]ENT`;
   
   if (shouldPushState) {
     history.pushState({}, '', `blog.html?id=${articleId}`);
@@ -157,7 +148,7 @@ function showArticle(articleId, shouldPushState = true) {
   if (img) {
     img.onerror = () => {
       img.src = BLOG_CONFIG.defaultImage;
-      img.onerror = null; // Убираем обработчик, чтобы избежать рекурсии
+      img.onerror = null;
     };
   }
 }
@@ -168,24 +159,28 @@ function showArticleList(shouldPushState = true) {
   if (!container) return;
   
   if (!blogArticles.length) {
-    container.innerHTML = '<div class="no-articles">No articles available</div>';
+    container.innerHTML = '<div class="no-articles">Нет доступных статей</div>';
     return;
   }
   
   container.innerHTML = `
     <div class="blog-listing">
-      <h1>Blog</h1>
+      <h1 class="blog-title">Блог CO[D]ENT</h1>
       <div class="articles-grid">
         ${blogArticles.map(article => `
           <article class="article-card" data-id="${article.id}">
-            <img src="${article.url || BLOG_CONFIG.defaultImage}" 
-                 alt="${escapeHtml(article.название)}" 
-                 class="card-image">
+            <div class="card-image-container">
+              <img src="${article.url || BLOG_CONFIG.defaultImage}" 
+                   alt="${escapeHtml(article.название)}" 
+                   class="card-image">
+            </div>
             <div class="card-content">
-              <h2>${escapeHtml(article.название)}</h2>
-              <time class="article-date">${formatDate(article.дата)}</time>
-              ${article.тезис ? `<p class="card-thesis"><strong>${escapeHtml(article.тезис)}</strong></p>` : ''}
-              <a href="blog.html?id=${article.id}" class="read-more">Read →</a>
+              <h2 class="card-title">${escapeHtml(article.название)}</h2>
+              <time class="card-date">${formatDate(article.дата)}</time>
+              <div class="card-excerpt">
+                ${article.тезис ? `<p><strong>${escapeHtml(article.тезис)}</strong></p>` : ''}
+              </div>
+              <a href="blog.html?id=${article.id}" class="read-more">Читать статью →</a>
             </div>
           </article>
         `).join('')}
@@ -193,7 +188,7 @@ function showArticleList(shouldPushState = true) {
     </div>
   `;
   
-  document.title = 'Blog';
+  document.title = 'Блог CO[D]ENT';
   
   if (shouldPushState && window.location.search) {
     history.pushState({}, '', 'blog.html');
@@ -203,7 +198,7 @@ function showArticleList(shouldPushState = true) {
   document.querySelectorAll('.card-image').forEach(img => {
     img.onerror = () => {
       img.src = BLOG_CONFIG.defaultImage;
-      img.onerror = null; // Убираем обработчик
+      img.onerror = null;
     };
   });
 }
@@ -273,7 +268,7 @@ function formatDate(dateString) {
 }
 
 function formatContent(text) {
-  if (!text) return '';
+  if (!text) return '<p>Нет содержимого</p>';
   return escapeHtml(text)
     .split('\n')
     .map(p => p.trim() ? `<p>${p}</p>` : '')
@@ -292,7 +287,7 @@ function showError(message) {
     container.innerHTML = `
       <div class="error-message">
         <p>${message}</p>
-        <button onclick="showArticleList()">Back to list</button>
+        <button class="error-button" onclick="showArticleList()">Вернуться к списку</button>
       </div>
     `;
   }
