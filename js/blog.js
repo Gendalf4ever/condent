@@ -1,14 +1,11 @@
-// Конфигурация блога
 const BLOG_CONFIG = {
-  sheetId: '1Hxmx_tznE64ifvKON4-waL6x7BYQ7plf1nWta5nsMlI',
-  sheetName: 'blog',
   containerId: 'article-container',
-  defaultImage: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPk5vIGltYWdlPC90ZXh0Pjwvc3ZnPg=='
+  modalId: 'articleModal',
+  defaultImage: 'data:image/svg+xml;base64,...' // ваш base64
 };
 
 let blogArticles = [];
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     await loadBlogData();
@@ -20,10 +17,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Загрузка данных
 async function loadBlogData() {
   try {
-    const sheetUrl = `https://docs.google.com/spreadsheets/d/${BLOG_CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=${BLOG_CONFIG.sheetName}`;
+    const config = window.sheetConfig.getBlogConfig();
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${window.sheetConfig.spreadsheetId}/export?format=csv&gid=${config.gid}`;
+    
     const response = await fetch(sheetUrl);
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
     
@@ -32,6 +30,8 @@ async function loadBlogData() {
     
     blogArticles.forEach(article => {
       article.dateObj = parseDate(article.дата);
+      article.formattedContent = formatContent(article.контент);
+      article.formattedThesis = formatContent(article.тезис);
     });
     
     blogArticles.sort((a, b) => b.dateObj - a.dateObj);
@@ -41,8 +41,66 @@ async function loadBlogData() {
     throw error;
   }
 }
+// Новый улучшенный парсер CSV
+function parseCSV(csvText) {
+  // Удаляем BOM символ если есть
+  if (csvText.charCodeAt(0) === 0xFEFF) {
+    csvText = csvText.substring(1);
+  }
 
-// Обработка начального маршрута
+  const lines = csvText.split('\n').filter(line => line.trim() !== '');
+  if (lines.length < 2) return [];
+
+  // Получаем заголовки (первая строка)
+  const headers = lines[0].split(',').map(h => 
+    h.trim().replace(/"/g, '').toLowerCase()
+  );
+  console.log('Headers:', headers); // Для отладки
+
+  const articles = [];
+
+  // Обрабатываем строки данных
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i]);
+    const article = {};
+    
+    for (let j = 0; j < headers.length; j++) {
+      article[headers[j]] = (values[j] || '').trim().replace(/^"|"$/g, '');
+    }
+
+    // Добавляем только статьи с ID и названием
+    if (article.id && article.название) {
+      articles.push(article);
+    }
+  }
+
+  return articles;
+}
+
+// Парсер строки CSV с учетом кавычек
+function parseCSVLine(line) {
+  const values = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      values.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  values.push(current);
+  return values;
+}
+
+// Остальные функции остаются без изменений
 function handleInitialRoute() {
   const urlParams = new URLSearchParams(window.location.search);
   const articleId = urlParams.get('id');
@@ -54,23 +112,16 @@ function handleInitialRoute() {
   }
 }
 
-// Настройка навигации
 function setupNavigation() {
   document.addEventListener('click', (e) => {
-    // Обработка кликов по карточкам статей
     const card = e.target.closest('.article-card');
-    if (card && !e.target.closest('a')) {
+    if (card) {
       e.preventDefault();
-      const articleId = card.dataset.id;
-      navigateToArticle(articleId);
-      return;
+      navigateToArticle(card.dataset.id);
     }
     
-    // Обработка кнопки "Назад"
-    if (e.target.matches('.back-button')) {
-      e.preventDefault();
-      navigateToList();
-      return;
+    if (e.target.classList.contains('close-modal')) {
+      closeModal();
     }
   });
   
@@ -86,74 +137,16 @@ function setupNavigation() {
   });
 }
 
-// Навигация к статье
 function navigateToArticle(articleId) {
   history.pushState({}, '', `blog.html?id=${articleId}`);
   showArticle(articleId, false);
 }
 
-// Навигация к списку
 function navigateToList() {
   history.pushState({}, '', 'blog.html');
   showArticleList(false);
 }
 
-// Показать статью
-function showArticle(articleId, shouldPushState = true) {
-  const article = blogArticles.find(a => a.id === articleId);
-  if (!article) {
-    showError('Статья не найдена');
-    return showArticleList();
-  }
-  
-  const container = document.getElementById(BLOG_CONFIG.containerId);
-  if (!container) return;
-  
-  container.innerHTML = `
-    <article class="blog-article">
-      <header class="article-header">
-        <img src="${article.url || BLOG_CONFIG.defaultImage}" 
-             alt="${escapeHtml(article.название)}" 
-             class="article-image">
-        <div class="article-meta">
-          <h1>${escapeHtml(article.название)}</h1>
-          <time class="article-date">${formatDate(article.дата)}</time>
-        </div>
-      </header>
-      
-      <div class="article-body">
-        ${article.заголовок ? `<h2 class="article-subtitle">${escapeHtml(article.заголовок)}</h2>` : ''}
-        
-        <div class="article-content">
-          ${formatContent(article.контент)}
-        </div>
-        
-        <div class="article-footer">
-          <a href="blog.html" class="back-button">← Вернуться к списку статей</a>
-        </div>
-      </div>
-    </article>
-  `;
-  
-  document.title = `${article.название} | Блог CO[D]ENT`;
-  
-  if (shouldPushState) {
-    history.pushState({}, '', `blog.html?id=${articleId}`);
-  }
-  
-  window.scrollTo(0, 0);
-  
-  // Настройка обработчика ошибок изображения
-  const img = container.querySelector('.article-image');
-  if (img) {
-    img.onerror = () => {
-      img.src = BLOG_CONFIG.defaultImage;
-      img.onerror = null;
-    };
-  }
-}
-
-// Показать список статей
 function showArticleList(shouldPushState = true) {
   const container = document.getElementById(BLOG_CONFIG.containerId);
   if (!container) return;
@@ -177,9 +170,7 @@ function showArticleList(shouldPushState = true) {
             <div class="card-content">
               <h2 class="card-title">${escapeHtml(article.название)}</h2>
               <time class="card-date">${formatDate(article.дата)}</time>
-              <div class="card-excerpt">
-                ${article.тезис ? `<p><strong>${escapeHtml(article.тезис)}</strong></p>` : ''}
-              </div>
+              ${article.formattedThesis ? `<div class="card-excerpt">${article.formattedThesis}</div>` : ''}
               <a href="blog.html?id=${article.id}" class="read-more">Читать статью →</a>
             </div>
           </article>
@@ -190,66 +181,58 @@ function showArticleList(shouldPushState = true) {
   
   document.title = 'Блог CO[D]ENT';
   
-  if (shouldPushState && window.location.search) {
-    history.pushState({}, '', 'blog.html');
-  }
-  
-  // Настройка обработчиков ошибок изображений
   document.querySelectorAll('.card-image').forEach(img => {
-    img.onerror = () => {
-      img.src = BLOG_CONFIG.defaultImage;
-      img.onerror = null;
-    };
+    img.onerror = () => img.src = BLOG_CONFIG.defaultImage;
   });
 }
 
-// Вспомогательные функции
-function parseCSV(csvText) {
-  if (csvText.charCodeAt(0) === 0xFEFF) csvText = csvText.substring(1);
+function showArticle(articleId, shouldPushState = true) {
+  const article = blogArticles.find(a => a.id === articleId);
+  if (!article) return showError('Статья не найдена');
   
-  const lines = csvText.split('\n').filter(line => line.trim() !== '');
-  if (lines.length < 2) return [];
+  const modalHTML = `
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <button class="close-modal">&times;</button>
+        <article class="blog-article">
+          <header class="article-header">
+            <img src="${article.url || BLOG_CONFIG.defaultImage}" 
+                 alt="${escapeHtml(article.название)}" 
+                 class="article-image">
+            <div class="article-meta">
+              <h1>${escapeHtml(article.название)}</h1>
+              <time class="article-date">${formatDate(article.дата)}</time>
+            </div>
+          </header>
+          
+          <div class="article-body">
+            ${article.заголовок ? `<h2 class="article-subtitle">${escapeHtml(article.заголовок)}</h2>` : ''}
+            
+            <div class="article-content">
+              ${article.formattedThesis ? `<div class="article-thesis">${article.formattedThesis}</div>` : ''}
+              ${article.formattedContent || '<p>Нет содержимого</p>'}
+            </div>
+            
+            <div class="article-footer">
+              <button class="back-button" onclick="navigateToList()">← Назад к списку</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  `;
   
-  const delimiter = detectDelimiter(lines[0]);
-  const headers = lines[0].split(delimiter).map(h => h.trim().toLowerCase().replace(/"/g, ''));
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  document.title = `${article.название} | Блог CO[D]ENT`;
   
-  return lines.slice(1).map(line => {
-    const values = parseLine(line, delimiter);
-    const article = {};
-    
-    headers.forEach((header, index) => {
-      let value = values[index] || '';
-      if (value.startsWith('"') && value.endsWith('"')) {
-        value = value.slice(1, -1).trim();
-      }
-      article[header] = value;
-    });
-    
-    return article;
-  }).filter(article => article.id && article.название);
+  const img = document.querySelector('.article-image');
+  if (img) img.onerror = () => img.src = BLOG_CONFIG.defaultImage;
 }
 
-function detectDelimiter(line) {
-  const delimiters = ['\t', ',', ';'];
-  return delimiters.find(d => line.includes(d)) || ',';
-}
-
-function parseLine(line, delimiter) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') inQuotes = !inQuotes;
-    else if (char === delimiter && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else current += char;
-  }
-  
-  result.push(current);
-  return result;
+function closeModal() {
+  const modal = document.querySelector('.modal-overlay');
+  if (modal) modal.remove();
+  navigateToList();
 }
 
 function parseDate(dateString) {
@@ -268,10 +251,10 @@ function formatDate(dateString) {
 }
 
 function formatContent(text) {
-  if (!text) return '<p>Нет содержимого</p>';
-  return escapeHtml(text)
-    .split('\n')
-    .map(p => p.trim() ? `<p>${p}</p>` : '')
+  if (!text) return '';
+  return text.split('\n')
+    .filter(p => p.trim())
+    .map(p => `<p>${escapeHtml(p)}</p>`)
     .join('');
 }
 

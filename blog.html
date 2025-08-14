@@ -2,12 +2,11 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Блог CO[D]ENT</title>
-    <meta name="description" content="Блог о 3D печати и технологиях">
+    <title>CO[D]ENT - Блог</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
+    <script src="js/sheet-config.js"></script>
 </head>
 <body>
     <div id="page-header" class="page-header"></div>
@@ -16,14 +15,19 @@
         <div class="loading">Загрузка блога...</div>
     </main>
 
+    <!-- Модальное окно статьи -->
+    <div id="articleModal" class="modal">
+        <div class="modal-content article-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-article-content"></div>
+        </div>
+    </div>
+    
     <script src="js/load-components.js"></script>
     <script src="js/blog.js"></script>
     <script>
-        // Установка заголовка страницы
         document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('page-header')) {
-                document.getElementById('page-header').textContent = 'Блог';
-            }
+            window.sheetConfig.setPageTitle();
             loadComponent('includes/help-button.html', 'body');
         });
     </script>

@@ -50,9 +50,19 @@ window.sheetConfig = {
     'compressors': {
       title: 'Компрессоры',
       gid: '1854864900'
+    },
+    'blog': {
+    title: 'Блог CO[D]ENT',
+    gid: '150124409' // ваш gid для блога
     }
   },
   
+
+
+  // Добавляем метод для блога:
+getBlogConfig: function() {
+  return this.pages['blog'] || { title: 'Блог', gid: '0' };
+},
   /**
    * Получает конфигурацию для текущей страницы
    * @returns {Object} Конфиг страницы или конфиг по умолчанию (3d-printers)
