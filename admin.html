@@ -1,71 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>Админка блога</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
 </head>
 <body>
-    <!-- Форма входа -->
     <div id="auth-container">
-        <div class="auth-form">
-            <h2>Вход в админку</h2>
-            <div id="auth-error" class="error-message" style="display:none;"></div>
-            <input type="email" id="email" placeholder="Email" readonly>
-            <input type="password" id="password" placeholder="Пароль">
-            <button id="login-btn">Войти</button>
-        </div>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
     </div>
 
-    <!-- Панель админа -->
     <div id="admin-container" style="display:none;">
-        <header class="admin-header">
-            <h1>Панель управления блогом</h1>
-            <div class="admin-actions">
-                <button id="change-password-btn">Сменить пароль</button>
-                <button id="logout-btn">Выйти</button>
-                <button id="add-article-btn">+ Новая статья</button>
-            </div>
+        <header>
+            <h1>Панель управления</h1>
+            <button id="logout">Выйти</button>
+            <button id="add-article">+ Новая статья</button>
         </header>
-
-        <div class="articles-list" id="articles-list">
-            <!-- Список статей будет здесь -->
-        </div>
-
-        <!-- Модальное окно редактора статьи -->
+        
+        <div id="articles-list"></div>
+        
         <div id="editor-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-               <!-- Внутри модального окна редактора -->
             <form id="article-form">
                 <input type="hidden" id="article-id">
                 <input type="text" id="article-title" placeholder="Заголовок" required>
-                <input type="date" id="article-date">
-                <textarea id="article-content" placeholder="Содержание"></textarea>
+                <textarea id="article-content" placeholder="Текст статьи"></textarea>
                 <input type="file" id="article-image" accept="image/*">
                 <button type="submit">Сохранить</button>
             </form>
-            </div>
-        </div>
-
-        <!-- Модальное окно смены пароля -->
-        <div id="password-change-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>Смена пароля</h2>
-                <form id="change-password-form">
-                    <input type="password" id="current-password" placeholder="Текущий пароль" required>
-                    <input type="password" id="new-password" placeholder="Новый пароль" required>
-                    <input type="password" id="confirm-password" placeholder="Подтвердите новый пароль" required>
-                    <button type="submit">Сменить пароль</button>
-                </form>
-            </div>
         </div>
     </div>
 

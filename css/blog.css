@@ -1,4 +1,3 @@
-
 /* Модальное окно */
 .modal-overlay {
   position: fixed;
@@ -42,12 +41,33 @@
   max-width: 700px;
   margin: 0 auto;
 }
+
 /* Основные стили блога */
 .blog-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
+}
+
+/* Заголовок блога */
+.blog-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 0;
+}
+
+.blog-header h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.blog-header p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  margin: 0;
 }
 
 /* Сетка статей */
@@ -57,40 +77,29 @@
   gap: 25px;
   margin: 30px 0;
 }
-/**/
-.back-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #f0f0f0;
-  color: #333;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 20px;
-}
 
-.back-button:hover {
-  background: #e0e0e0;
-}
 /* Карточка статьи */
 .article-card {
   background: white;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .article-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .card-image-container {
   height: 200px;
   overflow: hidden;
+  position: relative;
 }
 
 .card-image {
@@ -106,19 +115,25 @@
 
 .card-content {
   padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-title {
   font-size: 1.3rem;
   margin-bottom: 10px;
-  color: #333;
+  color: #2c3e50;
+  line-height: 1.3;
+  font-weight: 600;
 }
 
 .card-date {
-  color: #666;
+  color: #7f8c8d;
   font-size: 0.9rem;
   display: block;
   margin-bottom: 15px;
+  font-weight: 500;
 }
 
 .card-excerpt {
@@ -126,113 +141,263 @@
   margin-bottom: 15px;
   line-height: 1.5;
   font-size: 0.95rem;
+  flex-grow: 1;
 }
 
-/* Полная статья */
-.blog-article {
+.read-more {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+  margin-top: auto;
+}
+
+.read-more:hover {
+  color: #2980b9;
+}
+
+/* Страница отдельной статьи */
+.single-article {
   max-width: 800px;
   margin: 0 auto;
-  padding: 30px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  padding: 20px;
 }
 
-.article-header {
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.article-header h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.article-image {
+.article-main-image {
   width: 100%;
   max-height: 400px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 8px;
   margin: 20px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.article-date {
-  color: #666;
-  font-size: 0.95rem;
+.article-meta {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-.article-subtitle {
-  font-size: 1.5rem;
-  margin: 25px 0 15px;
-  color: #444;
-  font-weight: 600;
+.article-meta h1 {
+  font-size: 2.2rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.article-meta time {
+  color: #7f8c8d;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.article-body {
+  line-height: 1.7;
+  font-size: 1.1rem;
+  color: #34495e;
 }
 
 .article-content {
-  line-height: 1.7;
-  font-size: 1.05rem;
-  color: #444;
+  margin-bottom: 30px;
 }
 
 .article-content p {
   margin-bottom: 20px;
+  line-height: 1.7;
 }
 
-.article-thesis {
-  font-size: 1.15rem;
-  line-height: 1.6;
-  margin: 0 0 30px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-left: 4px solid #0066cc;
-  border-radius: 0 4px 4px 0;
+.article-footer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ecf0f1;
 }
 
 /* Кнопки и навигация */
 .back-button {
-  display: inline-block;
-  margin-top: 30px;
-  padding: 10px 20px;
-  background: #f0f0f0;
-  color: #333;
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  background: #3498db;
+  color: white;
   text-decoration: none;
-  border-radius: 4px;
-  transition: background 0.2s;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  margin: 10px 0;
 }
 
 .back-button:hover {
-  background: #e0e0e0;
+  background: #2980b9;
+  transform: translateY(-2px);
 }
 
-/* Сообщения об ошибках */
+/* Сообщения */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+.no-articles {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 40px 0;
+}
+
 .error-message {
   text-align: center;
-  padding: 30px;
-  color: #d32f2f;
-  background: #ffebee;
+  padding: 40px 30px;
+  color: #e74c3c;
+  background: #fadbd8;
   border-radius: 8px;
   max-width: 600px;
   margin: 50px auto;
+  border-left: 4px solid #e74c3c;
+}
+
+.error-message p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
 }
 
 .error-button {
-  margin-top: 15px;
-  padding: 8px 20px;
-  background: #d32f2f;
+  padding: 10px 25px;
+  background: #e74c3c;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.error-button:hover {
+  background: #c0392b;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.article-card {
+  animation: fadeIn 0.5s ease-out;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .blog-article {
-    padding: 20px;
+  .blog-container {
+    padding: 15px;
+  }
+  
+  .blog-header h1 {
+    font-size: 2rem;
   }
   
   .articles-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
+  
+  .modal-content {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .article-meta h1 {
+    font-size: 1.8rem;
+  }
+  
+  .card-content {
+    padding: 15px;
+  }
+  
+  .single-article {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-header {
+    margin-bottom: 30px;
+    padding: 20px 0;
+  }
+  
+  .blog-header h1 {
+    font-size: 1.7rem;
+  }
+  
+  .card-title {
+    font-size: 1.1rem;
+  }
+  
+  .article-meta h1 {
+    font-size: 1.5rem;
+  }
+  
+  .back-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Состояния загрузки */
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Улучшенная читаемость контента */
+.article-content {
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.article-content p {
+  margin-bottom: 1.5em;
+}
+
+.article-content strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Кастомный скроллбар */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }

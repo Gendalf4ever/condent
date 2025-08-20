@@ -1,297 +1,313 @@
 // Конфигурация блога
 const BLOG_CONFIG = {
-  containerId: 'article-container',
-  modalId: 'articleModal',
-  defaultImage: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAwIiBoZWlnaHQ9IjUwMCI+PHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAwIiB5PSIyNTAiIGZvbnQtc2l6ZT0iMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiPk5vIGltYWdlPC90ZXh0Pjwvc3ZnPg=='
+    containerId: 'article-container',
+    defaultImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjQwMCIgeT0iMjAwIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5Ij7QndC+0LLRi9C5INGN0LvQtdC60YLRgNC+0L3QvdC+0LU8L3RleHQ+PC9zdmc+'
 };
 
-let blogArticles = [];
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    // Проверяем инициализацию Firebase
-    if (!window.firebaseServices) {
-      throw new Error('Firebase не инициализирован');
-    }
-
-    await loadBlogData();
-    setupNavigation();
-    handleInitialRoute();
-    
-    // Подписка на обновления в реальном времени
-    setupRealTimeUpdates();
-  } catch (error) {
-    console.error('Ошибка инициализации:', error);
-    showError('Не удалось загрузить блог. Пожалуйста, попробуйте позже.');
-  }
+// Основная функция инициализации
+document.addEventListener('DOMContentLoaded', () => {
+    // Даем время на загрузку Firebase
+    setTimeout(initializeBlog, 100);
 });
 
-// ====================== ОСНОВНЫЕ ФУНКЦИИ ====================== //
+async function initializeBlog() {
+    try {
+        // Проверяем инициализацию Firebase
+        if (!window.firebaseServices) {
+            console.warn('Firebase services not found, retrying...');
+            await waitForFirebase();
+        }
 
-// Загрузка данных блога из Firebase
-async function loadBlogData() {
-  try {
-    const snapshot = await firebaseServices.db.collection('articles')
-      .orderBy('createdAt', 'desc')
-      .get();
+        const { db } = window.firebaseServices;
+        if (!db) {
+            throw new Error('Firestore not available');
+        }
 
-    blogArticles = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        название: data.title || 'Без названия',
-        дата: data.date || data.createdAt?.toDate().toISOString(),
-        контент: data.content || '',
-        тезис: data.excerpt || '',
-        url: data.imageUrl || '',
-        заголовок: data.subtitle || ''
-      };
+        console.log('Blog initialization started');
+        await loadAndDisplayArticles();
+        setupRealTimeUpdates();
+        setupNavigation();
+        
+    } catch (error) {
+        console.error('Blog initialization error:', error);
+        showError('Не удалось загрузить блог. Пожалуйста, обновите страницу.');
+    }
+}
+
+// Ожидание инициализации Firebase
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        const checkInterval = setInterval(() => {
+            if (window.firebaseServices) {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 100);
+        
+        // Таймаут на случай если Firebase не загрузится
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            resolve();
+        }, 3000);
     });
+}
 
-    processArticlesData();
-    
-  } catch (error) {
-    console.error('Ошибка загрузки данных:', error);
-    throw error;
-  }
+// Загрузка и отображение статей
+async function loadAndDisplayArticles() {
+    const container = document.getElementById(BLOG_CONFIG.containerId);
+    if (!container) return;
+
+    try {
+        showLoading();
+
+        const { db } = window.firebaseServices;
+        const snapshot = await db.collection('articles')
+            .orderBy('createdAt', 'desc')
+            .get();
+
+        if (snapshot.empty) {
+            showNoArticles();
+            return;
+        }
+
+        const articles = processArticles(snapshot);
+        renderArticles(articles);
+        
+    } catch (error) {
+        console.error('Error loading articles:', error);
+        showError('Ошибка при загрузке статей');
+    }
 }
 
 // Обработка данных статей
-function processArticlesData() {
-  blogArticles.forEach(article => {
-    article.dateObj = parseDate(article.дата);
-    article.formattedDate = formatDate(article.дата);
-    article.formattedContent = formatContent(article.контент);
-    article.formattedThesis = formatContent(article.тезис || article.контент?.substring(0, 200) + '...');
-  });
+function processArticles(snapshot) {
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            title: data.title || 'Без названия',
+            content: data.content || '',
+            imageUrl: data.imageUrl || null,
+            date: data.createdAt?.toDate() || new Date(),
+            formattedDate: formatDate(data.createdAt?.toDate() || new Date()),
+            excerpt: getExcerpt(data.content || '', 120)
+        };
+    });
+}
+
+// Отображение статей в виде сетки
+function renderArticles(articles) {
+    const container = document.getElementById(BLOG_CONFIG.containerId);
+    
+    container.innerHTML = `
+        <div class="blog-header">
+            <h1>Блог CO[D]ENT</h1>
+            <p>Последние статьи и новости</p>
+        </div>
+        <div class="articles-grid">
+            ${articles.map(article => `
+                <article class="article-card" data-id="${article.id}">
+                    <div class="card-image-container">
+                        <img src="${article.imageUrl || BLOG_CONFIG.defaultImage}" 
+                             alt="${article.title}"
+                             class="card-image"
+                             onerror="this.src='${BLOG_CONFIG.defaultImage}'">
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">${escapeHtml(article.title)}</h2>
+                        <time class="card-date">${article.formattedDate}</time>
+                        <div class="card-excerpt">${article.excerpt}</div>
+                        <a href="?id=${article.id}" class="read-more">Читать статью →</a>
+                    </div>
+                </article>
+            `).join('')}
+        </div>
+    `;
 }
 
 // Настройка навигации
 function setupNavigation() {
-  document.addEventListener('click', (e) => {
-    const card = e.target.closest('.article-card');
-    if (card) {
-      e.preventDefault();
-      navigateToArticle(card.dataset.id);
-    }
+    // Обработка URL параметров
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
     
-    if (e.target.classList.contains('close-modal') || e.target.classList.contains('back-button')) {
-      closeModal();
+    if (articleId) {
+        showSingleArticle(articleId);
     }
-  });
-  
-  window.addEventListener('popstate', handleRouteChange);
+
+    // Обработка кликов по карточкам
+    document.addEventListener('click', (e) => {
+        const articleCard = e.target.closest('.article-card');
+        if (articleCard) {
+            const articleId = articleCard.dataset.id;
+            showSingleArticle(articleId);
+        }
+    });
+
+    // Обработка кнопки "Назад"
+    window.addEventListener('popstate', handleBrowserBack);
 }
 
-// Обработчик изменения роута
-function handleRouteChange() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const articleId = urlParams.get('id');
-  
-  if (articleId) {
-    showArticle(articleId, false);
-  } else {
-    showArticleList(false);
-  }
+// Показ отдельной статьи
+async function showSingleArticle(articleId) {
+    try {
+        showLoading();
+        
+        const { db } = window.firebaseServices;
+        const doc = await db.collection('articles').doc(articleId).get();
+        
+        if (!doc.exists) {
+            throw new Error('Статья не найдена');
+        }
+
+        const article = doc.data();
+        renderSingleArticle(articleId, article);
+        
+        // Обновляем URL
+        window.history.pushState({ articleId }, '', `?id=${articleId}`);
+        
+    } catch (error) {
+        console.error('Error loading article:', error);
+        showError('Не удалось загрузить статью');
+        showArticleList();
+    }
 }
 
-// ====================== РОУТИНГ ====================== //
-
-function handleInitialRoute() {
-  handleRouteChange();
-}
-
-function navigateToArticle(articleId) {
-  history.pushState({}, '', `?id=${articleId}`);
-  showArticle(articleId, false);
-}
-
-function navigateToList() {
-  history.pushState({}, '', window.location.pathname);
-  showArticleList(false);
-}
-
-// ====================== ОТОБРАЖЕНИЕ СТАТЕЙ ====================== //
-
-function showArticleList(shouldPushState = true) {
-  const container = document.getElementById(BLOG_CONFIG.containerId);
-  if (!container) return;
-  
-  if (!blogArticles.length) {
-    container.innerHTML = '<div class="no-articles">Нет доступных статей</div>';
-    return;
-  }
-  
-  container.innerHTML = `
-    <div class="blog-listing">
-      <h1 class="blog-title">Блог CO[D]ENT</h1>
-      <div class="articles-grid">
-        ${blogArticles.map(article => `
-          <article class="article-card" data-id="${article.id}">
-            <div class="card-image-container">
-              <img src="${article.url || BLOG_CONFIG.defaultImage}" 
-                   alt="${escapeHtml(article.название)}" 
-                   class="card-image"
-                   loading="lazy">
-            </div>
-            <div class="card-content">
-              <h2 class="card-title">${escapeHtml(article.название)}</h2>
-              <time class="card-date">${article.formattedDate}</time>
-              ${article.formattedThesis ? `<div class="card-excerpt">${article.formattedThesis}</div>` : ''}
-              <a href="?id=${article.id}" class="read-more">Читать статью →</a>
-            </div>
-          </article>
-        `).join('')}
-      </div>
-    </div>
-  `;
-  
-  document.title = 'Блог CO[D]ENT';
-  setupImageErrorHandlers();
-}
-
-function showArticle(articleId, shouldPushState = true) {
-  const article = blogArticles.find(a => a.id === articleId);
-  if (!article) {
-    showError('Статья не найдена');
-    navigateToList();
-    return;
-  }
-  
-  const modalHTML = `
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <button class="close-modal">&times;</button>
-        <article class="blog-article">
-          <header class="article-header">
-            <img src="${article.url || BLOG_CONFIG.defaultImage}" 
-                 alt="${escapeHtml(article.название)}" 
-                 class="article-image"
-                 loading="lazy">
-            <div class="article-meta">
-              <h1>${escapeHtml(article.название)}</h1>
-              <time class="article-date">${article.formattedDate}</time>
-            </div>
-          </header>
-          
-          <div class="article-body">
-            ${article.заголовок ? `<h2 class="article-subtitle">${escapeHtml(article.заголовок)}</h2>` : ''}
+// Отображение отдельной статьи
+function renderSingleArticle(articleId, article) {
+    const container = document.getElementById(BLOG_CONFIG.containerId);
+    
+    container.innerHTML = `
+        <div class="single-article">
+            <button class="back-button" onclick="showArticleList()">← Назад к списку</button>
             
-            <div class="article-content">
-              ${article.formattedThesis ? `<div class="article-thesis">${article.formattedThesis}</div>` : ''}
-              ${article.formattedContent || '<p>Нет содержимого</p>'}
-            </div>
-            
-            <div class="article-footer">
-              <button class="back-button">← Назад к списку</button>
-            </div>
-          </div>
-        </article>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-  document.title = `${article.название} | Блог CO[D]ENT`;
-  setupImageErrorHandlers();
+            <article class="blog-article">
+                <header class="article-header">
+                    ${article.imageUrl ? `
+                        <img src="${article.imageUrl}" 
+                             alt="${article.title}"
+                             class="article-image"
+                             onerror="this.src='${BLOG_CONFIG.defaultImage}'">
+                    ` : ''}
+                    
+                    <div class="article-meta">
+                        <h1>${escapeHtml(article.title || 'Без названия')}</h1>
+                        <time class="article-date">${formatDate(article.createdAt?.toDate() || new Date())}</time>
+                    </div>
+                </header>
+                
+                <div class="article-body">
+                    <div class="article-content">
+                        ${formatContent(article.content || 'Содержание отсутствует')}
+                    </div>
+                </div>
+                
+                <div class="article-footer">
+                    <button class="back-button" onclick="showArticleList()">← Назад к списку</button>
+                </div>
+            </article>
+        </div>
+    `;
 }
 
-function closeModal() {
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) modal.remove();
-  navigateToList();
-}
+// Возврат к списку статей
+window.showArticleList = function() {
+    loadAndDisplayArticles();
+    window.history.pushState({}, '', 'blog.html');
+};
 
-// ====================== РЕАЛЬНОЕ ВРЕМЯ ====================== //
-
+// Настройка обновлений в реальном времени
 function setupRealTimeUpdates() {
-  firebaseServices.db.collection('articles')
-    .orderBy('createdAt', 'desc')
-    .onSnapshot(snapshot => {
-      const updatedArticles = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          название: data.title,
-          дата: data.date || data.createdAt?.toDate().toISOString(),
-          контент: data.content,
-          тезис: data.excerpt,
-          url: data.imageUrl,
-          заголовок: data.subtitle
-        };
-      });
-      
-      blogArticles = updatedArticles;
-      processArticlesData();
-      handleRouteChange();
-    }, error => {
-      console.error('Ошибка real-time обновлений:', error);
+    try {
+        const { db } = window.firebaseServices;
+        
+        db.collection('articles')
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(snapshot => {
+                console.log('Real-time update received');
+                const articles = processArticles(snapshot);
+                renderArticles(articles);
+            }, error => {
+                console.error('Real-time update error:', error);
+            });
+            
+    } catch (error) {
+        console.warn('Real-time updates not available:', error);
+    }
+}
+
+// Обработка кнопки "Назад" в браузере
+function handleBrowserBack() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
+    
+    if (articleId) {
+        showSingleArticle(articleId);
+    } else {
+        showArticleList();
+    }
+}
+
+// Вспомогательные функции
+function formatDate(date) {
+    return date.toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
 }
 
-// ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================== //
-
-function parseDate(dateString) {
-  if (!dateString) return new Date();
-  return new Date(dateString);
-}
-
-function formatDate(dateString) {
-  const date = parseDate(dateString);
-  return date.toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+function getExcerpt(text, length = 100) {
+    if (!text) return '';
+    const cleanText = text.replace(/<[^>]*>/g, '');
+    return cleanText.length > length 
+        ? cleanText.substring(0, length) + '...' 
+        : cleanText;
 }
 
 function formatContent(text) {
-  if (!text) return '';
-  
-  // Простое форматирование текста
-  return text
-    .split('\n')
-    .filter(p => p.trim())
-    .map(p => {
-      // Обработка ссылок [текст](url)
-      p = p.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-      // Обработка жирного текста **текст**
-      p = p.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      return `<p>${escapeHtml(p)}</p>`;
-    })
-    .join('');
+    if (!text) return '<p>Содержание отсутствует</p>';
+    
+    return text
+        .split('\n')
+        .filter(paragraph => paragraph.trim())
+        .map(paragraph => `<p>${escapeHtml(paragraph)}</p>`)
+        .join('');
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-function setupImageErrorHandlers() {
-  document.querySelectorAll('img').forEach(img => {
-    img.onerror = () => {
-      img.src = BLOG_CONFIG.defaultImage;
-      img.onerror = null;
-    };
-  });
+// Функции отображения состояния
+function showLoading() {
+    const container = document.getElementById(BLOG_CONFIG.containerId);
+    if (container) {
+        container.innerHTML = '<div class="loading">Загрузка...</div>';
+    }
+}
+
+function showNoArticles() {
+    const container = document.getElementById(BLOG_CONFIG.containerId);
+    if (container) {
+        container.innerHTML = '<div class="no-articles">Статьи не найдены</div>';
+    }
 }
 
 function showError(message) {
-  const container = document.getElementById(BLOG_CONFIG.containerId);
-  if (container) {
-    container.innerHTML = `
-      <div class="error-message">
-        <p>${message}</p>
-        <button class="error-button" onclick="window.showArticleList()">Вернуться к списку</button>
-      </div>
-    `;
-  }
+    const container = document.getElementById(BLOG_CONFIG.containerId);
+    if (container) {
+        container.innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+                <button class="error-button" onclick="window.location.reload()">Обновить страницу</button>
+            </div>
+        `;
+    }
 }
 
-// Глобальные функции для использования в HTML
-window.navigateToList = navigateToList;
-window.showArticleList = showArticleList;
+// Глобальные функции для HTML
+window.navigateToArticle = showSingleArticle;
+window.navigateToList = showArticleList;

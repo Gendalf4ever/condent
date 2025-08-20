@@ -3,32 +3,82 @@
 <head>
     <meta charset="utf-8">
     <title>CO[D]ENT - Блог</title>
+    <meta name="description" content="Блог CO[D]ENT">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/blog.css">
-    <script src="js/sheet-config.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
 </head>
 <body>
+    <!-- Хедер будет загружен динамически -->
     <div id="page-header" class="page-header"></div>
     
-    <main class="blog-container" id="article-container">
-        <div class="loading">Загрузка блога...</div>
+    <!-- Основной контент блога -->
+    <main class="main-content-wrapper">
+        <div class="blog-container" id="article-container">
+            <div class="loading">Загрузка блога...</div>
+        </div>
     </main>
 
-    <!-- Модальное окно статьи -->
-    <div id="articleModal" class="modal">
-        <div class="modal-content article-modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="modal-article-content"></div>
-        </div>
-    </div>
-    
+    <!-- Футер будет загружен динамически -->
+    <div id="page-footer"></div>
+
+    <!-- Кнопка помощи -->
+    <div id="help-button-container"></div>
+
+    <!-- Подключаем скрипты в правильном порядке -->
     <script src="js/load-components.js"></script>
+    <script src="js/firebase-config.js"></script>
     <script src="js/blog.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            window.sheetConfig.setPageTitle();
-            loadComponent('includes/help-button.html', 'body');
+            // Загружаем компоненты
+            loadComponent('includes/header.html', '#page-header');
+            loadComponent('includes/footer.html', '#page-footer');
+            loadComponent('includes/help-button.html', '#help-button-container');
+            
+            // Устанавливаем заголовок страницы
+            if (typeof setPageHeader === 'function') {
+                setPageHeader('Блог CO[D]ENT');
+            }
+            
+            // Добавляем отступ при загрузке хедера
+            const checkHeader = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    clearInterval(checkHeader);
+                    document.documentElement.style.setProperty(
+                        '--header-height', 
+                        `${header.offsetHeight}px`
+                    );
+                }
+            }, 100);
+            
+            // Инициализация мобильного меню
+            const initMenu = setInterval(() => {
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+                const navMenu = document.querySelector('.nav');
+                
+                if (menuBtn && navMenu) {
+                    clearInterval(initMenu);
+                    
+                    menuBtn.addEventListener('click', () => {
+                        navMenu.classList.toggle('active');
+                    });
+                    
+                    document.addEventListener('click', (e) => {
+                        if (!e.target.closest('.nav') && !e.target.closest('.mobile-menu-btn')) {
+                            navMenu.classList.remove('active');
+                        }
+                    });
+                }
+            }, 100);
         });
     </script>
 </body>
