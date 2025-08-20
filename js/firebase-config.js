@@ -4,7 +4,7 @@ if (typeof firebase === 'undefined') {
 } else {
     // Конфигурация
     const firebaseConfig = {
-        apiKey: "",
+        apiKey: "не скажу",
         authDomain: "codent-7814d.firebaseapp.com",
         projectId: "codent-7814d",
         storageBucket: "codent-7814d.firebasestorage.app",
