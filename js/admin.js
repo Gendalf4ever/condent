@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Admin.js loaded');
+    
     // Инициализация Firebase
     const { auth, db, storage } = window.firebaseServices;
     if (!auth || !db) {
@@ -6,61 +8,147 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // DOM элементы (УБИРАЕМ поиск кнопки здесь)
+    // Основные элементы
     const authContainer = document.getElementById('auth-container');
     const adminContainer = document.getElementById('admin-container');
-    const loginForm = document.getElementById('login-form');
     const articlesList = document.getElementById('articles-list');
     const logoutBtn = document.getElementById('logout-btn');
-    
-    // Элементы модальных окон (оставляем только те, что нужны для логики)
-    const addArticleModal = document.getElementById('add-article-modal');
     const addArticleForm = document.getElementById('add-article-form');
-    
-    // Элементы формы добавления
-    const fileInput = document.getElementById('article-image');
-    const fileName = document.getElementById('file-name');
-    const imagePreview = document.getElementById('image-preview');
+    const editArticleForm = document.getElementById('edit-article-form');
+    const userEmailSpan = document.getElementById('user-email');
 
-    // УБИРАЕМ проверку кнопки отсюда
-    console.log('Admin.js initialized');
+    // Переменные для хранения состояния
+    let currentEditingArticleId = null;
 
-    // ================= ИНИЦИАЛИЗАЦИЯ =================
-    auth.onAuthStateChanged(user => {
-        if (user && user.email === "admin@yourdomain.com") {
-            showAdminPanel();
-            loadArticles();
+    // ================= ГЛОБАЛЬНАЯ ФУНКЦИЯ ДЛЯ ВХОДА =================
+    window.handleLogin = async function(email, password) {
+        try {
+            console.log('Attempting login with:', email);
+            
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            console.log('Login successful, checking admin status...');
+            
+            // Проверяем, является ли пользователь администратором
+            const isAdmin = await checkAdminStatus(user.email);
+            
+            if (!isAdmin) {
+                console.log('Admin check failed, logging out...');
+                await auth.signOut();
+                throw new Error('access-denied');
+            }
+            
+            console.log('Admin access granted!');
+            return true;
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            let errorMessage = 'Ошибка входа';
+            
+            switch (error.code || error.message) {
+                case 'auth/invalid-email':
+                    errorMessage = 'Неверный формат email';
+                    break;
+                case 'auth/user-disabled':
+                    errorMessage = 'Пользователь заблокирован';
+                    break;
+                case 'auth/user-not-found':
+                    errorMessage = 'Пользователь с таким email не найден';
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = 'Неверный пароль';
+                    break;
+                case 'access-denied':
+                    errorMessage = 'Доступ запрещен. Только для администраторов.';
+                    break;
+                default:
+                    errorMessage = error.message || 'Неизвестная ошибка';
+            }
+            
+            alert(errorMessage);
+            return false;
+        }
+    };
+
+    // ================= ПРОВЕРКА СТАТУСА АДМИНИСТРАТОРА =================
+    async function checkAdminStatus(userEmail) {
+        try {
+            console.log('🔍 Checking admin status for:', userEmail);
+            
+            // Проверяем наличие документа с ID = email пользователя
+            const adminDoc = await db.collection('admins').doc(userEmail).get();
+            
+            if (adminDoc.exists) {
+                console.log('✅ User is admin (individual document)');
+                return true;
+            }
+            
+            // Проверяем документ codent-admins с массивом emails
+            const codentAdminsDoc = await db.collection('admins').doc('codent-admins').get();
+            
+            if (codentAdminsDoc.exists) {
+                const data = codentAdminsDoc.data();
+                if (data.emails && data.emails.includes(userEmail)) {
+                    console.log('✅ User is admin (in codent-admins list)');
+                    return true;
+                }
+            }
+            
+            console.log('❌ Access denied');
+            return false;
+            
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            return false;
+        }
+    }
+
+    // ================= АУТЕНТИФИКАЦИЯ =================
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log('Auth state changed, user:', user.email);
+            
+            try {
+                // Обновляем отображение email пользователя
+                if (userEmailSpan) {
+                    userEmailSpan.textContent = user.email;
+                }
+                
+                // Проверяем, является ли пользователь администратором
+                const isAdmin = await checkAdminStatus(user.email);
+                
+                if (isAdmin) {
+                    console.log('Showing admin panel');
+                    showAdminPanel();
+                    loadArticles();
+                } else {
+                    console.log('Access denied, logging out');
+                    alert('Доступ запрещен. Только для администраторов.');
+                    await auth.signOut();
+                }
+            } catch (error) {
+                console.error('Error in auth state change:', error);
+                alert('Ошибка проверки прав доступа');
+                await auth.signOut();
+            }
         } else {
+            console.log('No user, showing auth form');
             showAuthForm();
         }
     });
 
-    // ================= АУТЕНТИФИКАЦИЯ =================
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
+    // ================= ВЫХОД ИЗ СИСТЕМЫ =================
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
             try {
-                await auth.signInWithEmailAndPassword(email, password);
+                await auth.signOut();
+                alert('Вы вышли из системы');
             } catch (error) {
-                showError('Неверные учетные данные');
+                console.error('Logout error:', error);
+                alert('Ошибка при выходе из системы');
             }
         });
-    }
-
-    // ================= УПРАВЛЕНИЕ МОДАЛЬНЫМИ ОКНАМИ =================
-    // Кнопка "Новая статья" теперь управляется в HTML скрипте
-
-    // Обработка выбора файла
-    if (fileInput) {
-        fileInput.addEventListener('change', handleFileSelect);
-    }
-
-    // Выход из системы
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => auth.signOut());
     }
 
     // ================= ФОРМА ДОБАВЛЕНИЯ СТАТЬИ =================
@@ -68,7 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
         addArticleForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!validateForm()) return;
+            const title = document.getElementById('article-title').value.trim();
+            const content = document.getElementById('article-content').value.trim();
+            
+            if (!title || !content) {
+                alert('Заполните все обязательные поля');
+                return;
+            }
 
             const submitBtn = addArticleForm.querySelector('.submit-btn');
             const originalText = submitBtn.innerHTML;
@@ -78,13 +172,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const articleData = {
-                    title: document.getElementById('article-title').value.trim(),
-                    content: document.getElementById('article-content').value.trim(),
+                    title: title,
+                    content: content,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    authorId: auth.currentUser.uid,
+                    authorEmail: auth.currentUser.email
                 };
 
-                // Загрузка изображения если есть
+                // Загрузка изображения
+                const fileInput = document.getElementById('article-image');
                 if (fileInput && fileInput.files[0]) {
                     articleData.imageUrl = await uploadImage(fileInput.files[0]);
                 }
@@ -93,13 +190,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const articleId = 'art-' + Date.now();
                 await db.collection('articles').doc(articleId).set(articleData);
 
-                showSuccess('Статья успешно добавлена!');
-                closeAddArticleModal();
+                alert('Статья успешно добавлена!');
+                if (typeof window.closeAddArticleModal === 'function') {
+                    window.closeAddArticleModal();
+                }
                 loadArticles();
 
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
-                showError('Ошибка при сохранении статьи: ' + error.message);
+                alert('Ошибка при сохранении статьи: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -107,104 +206,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ================= ФУНКЦИИ МОДАЛЬНЫХ ОКОН =================
-    function openAddArticleModal() {
-        console.log('Opening add article modal');
-        if (addArticleModal) {
-            addArticleModal.style.display = 'block';
-            resetForm();
-        }
-    }
-
-    function closeAddArticleModal() {
-        if (addArticleModal) {
-            addArticleModal.style.display = 'none';
-            resetForm();
-        }
-    }
-
-    function resetForm() {
-        if (addArticleForm) {
-            addArticleForm.reset();
-        }
-        if (fileName) {
-            fileName.textContent = 'Файл не выбран';
-        }
-        if (imagePreview) {
-            imagePreview.style.display = 'none';
-            imagePreview.innerHTML = '';
-        }
-        clearValidation();
-    }
-
-    function handleFileSelect(e) {
-        const file = e.target.files[0];
-        if (file && fileName) {
-            fileName.textContent = file.name;
+    // ================= ФОРМА РЕДАКТИРОВАНИЯ СТАТЬИ =================
+    if (editArticleForm) {
+        editArticleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            // Превью изображения
-            if (file.type.startsWith('image/') && imagePreview) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.innerHTML = `<img src="${e.target.result}" alt="Превью" style="max-width: 100%; max-height: 200px;">`;
-                    imagePreview.style.display = 'block';
+            const title = document.getElementById('edit-article-title').value.trim();
+            const content = document.getElementById('edit-article-content').value.trim();
+            
+            if (!title || !content) {
+                alert('Заполните все обязательные поля');
+                return;
+            }
+
+            const submitBtn = editArticleForm.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обновление...';
+
+            try {
+                const articleData = {
+                    title: title,
+                    content: content,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                reader.readAsDataURL(file);
-            }
-        } else if (fileName) {
-            fileName.textContent = 'Файл не выбран';
-            if (imagePreview) {
-                imagePreview.style.display = 'none';
-            }
-        }
-    }
 
-    // ================= ВАЛИДАЦИЯ ФОРМЫ =================
-    function validateForm() {
-        let isValid = true;
-        clearValidation();
-
-        const title = document.getElementById('article-title')?.value.trim();
-        const content = document.getElementById('article-content')?.value.trim();
-
-        if (!title) {
-            showFieldError('article-title', 'Введите название статьи');
-            isValid = false;
-        }
-
-        if (!content) {
-            showFieldError('article-content', 'Введите содержание статьи');
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    function showFieldError(fieldId, message) {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            const formGroup = field.closest('.form-group');
-            if (formGroup) {
-                formGroup.classList.add('error');
-                const errorElement = formGroup.querySelector('.error-message');
-                if (errorElement) {
-                    errorElement.textContent = message;
-                    errorElement.style.display = 'block';
+                // Загрузка нового изображения
+                const fileInput = document.getElementById('edit-article-image');
+                if (fileInput && fileInput.files[0]) {
+                    articleData.imageUrl = await uploadImage(fileInput.files[0]);
                 }
+
+                // Обновление статьи
+                await db.collection('articles').doc(currentEditingArticleId).update(articleData);
+
+                alert('Статья успешно обновлена!');
+                if (typeof window.closeEditArticleModal === 'function') {
+                    window.closeEditArticleModal();
+                }
+                loadArticles();
+
+            } catch (error) {
+                console.error('Ошибка обновления:', error);
+                alert('Ошибка при обновлении статьи: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
-        }
-    }
-
-    function clearValidation() {
-        document.querySelectorAll('.form-group').forEach(group => {
-            group.classList.remove('error');
-        });
-        document.querySelectorAll('.error-message').forEach(msg => {
-            msg.style.display = 'none';
         });
     }
 
-    // ================= ЗАГРУЗКА И ОТОБРАЖЕНИЕ СТАТЕЙ =================
+    // ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
     async function loadArticles() {
         try {
             if (!articlesList) return;
@@ -225,15 +278,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                     <div class="article-item">
                         <div class="article-info">
-                            <h3>${escapeHtml(data.title || 'Без названия')}</h3>
+                            <h3>${data.title || 'Без названия'}</h3>
                             <time>${formatDate(data.createdAt?.toDate())}</time>
                             ${data.imageUrl ? `<img src="${data.imageUrl}" class="article-thumb" alt="Превью">` : ''}
+                            <div class="article-author">Автор: ${data.authorEmail || 'Неизвестно'}</div>
+                            <div class="article-updated">Обновлено: ${formatDate(data.updatedAt?.toDate())}</div>
                         </div>
                         <div class="article-actions">
-                            <button class="edit-btn" onclick="editArticle('${doc.id}')">
+                            <button onclick="editArticle('${doc.id}')" class="edit-btn">
                                 <i class="fas fa-edit"></i> Редактировать
                             </button>
-                            <button class="delete-btn" onclick="deleteArticle('${doc.id}')">
+                            <button onclick="deleteArticle('${doc.id}')" class="delete-btn">
                                 <i class="fas fa-trash"></i> Удалить
                             </button>
                         </div>
@@ -241,26 +296,123 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }).join('');
 
-            // Обновляем счетчик статей
-            const articlesCount = document.getElementById('articles-count');
-            if (articlesCount) {
-                articlesCount.textContent = snapshot.size;
-            }
-
         } catch (error) {
-            console.error('Ошибка загрузки статей:', error);
+            console.error('Ошибка загрузки:', error);
             if (articlesList) {
                 articlesList.innerHTML = '<div class="error-message">Ошибка загрузки статей</div>';
             }
         }
     }
 
-    // ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
     async function uploadImage(file) {
-        const storageRef = storage.ref(`articles/${Date.now()}_${file.name}`);
-        await storageRef.put(file);
-        return await storageRef.getDownloadURL();
+        try {
+            const API_KEY = 'get_some_key'; //ключ
+            
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки на ImgBB');
+            }
+            
+            const data = await response.json();
+            console.log('✅ Изображение загружено на ImgBB:', data.data.url);
+            return data.data.url;
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки:', error);
+            
+            const fileName = file.name.substring(0, 15);
+            return `https://via.placeholder.com/800x400/3498db/ffffff?text=${encodeURIComponent(fileName)}`;
+        }
     }
+
+    // ================= ФУНКЦИИ РЕДАКТИРОВАНИЯ =================
+    window.editArticle = async function(articleId) {
+        try {
+            console.log('Редактирование статьи:', articleId);
+            currentEditingArticleId = articleId;
+            
+            // Загружаем данные статьи
+            const articleDoc = await db.collection('articles').doc(articleId).get();
+            
+            if (!articleDoc.exists) {
+                alert('Статья не найдена');
+                return;
+            }
+            
+            const articleData = articleDoc.data();
+            
+            // Заполняем форму редактирования
+            document.getElementById('edit-article-title').value = articleData.title || '';
+            document.getElementById('edit-article-content').value = articleData.content || '';
+            
+            // Показываем текущее изображение
+            const imagePreview = document.getElementById('edit-image-preview');
+            if (articleData.imageUrl && imagePreview) {
+                imagePreview.innerHTML = `<img src="${articleData.imageUrl}" alt="Текущее изображение" style="max-width: 200px; margin-top: 10px;">`;
+                imagePreview.style.display = 'block';
+            }
+            
+            // Открываем модальное окно редактирования
+            if (typeof window.openEditArticleModal === 'function') {
+                window.openEditArticleModal();
+            } else {
+                console.error('Функция openEditArticleModal не найдена');
+            }
+            
+        } catch (error) {
+            console.error('Ошибка загрузки статьи:', error);
+            alert('Ошибка при загрузке статьи для редактирования');
+        }
+    };
+
+    window.openEditArticleModal = function() {
+        const editModal = document.getElementById('edit-article-modal');
+        if (editModal) {
+            editModal.style.display = 'block';
+        }
+    };
+
+    window.closeEditArticleModal = function() {
+        const editModal = document.getElementById('edit-article-modal');
+        if (editModal) {
+            editModal.style.display = 'none';
+            // Сбрасываем форму
+            if (editArticleForm) editArticleForm.reset();
+            const imagePreview = document.getElementById('edit-image-preview');
+            if (imagePreview) {
+                imagePreview.innerHTML = '';
+                imagePreview.style.display = 'none';
+            }
+            currentEditingArticleId = null;
+        }
+    };
+
+    // Обработчик для кнопки отмены редактирования
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', window.closeEditArticleModal);
+    }
+
+    // Обработчик для закрытия модального окна
+    const closeEditModal = document.getElementById('close-edit-modal');
+    if (closeEditModal) {
+        closeEditModal.addEventListener('click', window.closeEditArticleModal);
+    }
+
+    // Закрытие по клику вне окна
+    window.addEventListener('click', function(event) {
+        const editModal = document.getElementById('edit-article-modal');
+        if (event.target === editModal) {
+            window.closeEditArticleModal();
+        }
+    });
 
     function showAdminPanel() {
         if (authContainer && adminContainer) {
@@ -276,50 +428,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showError(message) {
-        alert('Ошибка: ' + message);
-    }
-
-    function showSuccess(message) {
-        alert('Успех: ' + message);
-    }
-
     function formatDate(date) {
-        if (!date) return '';
+        if (!date) return 'Неизвестно';
         return date.toLocaleDateString('ru-RU', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         });
     }
 
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     // ================= ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ КНОПОК =================
-    window.editArticle = async function(articleId) {
-        console.log('Редактирование статьи:', articleId);
-        // Здесь будет логика редактирования
-        alert('Редактирование статьи: ' + articleId);
-    };
-
     window.deleteArticle = async function(articleId) {
         if (confirm('Удалить статью?')) {
             try {
                 await db.collection('articles').doc(articleId).delete();
-                showSuccess('Статья удалена');
+                alert('Статья удалена');
                 loadArticles();
             } catch (error) {
                 console.error('Ошибка удаления:', error);
-                showError('Ошибка удаления статьи');
+                alert('Ошибка удаления статьи');
             }
         }
     };
-
-    // Сделаем функции доступными глобально для модального окна
-    window.openAddArticleModal = openAddArticleModal;
-    window.closeAddArticleModal = closeAddArticleModal;
 });

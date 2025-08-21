@@ -21,7 +21,7 @@ if (typeof firebase === 'undefined') {
     try {
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage(); // Теперь storage доступен
+        const storage = firebase.storage(); 
         
         // Экспорт для использования
         window.firebaseServices = { 

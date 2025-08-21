@@ -39,75 +39,58 @@
     <!-- Основная панель администрирования -->
     <div id="admin-container" style="display:none;">
         <header class="admin-header">
-            <div class="admin-header-content">
-                <div class="admin-title">
-                    <h1><i class="fas fa-cog"></i> Панель управления блогом</h1>
-                    <p>Управление статьями и контентом</p>
-                </div>
-                <div class="admin-actions">
-                    <button id="logout-btn" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Выйти
-                    </button>
-                </div>
-            </div>
+            <h1>Панель управления CO[D]ENT</h1>
+            <p>Добро пожаловать, <span id="user-email"></span></p>
         </header>
 
-        <main class="admin-main">
-            <div class="admin-toolbar">
-                <button id="add-article-btn" class="add-article-btn">
-                    <i class="fas fa-plus"></i> Новая статья
-                </button>
-                <div class="stats">
-                    <span class="stat-item">
-                        <i class="fas fa-file-alt"></i> Статей: <span id="articles-count">0</span>
-                    </span>
-                </div>
-            </div>
+        <div class="admin-actions">
+            <button id="logout-btn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Выйти
+            </button>
+            <button id="add-article-btn" class="add-article-btn">
+                <i class="fas fa-plus"></i> Добавить статью
+            </button>
+        </div>
 
-            <div class="articles-container">
-                <h2>Список статей</h2>
-                <div id="articles-list" class="articles-grid">
-                    <div class="loading-articles">Загрузка статей...</div>
-                </div>
+        <section class="articles-section">
+            <h2>Статьи</h2>
+            <div id="articles-list" class="articles-list">
+                <!-- Статьи будут загружены здесь -->
             </div>
-        </main>
+        </section>
 
         <!-- Модальное окно добавления статьи -->
         <div id="add-article-modal" class="modal">
             <div class="modal-content">
-                <span class="close-modal" id="close-add-modal">&times;</span>
-                <h2><i class="fas fa-plus"></i> Добавить новую статью</h2>
-                
-                <form id="add-article-form" class="article-form">
+                <div class="modal-header">
+                    <h3>Добавить новую статью</h3>
+                    <span id="close-add-modal" class="close">&times;</span>
+                </div>
+                <form id="add-article-form" class="modal-form">
                     <div class="form-group">
-                        <label for="article-title">Название статьи *</label>
-                        <input type="text" id="article-title" required placeholder="Введите заголовок статьи">
-                        <span class="error-message"></span>
+                        <label for="article-title">Заголовок статьи</label>
+                        <input type="text" id="article-title" placeholder="Введите заголовок" required>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="article-content">Содержание статьи *</label>
-                        <textarea id="article-content" required placeholder="Напишите содержание статьи..." rows="8"></textarea>
-                        <span class="error-message"></span>
+                        <label for="article-content">Содержание статьи</label>
+                        <textarea id="article-content" placeholder="Напишите содержание статьи..." rows="10" required></textarea>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="article-image">Изображение статьи</label>
                         <div class="file-upload">
                             <input type="file" id="article-image" accept="image/*">
-                            <label for="article-image" class="file-label">
-                                <i class="fas fa-upload"></i> Выберите изображение
+                            <label for="article-image" class="file-upload-label">
+                                <i class="fas fa-upload"></i> Выбрать изображение
                             </label>
-                            <span class="file-name" id="file-name">Файл не выбран</span>
+                            <span id="file-name">Файл не выбран</span>
                         </div>
                         <div id="image-preview" class="image-preview"></div>
-                        <span class="file-hint">Поддерживаемые форматы: JPG, PNG, GIF. Макс. размер: 5MB</span>
                     </div>
-                    
+
                     <div class="form-actions">
-                        <button type="button" class="cancel-btn" id="cancel-add-btn">
-                            <i class="fas fa-times"></i> Отмена
-                        </button>
+                        <button type="button" id="cancel-add-btn" class="cancel-btn">Отмена</button>
                         <button type="submit" class="submit-btn">
                             <i class="fas fa-save"></i> Сохранить статью
                         </button>
@@ -115,56 +98,121 @@
                 </form>
             </div>
         </div>
+<!-- Модальное окно редактирования статьи -->
+<div id="edit-article-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Редактировать статью</h3>
+            <span id="close-edit-modal" class="close">&times;</span>
+        </div>
+        <form id="edit-article-form" class="modal-form">
+            <div class="form-group">
+                <label for="edit-article-title">Заголовок статьи</label>
+                <input type="text" id="edit-article-title" placeholder="Введите заголовок" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-article-content">Содержание статьи</label>
+                <textarea id="edit-article-content" placeholder="Напишите содержание статьи..." rows="10" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-article-image">Новое изображение статьи (оставьте пустым, чтобы сохранить текущее)</label>
+                <div class="file-upload">
+                    <input type="file" id="edit-article-image" accept="image/*">
+                    <label for="edit-article-image" class="file-upload-label">
+                        <i class="fas fa-upload"></i> Выбрать новое изображение
+                    </label>
+                    <span id="edit-file-name">Файл не выбран</span>
+                </div>
+                <div id="edit-image-preview" class="image-preview"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancel-edit-btn" class="cancel-btn">Отмена</button>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i> Обновить статью
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
     </div>
 
     <!-- Подключаем скрипты -->
     <script src="js/firebase-config.js"></script>
     
     <script>
-        // Базовая инициализация модальных окон
+        // Базовая инициализация
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing admin interface...');
             
-            // Основные элементы
+            // ===== ФОРМА ВХОДA =====
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Login form submitted');
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (!email || !password) {
+                        alert('Заполните все поля');
+                        return;
+                    }
+                    
+                    // Показываем loading state
+                    const submitBtn = loginForm.querySelector('.auth-submit-btn');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
+                    
+                    // Вызываем глобальную функцию для входа
+                    if (window.handleLogin) {
+                        window.handleLogin(email, password)
+                            .finally(() => {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalText;
+                            });
+                    } else {
+                        alert('Система входа не инициализирована');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                });
+            }
+
+            // ===== МОДАЛЬНОЕ ОКНО СТАТЬИ =====
             const addArticleBtn = document.getElementById('add-article-btn');
             const addArticleModal = document.getElementById('add-article-modal');
             const closeAddModal = document.getElementById('close-add-modal');
             const cancelAddBtn = document.getElementById('cancel-add-btn');
-            const addArticleForm = document.getElementById('add-article-form');
             const fileInput = document.getElementById('article-image');
             const fileName = document.getElementById('file-name');
             const imagePreview = document.getElementById('image-preview');
 
-            // Проверяем существование элементов
-            if (!addArticleBtn) {
-                console.error('Кнопка "Новая статья" не найдена');
-                return;
-            }
-
-            if (!addArticleModal) {
-                console.error('Модальное окно не найдено');
-                return;
-            }
-
             // Функции для работы с модальными окнами
             function openAddArticleModal() {
-                console.log('Opening add article modal');
-                addArticleModal.style.display = 'block';
-                resetForm();
+                if (addArticleModal) {
+                    addArticleModal.style.display = 'block';
+                    resetForm();
+                }
             }
 
             function closeAddArticleModal() {
-                addArticleModal.style.display = 'none';
-                resetForm();
+                if (addArticleModal) {
+                    addArticleModal.style.display = 'none';
+                    resetForm();
+                }
             }
 
             function resetForm() {
-                if (addArticleForm) {
-                    addArticleForm.reset();
-                }
-                if (fileName) {
-                    fileName.textContent = 'Файл не выбран';
-                }
+                const addArticleForm = document.getElementById('add-article-form');
+                if (addArticleForm) addArticleForm.reset();
+                if (fileName) fileName.textContent = 'Файл не выбран';
                 if (imagePreview) {
                     imagePreview.style.display = 'none';
                     imagePreview.innerHTML = '';
@@ -176,25 +224,24 @@
                 if (file && fileName) {
                     fileName.textContent = file.name;
                     
-                    // Превью изображения
                     if (file.type.startsWith('image/') && imagePreview) {
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Превью" style="max-width: 100%; max-height: 200px;">`;
+                            imagePreview.innerHTML = `<img src="${e.target.result}" alt="Превью">`;
                             imagePreview.style.display = 'block';
                         };
                         reader.readAsDataURL(file);
                     }
                 } else if (fileName) {
                     fileName.textContent = 'Файл не выбран';
-                    if (imagePreview) {
-                        imagePreview.style.display = 'none';
-                    }
+                    if (imagePreview) imagePreview.style.display = 'none';
                 }
             }
 
             // Обработчики событий
-            addArticleBtn.addEventListener('click', openAddArticleModal);
+            if (addArticleBtn) {
+                addArticleBtn.addEventListener('click', openAddArticleModal);
+            }
 
             if (closeAddModal) {
                 closeAddModal.addEventListener('click', closeAddArticleModal);
@@ -215,7 +262,7 @@
                 }
             });
 
-            // Делаем функции глобальными для использования в admin.js
+            // Делаем функции глобальными
             window.openAddArticleModal = openAddArticleModal;
             window.closeAddArticleModal = closeAddArticleModal;
 
@@ -223,22 +270,7 @@
         });
     </script>
 
-    <!-- Подключаем основной скрипт после инициализации -->
+    <!-- Подключаем основной скрипт -->
     <script src="js/admin.js"></script>
-
-    <script>
-        // Резервная инициализация на случай если что-то пошло не так
-        setTimeout(() => {
-            const addArticleBtn = document.getElementById('add-article-btn');
-            const addArticleModal = document.getElementById('add-article-modal');
-            
-            if (addArticleBtn && addArticleModal && !addArticleBtn.onclick) {
-                addArticleBtn.addEventListener('click', () => {
-                    addArticleModal.style.display = 'block';
-                });
-                console.log('Резервная инициализация кнопки выполнена');
-            }
-        }, 2000);
-    </script>
 </body>
 </html>
