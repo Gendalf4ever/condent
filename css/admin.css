@@ -1,3 +1,95 @@
+/* Стили для контейнера аутентификации */
+#auth-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.auth-wrapper {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    margin: 1rem;
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-logo h2 {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.auth-logo p {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 2px solid #ecf0f1;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.auth-submit-btn {
+    padding: 0.75rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.auth-submit-btn:hover {
+    background: #2980b9;
+}
+
 /* Стили для админ-панели */
 .admin-header {
     text-align: center;
@@ -297,5 +389,28 @@
     
     .form-actions {
         flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-wrapper {
+        padding: 2rem 1.5rem;
+        margin: 0.5rem;
+    }
+    
+    .auth-logo h2 {
+        font-size: 2rem;
+    }
+    
+    .admin-header {
+        padding: 1.5rem;
+    }
+    
+    .articles-section {
+        padding: 1.5rem;
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
     }
 }

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Наша команда - CODENT.PRO</title>
+        <meta name="description" content="Профессиональная команда экспертов в области цифровой стоматологии">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/team.css">
+    </head>
+    <body>
+       <!-- Хедер будет загружен динамически -->
+       
+       <!-- основной контент -->
+       <main class="main-content-wrapper">
+           <div class="content-main">
+               <h1>Наша команда</h1>
+               
+               <div class="team-intro">
+                   <p>CO[D]ENT - это команда профессионалов. Мы вообще крутые и так далее.</p>
+               </div>
+
+               <div class="team-members">
+                   <h2>Эксперты компании</h2>
+                   
+                   <div class="members-grid">
+                       <div class="member-card">
+                           <div class="member-photo">
+                               <img src="src/img/team/2-2.png" alt="Основатель компании" onerror="this.src='https://via.placeholder.com/300x300?text=Фото'">
+                           </div>
+                           <div class="member-info">
+                               <h3>Евгений Братчиков</h3>
+                               <p class="member-position">Основатель</p>
+                               <p class="member-bio">бебебебебеббебебебебебебеббабаббабабабабабаббабабабабаб</p>
+                               <div class="member-skills">
+                                   <span class="skill-tag">скилл 1</span>
+                                   <span class="skill-tag">скилл 2</span>
+                                   <span class="skill-tag">скилл 3</span>
+                               </div>
+                           </div>
+                       </div>
+
+                       <div class="member-card">
+                           <div class="member-photo">
+                               <img src="src/img/team/1-2.png" alt="Главный технолог" onerror="this.src='https://via.placeholder.com/300x300?text=Фото'">
+                           </div>
+                           <div class="member-info">
+                               <h3>Габиб Керимов</h3>
+                               <p class="member-position">Главный продажник</p>
+                               <p class="member-bio">Вообще очень хороший человек бла бла бла бла</p>
+                               <div class="member-skills">
+                                   <span class="skill-tag">скилл 1</span>
+                                   <span class="skill-tag">скилл 2</span>
+                                   <span class="skill-tag">скилл 3 </span>
+                               </div>
+                           </div>
+                       </div>
+                        
+                   </div>
+               </div>
+
+               <div class="team-values">
+                   <h2>Наши ценности</h2>
+                   <div class="values-grid">
+                       <div class="value-item">
+                           <i class="fas fa-lightbulb"></i>
+                           <h4>Инновации</h4>
+                           <p>Постоянное изучение и внедрение новых технологий</p>
+                       </div>
+                       <div class="value-item">
+                           <i class="fas fa-graduation-cap"></i>
+                           <h4>Обучение</h4>
+                           <p>Делимся знаниями и помогаем расти профессионалам</p>
+                       </div>
+                       <div class="value-item">
+                           <i class="fas fa-handshake"></i>
+                           <h4>Партнерство</h4>
+                           <p>Строим долгосрочные отношения с клиентами</p>
+                       </div>
+                       <div class="value-item">
+                           <i class="fas fa-shield-alt"></i>
+                           <h4>Надежность</h4>
+                           <p>Гарантируем качество оборудования и поддержки</p>
+                       </div>
+                   </div>
+               </div>
+
+               <div class="team-join">
+                   <h2>Присоединяйтесь к нашей команде</h2>
+                   <p>Мы всегда рады талантливым специалистам в области цифровой стоматологии</p>
+                   <a href="contacts.html" class="btn btn-primary">Связаться с нами</a>
+               </div>
+           </div>
+       </main>
+
+       <!-- Футер будет загружен динамически -->
+       
+       <!-- Подключаем скрипты -->
+       <script src="js/load-components.js"></script>
+       <script>
+           document.addEventListener('DOMContentLoaded', () => {
+               // Установка заголовка
+               if (typeof setPageHeader === 'function') {
+                   setPageHeader('Наша команда', 'Профессионалы цифровой стоматологии');
+               }
+               
+               // Добавляем отступ при загрузке хедера
+               const checkHeader = setInterval(() => {
+                   const header = document.querySelector('header');
+                   if (header) {
+                       clearInterval(checkHeader);
+                       document.documentElement.style.setProperty(
+                           '--header-height', 
+                           `${header.offsetHeight}px`
+                       );
+                   }
+               }, 100);
+           });
+       </script>
+    </body>
+</html>
