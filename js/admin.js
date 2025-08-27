@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Переменные для хранения состояния
     let currentEditingArticleId = null;
+    let currentArticleImageUrl = null;
 
     // ================= ГЛОБАЛЬНАЯ ФУНКЦИЯ ДЛЯ ВХОДА =================
     window.handleLogin = async function(email, password) {
@@ -157,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             
             const title = document.getElementById('article-title').value.trim();
-            const content = document.getElementById('article-content').value.trim();
+            const content = window.quillAdd ? window.quillAdd.root.innerHTML : '';
             
-            if (!title || !content) {
+            if (!title || !content || content === '<p><br></p>') {
                 alert('Заполните все обязательные поля');
                 return;
             }
@@ -212,9 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             
             const title = document.getElementById('edit-article-title').value.trim();
-            const content = document.getElementById('edit-article-content').value.trim();
+            const content = window.quillEdit ? window.quillEdit.root.innerHTML : '';
             
-            if (!title || !content) {
+            if (!title || !content || content === '<p><br></p>') {
                 alert('Заполните все обязательные поля');
                 return;
             }
@@ -236,6 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fileInput = document.getElementById('edit-article-image');
                 if (fileInput && fileInput.files[0]) {
                     articleData.imageUrl = await uploadImage(fileInput.files[0]);
+                } else if (document.getElementById('remove-image-checkbox').checked) {
+                    // Удаляем изображение
+                    articleData.imageUrl = null;
+                } else {
+                    // Сохраняем текущее изображение
+                    articleData.imageUrl = currentArticleImageUrl;
                 }
 
                 // Обновление статьи
@@ -306,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function uploadImage(file) {
         try {
-            const API_KEY = 'get_some_key'; //ключ
+            const API_KEY = 'get_some_key'; //  ключ
             
             const formData = new FormData();
             formData.append('image', file);
@@ -347,16 +354,46 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const articleData = articleDoc.data();
+            currentArticleImageUrl = articleData.imageUrl || null;
             
             // Заполняем форму редактирования
             document.getElementById('edit-article-title').value = articleData.title || '';
-            document.getElementById('edit-article-content').value = articleData.content || '';
+            
+            // Заполняем редактор контентом
+            if (window.quillEdit) {
+                window.quillEdit.root.innerHTML = articleData.content || '';
+            }
             
             // Показываем текущее изображение
             const imagePreview = document.getElementById('edit-image-preview');
-            if (articleData.imageUrl && imagePreview) {
-                imagePreview.innerHTML = `<img src="${articleData.imageUrl}" alt="Текущее изображение" style="max-width: 200px; margin-top: 10px;">`;
+            const removeImageContainer = document.getElementById('remove-image-container');
+            
+            if (currentArticleImageUrl) {
+                imagePreview.innerHTML = `
+                    <div class="current-image">
+                        <img src="${currentArticleImageUrl}" alt="Текущее изображение" style="max-width: 200px;">
+                        <div class="image-actions">
+                            <label class="remove-image-label">
+                                <input type="checkbox" id="remove-image-checkbox">
+                                Удалить изображение
+                            </label>
+                        </div>
+                    </div>
+                `;
                 imagePreview.style.display = 'block';
+                
+                // Показываем контейнер для удаления
+                if (removeImageContainer) {
+                    removeImageContainer.style.display = 'block';
+                }
+            } else {
+                imagePreview.innerHTML = '';
+                imagePreview.style.display = 'none';
+                
+                // Скрываем контейнер для удаления
+                if (removeImageContainer) {
+                    removeImageContainer.style.display = 'none';
+                }
             }
             
             // Открываем модальное окно редактирования
@@ -390,7 +427,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 imagePreview.innerHTML = '';
                 imagePreview.style.display = 'none';
             }
+            // Очищаем редактор
+            if (window.quillEdit) {
+                window.quillEdit.root.innerHTML = '';
+            }
+            // Сбрасываем чекбокс удаления
+            const removeCheckbox = document.getElementById('remove-image-checkbox');
+            if (removeCheckbox) {
+                removeCheckbox.checked = false;
+            }
             currentEditingArticleId = null;
+            currentArticleImageUrl = null;
         }
     };
 
