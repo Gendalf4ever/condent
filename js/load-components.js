@@ -23,9 +23,7 @@ const CONFIG = {
       millingProducts: 'includes/tables/milling-products.html'
     },
     content: 'content/'
-  },
-  
-
+  }
 };
 
 // Улучшенная функция установки заголовка страницы
@@ -72,7 +70,14 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
     const html = await response.text();
     componentCache.set(fullPath, html); // Кэшируем результат
     
-    return insertHtml(html, targetSelector, position);
+    const success = insertHtml(html, targetSelector, position);
+    
+    // Инициализируем компонент после загрузки
+    if (success) {
+      initComponentAfterLoad(componentPath, targetSelector);
+    }
+    
+    return success;
     
   } catch (error) {
     console.error(`Failed to load ${componentPath}:`, error);
@@ -91,6 +96,82 @@ window.loadComponent = async function(componentPath, targetSelector = 'body', po
   }
 };
 
+// Функция для инициализации компонентов после загрузки
+function initComponentAfterLoad(componentPath, targetSelector) {
+  const target = document.querySelector(targetSelector);
+  if (!target) return;
+  
+  // Инициализация реквизитов компании
+  if (componentPath.includes('company-details')) {
+    initCompanyDetails(target);
+  }
+  
+  // Инициализация других компонентов...
+  if (componentPath.includes('test-me-button')) {
+    initTestMeButton(target);
+  }
+  
+  // Инициализация таблиц
+  if (componentPath.includes('tables/')) {
+    initTables(target);
+  }
+}
+
+// Инициализация реквизитов компании
+function initCompanyDetails(container) {
+  const toggleBtn = container.querySelector('.company-details__toggle');
+  const content = container.querySelector('.company-details__content');
+  
+  if (toggleBtn && content) {
+    // Сначала скрываем контент
+    content.style.display = 'none';
+    
+    toggleBtn.addEventListener('click', () => {
+      const isExpanded = content.style.display === 'block';
+      content.style.display = isExpanded ? 'none' : 'block';
+      
+      // Анимация появления
+      if (!isExpanded) {
+        content.style.opacity = '0';
+        content.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+          content.style.transition = 'all 0.3s ease';
+          content.style.opacity = '1';
+          content.style.transform = 'translateY(0)';
+        }, 10);
+      }
+      
+      // Меняем иконку
+      toggleBtn.innerHTML = isExpanded ? 
+        '<i class="fas fa-plus"></i>' : 
+        '<i class="fas fa-minus"></i>';
+      
+      // Меняем aria-label
+      toggleBtn.setAttribute('aria-label', 
+        isExpanded ? 'Показать реквизиты' : 'Скрыть реквизиты');
+    });
+  }
+}
+
+// Инициализация тестовой кнопки
+function initTestMeButton(container) {
+  const button = container.querySelector('.test-button');
+  if (button) {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('Тестовая кнопка нажата');
+      // Добавьте свою логику здесь
+    });
+  }
+}
+
+// Инициализация таблиц
+function initTables(container) {
+  // Добавьте логику инициализации таблиц если нужно
+  console.log('Table loaded:', container);
+}
+
 // Модуль для кнопки тестирования
 const TestMeButton = {
   async load() {
@@ -102,23 +183,11 @@ const TestMeButton = {
       'beforeend'
     );
     
-    if (loaded) this.initButton();
     return loaded;
   },
 
   shouldLoad() {
     return window.location.pathname.includes('printers-set.html');
-  },
-
-  initButton() {
-    const button = document.querySelector('.test-button');
-    if (button) {
-      button.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('Тестовая кнопка нажата');
-        // Добавьте свою логику здесь
-      });
-    }
   }
 };
 
@@ -148,10 +217,14 @@ const PrinterTables = {
 const CompanyDetails = {
   async load() {
     if (!this.shouldLoad()) return false;
-    return await loadComponent(
+    
+    // Загружаем в контейнер на странице контактов
+    const loaded = await loadComponent(
       CONFIG.paths.components.companyDetails,
-      '.footer-contacts-container'
+      '#company-details-container'
     );
+    
+    return loaded;
   },
 
   shouldLoad() {
@@ -297,7 +370,6 @@ async function initializePage() {
       MillingProducts.load()
     ]);
     
-    
     // Добавляем класс для индикации загрузки
     document.documentElement.classList.add('page-loaded');
     
@@ -320,3 +392,7 @@ if (document.readyState === 'complete') {
 } else {
   document.addEventListener('DOMContentLoaded', initializePage);
 }
+
+// Экспортируем функции для глобального использования
+window.initCompanyDetails = initCompanyDetails;
+window.initTestMeButton = initTestMeButton;

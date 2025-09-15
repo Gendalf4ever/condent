@@ -401,3 +401,285 @@
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* ================= СТИЛИ ДЛЯ QUILL РЕДАКТОРА ================= */
+/* Контейнер контента Quill */
+.ql-editor {
+  font-family: inherit;
+  line-height: 1.7;
+  color: #34495e;
+  font-size: 1.1rem;
+}
+
+/* Стили для шрифтов */
+.ql-font-monospace {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace !important;
+  background: #f8f9fa;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.95em;
+}
+
+.ql-font-serif {
+  font-family: 'Georgia', 'Times New Roman', serif !important;
+}
+
+/* Стили для размеров текста */
+.ql-size-small {
+  font-size: 0.85em !important;
+}
+
+.ql-size-large {
+  font-size: 1.4em !important;
+}
+
+.ql-size-huge {
+  font-size: 2em !important;
+  line-height: 1.3;
+}
+
+/* Стили для выравнивания */
+.ql-align-center {
+  text-align: center !important;
+}
+
+.ql-align-right {
+  text-align: right !important;
+}
+
+.ql-align-justify {
+  text-align: justify !important;
+}
+
+/* Стили для списков */
+.ql-editor ol,
+.ql-editor ul {
+  padding-left: 1.8em;
+  margin: 1.2em 0;
+}
+
+.ql-editor li {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+}
+
+.ql-editor ol li {
+  padding-left: 0.3em;
+}
+
+/* Стили для цитат */
+.ql-editor blockquote {
+  border-left: 4px solid #3498db;
+  margin: 1.5em 0;
+  padding-left: 1.5em;
+  font-style: italic;
+  color: #7f8c8d;
+  background: #f8f9fa;
+  padding: 1.5em;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Стили для кода */
+.ql-editor code {
+  background: #2c3e50;
+  color: #ecf0f1;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.9em;
+}
+
+.ql-syntax {
+  background: #2c3e50 !important;
+  color: #ecf0f1 !important;
+  padding: 1.2em !important;
+  border-radius: 6px !important;
+  overflow: auto !important;
+  margin: 1em 0 !important;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace !important;
+  line-height: 1.5 !important;
+}
+
+/* Стили для ссылок */
+.ql-editor a {
+  color: #3498db;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.ql-editor a:hover {
+  color: #2980b9;
+  text-decoration: none;
+}
+
+/* Стили для изображений */
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5em 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: block;
+}
+
+/* Стили для таблиц */
+.ql-editor table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ql-editor td,
+.ql-editor th {
+  border: 1px solid #ddd;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.ql-editor th {
+  background: #3498db;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+}
+
+.ql-editor tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.ql-editor tr:hover {
+  background: #e8f4fd;
+}
+
+/* Стили для цветного текста */
+.ql-editor span[style*="color"] {
+  padding: 0.1em 0.2em;
+  border-radius: 3px;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
+}
+
+/* Стили для зачеркнутого текста */
+.ql-editor s {
+  text-decoration: line-through;
+  color: #95a5a6;
+}
+
+/* Стили для подчеркнутого текста */
+.ql-editor u {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Стили для комбинаций */
+.ql-editor strong em,
+.ql-editor em strong {
+  font-weight: bold;
+  font-style: italic;
+  color: #2c3e50;
+}
+
+/* Заголовки в контенте Quill */
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+  color: #2c3e50;
+  margin: 1.5em 0 0.8em 0;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.ql-editor h1 { 
+  font-size: 2.2em;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 0.3em;
+}
+
+.ql-editor h2 { 
+  font-size: 1.8em;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.2em;
+}
+
+.ql-editor h3 { font-size: 1.5em; }
+.ql-editor h4 { font-size: 1.3em; }
+.ql-editor h5 { font-size: 1.1em; }
+.ql-editor h6 { 
+  font-size: 1em;
+  color: #7f8c8d;
+}
+
+/* Адаптивность для контента Quill */
+@media (max-width: 768px) {
+  .ql-editor {
+    font-size: 16px;
+    padding: 0.5em;
+  }
+  
+  .ql-editor h1 { font-size: 1.8em; }
+  .ql-editor h2 { font-size: 1.5em; }
+  .ql-editor h3 { font-size: 1.3em; }
+  
+  .ql-editor table {
+    font-size: 14px;
+  }
+  
+  .ql-editor img {
+    margin: 1em 0;
+  }
+  
+  .ql-syntax {
+    padding: 1em !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Улучшенная читаемость для мобильных */
+@media (max-width: 480px) {
+  .ql-editor {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  
+  .ql-editor ol,
+  .ql-editor ul {
+    padding-left: 1.5em;
+  }
+  
+  .ql-editor blockquote {
+    padding: 1em;
+    margin: 1em 0;
+  }
+}
+
+/* Сброс отступов для первого и последнего элементов */
+.ql-editor > *:first-child {
+  margin-top: 0;
+}
+
+.ql-editor > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Специальные стили для различных форматов */
+.ql-editor .ql-indent-1 { padding-left: 3em; }
+.ql-editor .ql-indent-2 { padding-left: 6em; }
+.ql-editor .ql-indent-3 { padding-left: 9em; }
+.ql-editor .ql-indent-4 { padding-left: 12em; }
+.ql-editor .ql-indent-5 { padding-left: 15em; }
+.ql-editor .ql-indent-6 { padding-left: 18em; }
+.ql-editor .ql-indent-7 { padding-left: 21em; }
+.ql-editor .ql-indent-8 { padding-left: 24em; }
+
+/* Стили для разделительной линии */
+.ql-editor hr {
+  border: none;
+  border-top: 2px solid #ecf0f1;
+  margin: 2em 0;
+  height: 0;
+}

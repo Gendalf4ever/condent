@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function uploadImage(file) {
         try {
-            const API_KEY = 'get_some_key'; //  ключ
+            const API_KEY = 'бебебе'; //  ключ
             
             const formData = new FormData();
             formData.append('image', file);

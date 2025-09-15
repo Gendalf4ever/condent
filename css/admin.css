@@ -206,12 +206,6 @@
     margin-top: 0.5rem;
 }
 
-.article-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
 .article-actions button {
     padding: 0.5rem 1rem;
     border: none;
@@ -219,18 +213,6 @@
     cursor: pointer;
     font-size: 0.9rem;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.edit-btn {
-    background-color: #3498db;
-    color: white;
-}
-
-.edit-btn:hover {
-    background-color: #2980b9;
 }
 
 .delete-btn {
@@ -261,7 +243,7 @@
     padding: 2rem;
     border-radius: 8px;
     width: 90%;
-    max-width: 800px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -300,7 +282,8 @@
     font-weight: 500;
 }
 
-.modal-form input {
+.modal-form input,
+.modal-form textarea {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #bdc3c7;
@@ -308,70 +291,13 @@
     font-size: 1rem;
 }
 
-/* Стили для Quill редактора */
-.ql-toolbar {
-    border-radius: 4px 4px 0 0;
-    border: 1px solid #bdc3c7;
-    border-bottom: none;
-    background: #f8f9fa;
-}
-
-.ql-container {
-    border-radius: 0 0 4px 4px;
-    border: 1px solid #bdc3c7;
-    border-top: none;
-    font-size: 1rem;
-    min-height: 200px;
-}
-
-.ql-editor {
-    min-height: 250px;
-    padding: 1rem;
-    font-family: inherit;
-}
-
-.ql-editor.ql-blank::before {
-    color: #95a5a6;
-    font-style: italic;
-    left: 1rem;
-}
-
-/* Специальные стили для правильного отображения в блоге */
-.ql-font-monospace {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
-}
-
-.ql-size-small {
-    font-size: 0.75em;
-}
-
-.ql-size-large {
-    font-size: 1.5em;
-}
-
-.ql-size-huge {
-    font-size: 2.5em;
-}
-
-/* Кастомные стили для редактора */
-.ql-formats button:hover {
-    color: #3498db;
-}
-
-.ql-picker-label:hover {
-    color: #3498db;
-}
-
-.ql-active {
-    color: #3498db;
+.modal-form textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
 .file-upload {
     margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
 }
 
 .file-upload-label {
@@ -381,17 +307,11 @@
     color: white;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    margin-right: 1rem;
 }
 
 .file-upload-label:hover {
     background: #2980b9;
-}
-
-#file-name,
-#edit-file-name {
-    color: #7f8c8d;
-    font-size: 0.9rem;
 }
 
 .image-preview {
@@ -403,55 +323,6 @@
     max-width: 100%;
     max-height: 200px;
     border-radius: 4px;
-    border: 2px solid #ecf0f1;
-}
-
-/* Стили для удаления изображения */
-.remove-image-container {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #e9ecef;
-}
-
-.remove-image-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-weight: 500;
-    color: #dc3545;
-    transition: color 0.3s ease;
-}
-
-.remove-image-label:hover {
-    color: #c82333;
-}
-
-.remove-image-label input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-}
-
-.image-actions {
-    margin-top: 0.5rem;
-}
-
-.current-image {
-    text-align: center;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #e9ecef;
-}
-
-.current-image img {
-    border-radius: 6px;
-    border: 2px solid #e9ecef;
-    max-width: 100%;
-    height: auto;
 }
 
 .form-actions {
@@ -459,8 +330,6 @@
     gap: 1rem;
     justify-content: flex-end;
     margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #ecf0f1;
 }
 
 .cancel-btn {
@@ -470,12 +339,6 @@
     color: #7f8c8d;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.cancel-btn:hover {
-    background: #f8f9fa;
-    color: #2c3e50;
 }
 
 .submit-btn {
@@ -485,19 +348,10 @@
     color: white;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .submit-btn:hover {
     background: #27ae60;
-}
-
-.submit-btn:disabled {
-    background: #95a5a6;
-    cursor: not-allowed;
 }
 
 /* Состояния загрузки */
@@ -514,17 +368,6 @@
     color: #e74c3c;
     background: #fadbd8;
     border-radius: 4px;
-    border: 1px solid #f5c6cb;
-}
-
-/* Анимации */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.fa-spin {
-    animation: spin 1s linear infinite;
 }
 
 /* Адаптивность */
@@ -539,37 +382,13 @@
         text-align: center;
     }
     
-    .article-actions {
-        justify-content: center;
-    }
-    
     .modal-content {
         margin: 1rem;
         width: calc(100% - 2rem);
-        padding: 1.5rem;
     }
     
     .form-actions {
         flex-direction: column;
-    }
-    
-    .file-upload {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .ql-toolbar {
-        padding: 0.5rem;
-    }
-    
-    .ql-toolbar .ql-formats {
-        margin-right: 0.5rem;
-    }
-    
-    .ql-toolbar button {
-        padding: 0.25rem;
-        width: 28px;
-        height: 28px;
     }
 }
 
@@ -592,53 +411,6 @@
     }
     
     .modal-content {
-        padding: 1rem;
+        padding: 1.5rem;
     }
-    
-    .modal-form .form-group {
-        margin-bottom: 1rem;
-    }
-    
-    .form-actions {
-        margin-top: 1.5rem;
-    }
-}
-
-/* Улучшенный скроллбар для модальных окон */
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: #3498db;
-    border-radius: 4px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-    background: #2980b9;
-}
-
-/* Стили для состояний загрузки */
-.loading-state {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.loading-state::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
 }

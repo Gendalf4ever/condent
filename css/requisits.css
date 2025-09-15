@@ -1,0 +1,208 @@
+/* Стили для реквизитов компании */
+.company-details {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border: 1px solid #e9ecef;
+}
+
+.company-details__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.company-details__title {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.company-details__toggle {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.company-details__toggle:hover {
+    background: #2980b9;
+}
+
+.company-details__content {
+    display: none;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+    animation: fadeIn 0.3s ease;
+}
+
+.company-details__item {
+    margin-bottom: 0.8rem;
+    padding: 0.8rem;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+}
+
+.company-details__item:last-child {
+    margin-bottom: 0;
+}
+
+.company-details__item strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .company-details {
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .company-details__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .company-details__toggle {
+        align-self: stretch;
+        justify-content: center;
+    }
+}
+
+/* Стили для контактов */
+.contacts-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.footer-contacts-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.footer-contacts-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contact-block {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #3498db;
+}
+
+.contact-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.contact-info {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+.contact-link {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+.map-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.map-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    height: 400px;
+}
+
+.yandex-map {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+}
+
+/* Адаптивность для контактов */
+@media (max-width: 1024px) {
+    .contacts-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .map-wrapper {
+        height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-contacts-container,
+    .map-container {
+        padding: 1.5rem;
+    }
+    
+    .contact-block {
+        padding: 0.8rem;
+    }
+    
+    .map-wrapper {
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contacts-content {
+        margin-top: 1.5rem;
+    }
+    
+    .footer-contacts-container,
+    .map-container {
+        padding: 1rem;
+    }
+    
+    .map-wrapper {
+        height: 250px;
+    }
+}

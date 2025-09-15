@@ -28,6 +28,9 @@ async function initializeBlog() {
         setupRealTimeUpdates();
         setupNavigation();
         
+        // Инициализируем стили Quill
+        initQuillStyles();
+        
     } catch (error) {
         console.error('Blog initialization error:', error);
         showError('Не удалось загрузить блог. Пожалуйста, обновите страницу.');
@@ -166,6 +169,12 @@ async function showSingleArticle(articleId) {
         // Обновляем URL
         window.history.pushState({ articleId }, '', `?id=${articleId}`);
         
+        // Применяем стили Quill после рендеринга
+        setTimeout(() => {
+            applyQuillStyles();
+            processNestedStyles();
+        }, 100);
+        
     } catch (error) {
         console.error('Error loading article:', error);
         showError('Не удалось загрузить статью');
@@ -197,8 +206,8 @@ function renderSingleArticle(articleId, article) {
                 </header>
                 
                 <div class="article-body">
-                    <div class="article-content">
-                        ${formatContent(article.content || 'Содержание отсутствует')}
+                    <div class="article-content ql-editor">
+                        ${article.content || 'Содержание отсутствует'}
                     </div>
                 </div>
                 
@@ -248,6 +257,200 @@ function handleBrowserBack() {
     }
 }
 
+// ================= СТИЛИ QUILL РЕДАКТОРА =================
+// Функция для применения стилей Quill
+function applyQuillStyles() {
+    console.log('Applying Quill styles...');
+    
+    // Применяем стили ко всем элементам с классами Quill
+    const styles = {
+        // Шрифты
+        'ql-font-monospace': {
+            'font-family': "'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace",
+            'background': '#f8f9fa',
+            'padding': '0.1em 0.3em',
+            'border-radius': '3px',
+            'font-size': '0.95em'
+        },
+        'ql-font-serif': {
+            'font-family': "'Georgia', 'Times New Roman', serif"
+        },
+        
+        // Размеры текста
+        'ql-size-small': {
+            'font-size': '0.85em'
+        },
+        'ql-size-large': {
+            'font-size': '1.4em'
+        },
+        'ql-size-huge': {
+            'font-size': '2em',
+            'line-height': '1.3'
+        },
+        
+        // Выравнивание
+        'ql-align-center': {
+            'text-align': 'center'
+        },
+        'ql-align-right': {
+            'text-align': 'right'
+        },
+        'ql-align-justify': {
+            'text-align': 'justify'
+        }
+    };
+
+    // Применяем все стили
+    Object.entries(styles).forEach(([className, style]) => {
+        const elements = document.querySelectorAll(`.${className}`);
+        elements.forEach(element => {
+            Object.entries(style).forEach(([property, value]) => {
+                element.style.setProperty(property, value, 'important');
+            });
+        });
+    });
+
+    // Обрабатываем inline стили (цвета)
+    document.querySelectorAll('[style*="color"]').forEach(el => {
+        if (el.style.color) {
+            el.style.padding = '0.1em 0.2em';
+            el.style.borderRadius = '3px';
+            el.style.background = 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%)';
+        }
+    });
+
+    console.log('Quill styles applied');
+}
+
+// Функция для обработки вложенных стилей
+function processNestedStyles() {
+    console.log('Processing nested styles...');
+    
+    // Обрабатываем вложенные теги
+    const nestedSelectors = [
+        'em s u', 'em u s', 's em u', 's u em', 'u em s', 'u s em',
+        'strong em', 'em strong', 'strong u', 'u strong'
+    ];
+
+    nestedSelectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+            if (selector.includes('em') && selector.includes('strong')) {
+                el.style.fontWeight = 'bold';
+                el.style.fontStyle = 'italic';
+            }
+            if (selector.includes('u') && selector.includes('s')) {
+                el.style.textDecoration = 'underline line-through';
+            }
+        });
+    });
+
+    // Обрабатываем списки
+    document.querySelectorAll('ol, ul').forEach(list => {
+        list.style.paddingLeft = '1.8em';
+        list.style.margin = '1.2em 0';
+    });
+
+    document.querySelectorAll('li').forEach(li => {
+        li.style.marginBottom = '0.5em';
+        li.style.lineHeight = '1.6';
+    });
+
+    console.log('Nested styles processed');
+}
+
+// Основная функция инициализации стилей Quill
+function initQuillStyles() {
+    console.log('Initializing Quill styles...');
+    
+    // Применяем стили сразу
+    applyQuillStyles();
+    processNestedStyles();
+    
+    // Наблюдаем за изменениями DOM
+    const observer = new MutationObserver((mutations) => {
+        let shouldApply = false;
+        
+        mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        if (node.querySelector?.('[class*="ql-"]') || 
+                            node.querySelector?.('[style*="color"]') ||
+                            node.className?.includes('ql-')) {
+                            shouldApply = true;
+                        }
+                    }
+                });
+            }
+        });
+        
+        if (shouldApply) {
+            setTimeout(() => {
+                applyQuillStyles();
+                processNestedStyles();
+            }, 100);
+        }
+    });
+
+    // Начинаем наблюдение
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+
+    console.log('Quill styles initialized');
+}
+
+// Принудительное применение стилей
+function forceQuillStyles() {
+    console.log('Forcing Quill styles...');
+    
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .ql-font-monospace {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace !important;
+            background: #f8f9fa !important;
+            padding: 0.1em 0.3em !important;
+            border-radius: 3px !important;
+            font-size: 0.95em !important;
+        }
+        .ql-size-small { font-size: 0.85em !important; }
+        .ql-size-large { font-size: 1.4em !important; }
+        .ql-size-huge { font-size: 2em !important; line-height: 1.3 !important; }
+        .ql-align-center { text-align: center !important; }
+        .ql-align-right { text-align: right !important; }
+        .ql-align-justify { text-align: justify !important; }
+        
+        span[style*="color"] {
+            padding: 0.1em 0.2em !important;
+            border-radius: 3px !important;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%) !important;
+        }
+        
+        em s u, em u s, s em u, s u em, u em s, u s em {
+            font-weight: bold !important;
+            font-style: italic !important;
+            text-decoration: underline line-through !important;
+            color: #2c3e50 !important;
+        }
+        
+        .ql-editor ol, .ql-editor ul {
+            padding-left: 1.8em !important;
+            margin: 1.2em 0 !important;
+        }
+        
+        .ql-editor li {
+            margin-bottom: 0.5em !important;
+            line-height: 1.6 !important;
+        }
+    `;
+    
+    document.head.appendChild(styleElement);
+    console.log('Forced styles applied');
+}
+
 // Вспомогательные функции
 function formatDate(date) {
     return date.toLocaleDateString('ru-RU', {
@@ -263,16 +466,6 @@ function getExcerpt(text, length = 100) {
     return cleanText.length > length 
         ? cleanText.substring(0, length) + '...' 
         : cleanText;
-}
-
-function formatContent(text) {
-    if (!text) return '<p>Содержание отсутствует</p>';
-    
-    return text
-        .split('\n')
-        .filter(paragraph => paragraph.trim())
-        .map(paragraph => `<p>${escapeHtml(paragraph)}</p>`)
-        .join('');
 }
 
 function escapeHtml(text) {
@@ -311,3 +504,9 @@ function showError(message) {
 // Глобальные функции для HTML
 window.navigateToArticle = showSingleArticle;
 window.navigateToList = showArticleList;
+window.applyQuillStyles = applyQuillStyles;
+window.forceQuillStyles = forceQuillStyles;
+
+// Принудительно применяем стили при загрузке
+setTimeout(forceQuillStyles, 500);
+setTimeout(applyQuillStyles, 1000);
