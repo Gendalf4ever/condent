@@ -1,13 +1,15 @@
 <!-- Попап окно для формы обратной связи -->
 <div id="contact-popup" class="popup-overlay">
-    <div class="popup-content">
+    <div class="popup-content fullscreen-popup">
         <!-- Кнопка закрытия -->
         <button class="popup-close-btn" aria-label="Закрыть окно">
             <i class="fas fa-times"></i>
         </button>
 
-        <h2>Связаться с нами</h2>
-        <p>Мы ответим в ближайшее время и проконсультируем</p>
+        <div class="popup-header">
+            <h2>Связаться с нами</h2>
+            <p>Мы ответим в ближайшее время и проконсультируем</p>
+        </div>
 
         <form class="contact-form" id="contact-form-popup">
             <div class="form-group">
@@ -17,7 +19,43 @@
 
             <div class="form-group">
                 <label for="popup-phone">Телефон *</label>
-                <input type="tel" id="popup-phone" name="phone" required>
+                <div class="phone-input-container">
+                    <div class="country-code-selector">
+                        <button type="button" class="country-code-btn" id="country-code-btn">
+                            <span class="country-flag">🇷🇺</span>
+                            <span class="country-code">+7</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="country-dropdown" id="country-dropdown">
+                            <div class="country-option" data-code="7" data-flag="🇷🇺">
+                                <span class="country-flag">🇷🇺</span>
+                                <span class="country-name">Россия</span>
+                                <span class="country-code">+7</span>
+                            </div>
+                            <div class="country-option" data-code="375" data-flag="🇧🇾">
+                                <span class="country-flag">🇧🇾</span>
+                                <span class="country-name">Беларусь</span>
+                                <span class="country-code">+375</span>
+                            </div>
+                            <div class="country-option" data-code="77" data-flag="🇰🇿">
+                                <span class="country-flag">🇰🇿</span>
+                                <span class="country-name">Казахстан</span>
+                                <span class="country-code">+7</span>
+                            </div>
+                            <div class="country-option" data-code="380" data-flag="🇺🇦">
+                                <span class="country-flag">🇺🇦</span>
+                                <span class="country-name">Украина</span>
+                                <span class="country-code">+380</span>
+                            </div>
+                            <div class="country-option" data-code="48" data-flag="🇵🇱">
+                                <span class="country-flag">🇵🇱</span>
+                                <span class="country-name">Польша</span>
+                                <span class="country-code">+48</span>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="tel" id="popup-phone" name="phone" placeholder="(000) 000-00-00" required>
+                </div>
             </div>
 
             <div class="form-group">
@@ -28,6 +66,17 @@
             <div class="form-group">
                 <label for="popup-message">Сообщение</label>
                 <textarea id="popup-message" name="message" rows="4" placeholder="Ваш вопрос"></textarea>
+            </div>
+
+            <!-- Чекбокс согласия с политикой конфиденциальности -->
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="privacy-policy" name="privacy-policy" required>
+                <label for="privacy-policy" class="checkbox-label">
+                    Я соглашаюсь с 
+                    <a href="privacy.html" target="_blank" class="privacy-link">
+                        политикой конфиденциальности
+                    </a>
+                </label>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Отправить</button>
