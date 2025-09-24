@@ -179,8 +179,30 @@ function initPopupForm() {
     // Открытие/закрытие выпадающего списка
     countryCodeBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      countryDropdown.classList.toggle('show');
-      countryCodeBtn.classList.toggle('active');
+      const isOpen = countryDropdown.classList.contains('show');
+      
+      if (isOpen) {
+        closeCountryDropdown();
+      } else {
+        // Закрываем другие открытые dropdown'ы если есть
+        document.querySelectorAll('.country-dropdown.show').forEach(dropdown => {
+          if (dropdown !== countryDropdown) {
+            dropdown.classList.remove('show');
+          }
+        });
+        
+        countryDropdown.classList.add('show');
+        countryCodeBtn.classList.add('active');
+        
+        // Прокручиваем к выбранной стране
+        const selectedCode = countryCodeBtn.querySelector('.country-code').textContent.replace('+', '');
+        const selectedOption = Array.from(countryDropdown.querySelectorAll('.country-option')).find(option => 
+          option.getAttribute('data-code') === selectedCode
+        );
+        if (selectedOption) {
+          selectedOption.scrollIntoView({ block: 'nearest' });
+        }
+      }
     });
     
     // Выбор страны
@@ -204,7 +226,11 @@ function initPopupForm() {
     });
     
     // Закрытие dropdown при клике вне его
-    document.addEventListener('click', closeCountryDropdown);
+    document.addEventListener('click', function(e) {
+      if (!countryCodeBtn.contains(e.target) && !countryDropdown.contains(e.target)) {
+        closeCountryDropdown();
+      }
+    });
     
     // Маска для телефона
     phoneInput.addEventListener('input', function(e) {
@@ -215,6 +241,7 @@ function initPopupForm() {
     phoneInput.addEventListener('focus', function() {
       if (this.value === '') {
         this.value = '(';
+        this.setSelectionRange(1, 1);
       }
     });
   }

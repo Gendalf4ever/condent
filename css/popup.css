@@ -140,7 +140,7 @@
 
 .country-code-selector {
     position: relative;
-    min-width: 120px;
+    min-width: 100px;
 }
 
 .country-code-btn {
@@ -155,7 +155,9 @@
     cursor: pointer;
     transition: border-color 0.3s ease;
     width: 100%;
-    justify-content: space-between;
+    justify-content: center;
+    height: 100%;
+    min-height: 52px;
 }
 
 .country-code-btn:hover {
@@ -167,11 +169,13 @@
 }
 
 .country-flag {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    line-height: 1;
 }
 
 .country-code {
     font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .country-dropdown {
@@ -185,8 +189,9 @@
     margin-top: 5px;
     z-index: 1000;
     display: none;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .country-dropdown.show {
@@ -196,7 +201,7 @@
 .country-option {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 12px 15px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -211,14 +216,17 @@
     background: #222;
 }
 
-.country-name {
-    flex: 1;
-    color: #fff;
+.country-option .country-flag {
+    font-size: 1.3rem;
+    min-width: 24px;
+    text-align: center;
 }
 
 .country-option .country-code {
     color: #007bff;
     font-weight: 600;
+    font-size: 0.9rem;
+    min-width: 40px;
 }
 
 #popup-phone {
@@ -282,6 +290,25 @@
     background: #0056b3;
 }
 
+/* Стили для скроллбара в выпадающем списке */
+.country-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.country-dropdown::-webkit-scrollbar-track {
+    background: #222;
+    border-radius: 3px;
+}
+
+.country-dropdown::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 3px;
+}
+
+.country-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
     .fullscreen-popup {
@@ -308,12 +335,27 @@
         min-width: auto;
     }
     
+    .country-code-btn {
+        justify-content: center;
+        min-height: 50px;
+    }
+    
     .checkbox-group {
         padding: 12px;
     }
     
     .checkbox-label {
         font-size: 0.9rem;
+    }
+    
+    .country-dropdown {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 300px;
+        max-height: 60vh;
     }
 }
 
@@ -329,5 +371,13 @@
     .contact-form input,
     .contact-form textarea {
         padding: 12px;
+    }
+    
+    .country-code-btn {
+        padding: 12px;
+    }
+    
+    .country-flag {
+        font-size: 1.2rem;
     }
 }
