@@ -1,0 +1,36 @@
+<!-- Попап окно для формы обратной связи -->
+<div id="contact-popup" class="popup-overlay">
+    <div class="popup-content">
+        <!-- Кнопка закрытия -->
+        <button class="popup-close-btn" aria-label="Закрыть окно">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h2>Связаться с нами</h2>
+        <p>Мы ответим в ближайшее время и проконсультируем</p>
+
+        <form class="contact-form" id="contact-form-popup">
+            <div class="form-group">
+                <label for="popup-name">Имя</label>
+                <input type="text" id="popup-name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="popup-phone">Телефон *</label>
+                <input type="tel" id="popup-phone" name="phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="popup-email">Почта</label>
+                <input type="email" id="popup-email" name="email">
+            </div>
+
+            <div class="form-group">
+                <label for="popup-message">Сообщение</label>
+                <textarea id="popup-message" name="message" rows="4" placeholder="Ваш вопрос"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Отправить</button>
+        </form>
+    </div>
+</div>

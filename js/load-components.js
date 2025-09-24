@@ -12,6 +12,7 @@ const CONFIG = {
     components: {
       header: 'header.html',
       footer: 'footer.html',
+      supportForm: 'includes/support-form.html', 
       helpButton: 'includes/help-button.html',
       attentionBanner: 'includes/attention-banner.html',
       companyDetails: 'includes/company-details.html',
@@ -106,7 +107,7 @@ function initComponentAfterLoad(componentPath, targetSelector) {
     initCompanyDetails(target);
   }
   
-  // Инициализация других компонентов...
+  // Инициализация тестовой кнопки
   if (componentPath.includes('test-me-button')) {
     initTestMeButton(target);
   }
@@ -115,6 +116,93 @@ function initComponentAfterLoad(componentPath, targetSelector) {
   if (componentPath.includes('tables/')) {
     initTables(target);
   }
+  
+  // Инициализация попап-формы
+  if (componentPath.includes('support-form')) {
+    initPopupForm();
+  }
+  
+  // Инициализация хедера
+  if (componentPath.includes('header')) {
+    initMobileMenu();
+  }
+}
+
+// Функция инициализации попап-формы
+function initPopupForm() {
+  console.log('Initializing popup form...');
+  
+  const popup = document.getElementById('contact-popup');
+  const openPopupBtn = document.getElementById('open-contact-popup');
+  const closePopupBtn = document.querySelector('.popup-close-btn');
+
+  if (!popup) {
+    console.warn('Popup element not found');
+    return;
+  }
+  
+  if (!openPopupBtn) {
+    console.warn('Open popup button not found');
+    return;
+  }
+
+  console.log('Popup elements found:', { popup, openPopupBtn, closePopupBtn });
+
+  // Функция открытия попапа
+  function openPopup() {
+    console.log('Opening popup...');
+    popup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Функция закрытия попапа
+  function closePopup() {
+    console.log('Closing popup...');
+    popup.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Открытие попапа по клику на кнопку
+  openPopupBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    console.log('Popup button clicked');
+    openPopup();
+  });
+
+  // Закрытие попапа по клику на крестик
+  if (closePopupBtn) {
+    closePopupBtn.addEventListener('click', closePopup);
+  }
+
+  // Закрытие попапа по клику на затемненную область вокруг формы
+  popup.addEventListener('click', function(event) {
+    if (event.target === popup) {
+      closePopup();
+    }
+  });
+
+  // Закрытие попапа по клавише Esc
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && popup.classList.contains('active')) {
+      closePopup();
+    }
+  });
+
+  // Обработка отправки формы
+  const contactForm = document.getElementById('contact-form-popup');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      console.log('Form submitted');
+
+      // Здесь будет код для отправки данных на сервер
+      alert('Форма отправлена! (Это заглушка, реализуйте отправку на сервер)');
+      closePopup();
+      contactForm.reset();
+    });
+  }
+  
+  console.log('Popup form initialization complete');
 }
 
 // Инициализация реквизитов компании
@@ -170,6 +258,29 @@ function initTestMeButton(container) {
 function initTables(container) {
   // Добавьте логику инициализации таблиц если нужно
   console.log('Table loaded:', container);
+}
+
+// Мобильное меню
+function initMobileMenu() {
+  const menuBtn = document.querySelector('.mobile-menu-btn');
+  const navMenu = document.querySelector('.nav');
+  
+  if (menuBtn && navMenu) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navMenu.classList.toggle('active');
+      document.body.classList.toggle('no-scroll');
+      menuBtn.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav') && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        document.body.classList.remove('no-scroll');
+        menuBtn?.classList.remove('active');
+      }
+    });
+  }
 }
 
 // Модуль для кнопки тестирования
@@ -323,40 +434,20 @@ const BannerSystem = {
   }
 };
 
-// Мобильное меню
-function initMobileMenu() {
-  const menuBtn = document.querySelector('.mobile-menu-btn');
-  const navMenu = document.querySelector('.nav');
-  
-  if (menuBtn && navMenu) {
-    menuBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      navMenu.classList.toggle('active');
-      document.body.classList.toggle('no-scroll');
-      menuBtn.classList.toggle('active');
-    });
-    
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.nav') && navMenu.classList.contains('active')) {
-        navMenu.classList.remove('active');
-        document.body.classList.remove('no-scroll');
-        menuBtn?.classList.remove('active');
-      }
-    });
-  }
-}
-
 // Инициализация страницы
 async function initializePage() {
   try {
+    console.log('Starting page initialization...');
+    
     // 1. Основные компоненты
     await Promise.all([
       loadComponent(CONFIG.paths.components.header, 'body', 'afterbegin'),
       loadComponent(CONFIG.paths.components.footer, 'body', 'beforeend'),
-      loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend')
+      loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend'),
+      loadComponent(CONFIG.paths.components.supportForm, 'body', 'beforeend')
     ]);
     
-    initMobileMenu();
+    console.log('Basic components loaded');
     
     // 2. Баннеры
     await BannerSystem.loadAttentionBanner();
@@ -372,6 +463,8 @@ async function initializePage() {
     
     // Добавляем класс для индикации загрузки
     document.documentElement.classList.add('page-loaded');
+    
+    console.log('Page initialization complete');
     
   } catch (error) {
     console.error('Initialization failed:', error);
@@ -396,3 +489,4 @@ if (document.readyState === 'complete') {
 // Экспортируем функции для глобального использования
 window.initCompanyDetails = initCompanyDetails;
 window.initTestMeButton = initTestMeButton;
+window.initPopupForm = initPopupForm;
