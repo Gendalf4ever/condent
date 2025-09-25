@@ -164,87 +164,95 @@ function initPopupForm() {
   }
 
   // Функции для работы с выбором кода страны
-  function initCountryCodeSelector() {
-    const countryCodeBtn = document.getElementById('country-code-btn');
-    const countryDropdown = document.getElementById('country-dropdown');
-    const phoneInput = document.getElementById('popup-phone');
-    
-    if (!countryCodeBtn || !countryDropdown) {
-      console.warn('Country code selector elements not found');
-      return;
-    }
-    
-    console.log('Initializing country code selector...');
-    
-    // Открытие/закрытие выпадающего списка
-    countryCodeBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const isOpen = countryDropdown.classList.contains('show');
-      
-      if (isOpen) {
-        closeCountryDropdown();
-      } else {
-        // Закрываем другие открытые dropdown'ы если есть
-        document.querySelectorAll('.country-dropdown.show').forEach(dropdown => {
-          if (dropdown !== countryDropdown) {
-            dropdown.classList.remove('show');
-          }
-        });
-        
-        countryDropdown.classList.add('show');
-        countryCodeBtn.classList.add('active');
-        
-        // Прокручиваем к выбранной стране
-        const selectedCode = countryCodeBtn.querySelector('.country-code').textContent.replace('+', '');
-        const selectedOption = Array.from(countryDropdown.querySelectorAll('.country-option')).find(option => 
-          option.getAttribute('data-code') === selectedCode
-        );
-        if (selectedOption) {
-          selectedOption.scrollIntoView({ block: 'nearest' });
-        }
-      }
-    });
-    
-    // Выбор страны
-    countryDropdown.querySelectorAll('.country-option').forEach(option => {
-      option.addEventListener('click', function() {
-        const code = this.getAttribute('data-code');
-        const flag = this.getAttribute('data-flag');
-        
-        console.log('Country selected:', code, flag);
-        
-        // Обновляем кнопку
-        countryCodeBtn.querySelector('.country-flag').textContent = flag;
-        countryCodeBtn.querySelector('.country-code').textContent = '+' + code;
-        
-        // Закрываем dropdown
-        closeCountryDropdown();
-        
-        // Фокусируемся на поле ввода телефона
-        phoneInput.focus();
-      });
-    });
-    
-    // Закрытие dropdown при клике вне его
-    document.addEventListener('click', function(e) {
-      if (!countryCodeBtn.contains(e.target) && !countryDropdown.contains(e.target)) {
-        closeCountryDropdown();
-      }
-    });
-    
-    // Маска для телефона
-    phoneInput.addEventListener('input', function(e) {
-      formatPhoneNumber(this);
-    });
-    
-    // Автофокус на поле ввода при открытии попапа
-    phoneInput.addEventListener('focus', function() {
-      if (this.value === '') {
-        this.value = '(';
-        this.setSelectionRange(1, 1);
-      }
-    });
+  // Функции для работы с выбором кода страны
+function initCountryCodeSelector() {
+  const countryCodeBtn = document.getElementById('country-code-btn');
+  const countryDropdown = document.getElementById('country-dropdown');
+  const phoneInput = document.getElementById('popup-phone');
+  
+  if (!countryCodeBtn || !countryDropdown) {
+    console.warn('Country code selector elements not found');
+    return;
   }
+  
+  console.log('Initializing country code selector...');
+  
+  // Открытие/закрытие выпадающего списка
+  countryCodeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const isOpen = countryDropdown.classList.contains('show');
+    
+    if (isOpen) {
+      closeCountryDropdown();
+    } else {
+      countryDropdown.classList.add('show');
+      countryCodeBtn.classList.add('active');
+      
+      // Прокручиваем к выбранной стране
+      const selectedCode = countryCodeBtn.querySelector('.country-code').textContent.replace('+', '');
+      const selectedOption = Array.from(countryDropdown.querySelectorAll('.country-option')).find(option => 
+        option.getAttribute('data-code') === selectedCode
+      );
+      if (selectedOption) {
+        selectedOption.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  });
+  
+  // Выбор страны
+  countryDropdown.querySelectorAll('.country-option').forEach(option => {
+    option.addEventListener('click', function() {
+      const code = this.getAttribute('data-code');
+      const flagClass = this.getAttribute('data-flag');
+      
+      console.log('Country selected:', code, flagClass);
+      
+      // Обновляем кнопку - убираем старые классы флагов и добавляем новый
+      const flagElement = countryCodeBtn.querySelector('.country-flag');
+      flagElement.className = 'country-flag ' + flagClass + '-flag';
+      countryCodeBtn.querySelector('.country-code').textContent = '+' + code;
+      
+      // Закрываем dropdown
+      closeCountryDropdown();
+      
+      // Фокусируемся на поле ввода телефона
+      phoneInput.focus();
+    });
+  });
+  
+  // Закрытие dropdown при клике вне его
+  document.addEventListener('click', function(e) {
+    if (!countryCodeBtn.contains(e.target) && !countryDropdown.contains(e.target)) {
+      closeCountryDropdown();
+    }
+  });
+  
+  // Остальной код без изменений...
+  // Маска для телефона
+  phoneInput.addEventListener('input', function(e) {
+    formatPhoneNumber(this);
+  });
+  
+  // Автофокус на поле ввода при открытии попапа
+  phoneInput.addEventListener('focus', function() {
+    if (this.value === '') {
+      this.value = '(';
+      this.setSelectionRange(1, 1);
+    }
+  });
+}
+
+function closeCountryDropdown() {
+  const countryDropdown = document.getElementById('country-dropdown');
+  const countryCodeBtn = document.getElementById('country-code-btn');
+  
+  if (countryDropdown) {
+    countryDropdown.classList.remove('show');
+  }
+  if (countryCodeBtn) {
+    countryCodeBtn.classList.remove('active');
+  }
+}
   
   function closeCountryDropdown() {
     const countryDropdown = document.getElementById('country-dropdown');
