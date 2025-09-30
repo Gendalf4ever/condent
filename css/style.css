@@ -1,3 +1,27 @@
+/* Подключение шрифта Tilda Sans */
+@import url('https://fonts.googleapis.com/css2?family=Tilda+Sans:wght@400;700&display=swap');
+
+/* Глобальные стили заголовков с Tilda Sans */
+h1 {
+    font-family: 'Tilda Sans', sans-serif;
+    font-size: 42px;
+    font-weight: 400;
+}
+
+h1.bold {
+    font-weight: 700;
+}
+
+h2 {
+    font-family: 'Tilda Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+}
+
+h2.bold {
+    font-weight: 700;
+}
+
 /*Стили для таблиц в  printers-set.html*/
 /* Основные стили таблиц */
             .printers-set-table, 
@@ -28,6 +52,7 @@
             /* Стили для переключателей таблиц */
             .table-switcher {
                 margin: 20px 0;
+                margin-top: 100px; /* Отступ под фиксированный хедер */
                 padding: 15px;
                 background: #f5f5f5;
                 border-radius: 8px;
@@ -88,6 +113,10 @@
             
             /* Адаптация для мобильных */
             @media (max-width: 768px) {
+                .table-switcher {
+                    margin-top: 80px; /* Меньший отступ для мобильных */
+                }
+                
                 .printers-set-table {
                     font-size: 0.8em;
                 }
@@ -289,8 +318,8 @@
 
 /* Основной контент */
 .main-content-wrapper {
-  padding-top: var(--header-height); /*Отступ перед хедером*/
-  min-height: calc(100vh - var(--header-height) - 100px); /* 100px - примерная высота футера */
+  padding-top: 0; /* Убираем отступ, так как page-header уже имеет margin-top */
+  min-height: calc(100vh - 100px); /* 100px - примерная высота футера */
 }
 
 .content-main {
@@ -304,7 +333,7 @@
 @media (max-width: 768px) {
   .content-main {
     padding: 1rem;
-    margin-top: 60px; /* Меньший отступ для мобильных */
+    margin-top: 0; /* Убираем отступ, так как page-header уже имеет margin-top */
   }
   
   :root {
@@ -661,6 +690,7 @@
   color: #fff;
   padding: 30px 0;
   margin-bottom: 40px;
+  margin-top: 80px; /* Отступ под фиксированный хедер */
 }
 
 .page-header__container {
@@ -679,6 +709,7 @@
   .page-header {
     padding: 20px 0;
     margin-bottom: 30px;
+    margin-top: 60px; /* Меньший отступ для мобильных */
   }
   
   .page-header__title {
@@ -761,12 +792,97 @@
  /* Базовые стили */
  .content-main {
                 padding: 2rem;
-                margin-top: 80px; /* Отступ под хедер */
+                margin-top: 0; /* Убираем отступ, так как page-header уже имеет margin-top */
                 max-width: 1200px;
                 margin-left: auto;
                 margin-right: auto;
                 line-height: 1.6;
             }
+
+/* Общие стили для страниц без page-header */
+body > div:first-child:not(.page-header):not(header) {
+    margin-top: 100px; /* Отступ под фиксированный хедер для первого элемента */
+}
+
+@media (max-width: 768px) {
+    body > div:first-child:not(.page-header):not(header) {
+        margin-top: 80px; /* Меньший отступ для мобильных */
+    }
+}
+
+/* Стили для страницы образования */
+.education-page-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.education-header {
+    margin-bottom: 40px;
+}
+
+.education-header h1 {
+    font-family: 'Tilda Sans', sans-serif;
+    font-size: 42px;
+    font-weight: 400;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.education-header p {
+    font-size: 18px;
+    color: #333333;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.education-content {
+    margin-top: 40px;
+}
+
+.education-link-container {
+    margin-top: 30px;
+}
+
+.education-link {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.education-link:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+    .education-page-content {
+        padding: 20px 15px;
+    }
+    
+    .education-header h1 {
+        font-size: 32px;
+    }
+    
+    .education-header p {
+        font-size: 16px;
+    }
+    
+    .education-link {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}
             
             .content-main-list {
                 margin: 1rem 0;
@@ -862,11 +978,12 @@
         /* Стили хедера */
         header {
             background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
+            border-radius: 0 0 8px 8px;
         }
         
         .header-container {
@@ -890,10 +1007,18 @@
             margin-right: 10px;
         }
         
+        .logo {
+            text-decoration: none;
+        }
+        
         .logo-text {
             font-size: 20px;
             font-weight: 700;
-            color: var(--primary);
+            color: #000000;
+        }
+        
+        .logo-text .bracket {
+            color: #EF4444;
         }
         
         /* Основное меню */
@@ -914,7 +1039,7 @@
         
         .nav-link {
             text-decoration: none;
-            color: var(--text);
+            color: #000000;
             font-weight: 500;
             font-size: 16px;
             transition: color 0.3s;
@@ -924,7 +1049,7 @@
         }
         
         .nav-link:hover {
-            color: var(--secondary);
+            color: #EF4444;
         }
         
         .nav-link i {
@@ -938,13 +1063,14 @@
             top: 100%;
             left: 0;
             background-color: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            min-width: 250px;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             z-index: 100;
+            border: 1px solid #E0E0E0;
         }
         
         .nav-item:hover .dropdown {
@@ -953,19 +1079,29 @@
         }
         
         .dropdown-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 20px;
+            border-bottom: 1px solid #F0F0F0;
+            transition: background-color 0.3s ease;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #F8F9FA;
         }
         
         .dropdown-link {
             text-decoration: none;
-            color: var(--text);
+            color: #000000;
             display: block;
-            transition: color 0.3s;
+            transition: color 0.3s ease;
+            font-weight: 500;
         }
         
         .dropdown-link:hover {
-            color: var(--secondary);
+            color: #EF4444;
         }
         
         /* Правая часть хедера */
@@ -979,13 +1115,18 @@
             align-items: center;
             margin-right: 20px;
             text-decoration: none;
-            color: var(--text);
+            color: #000000;
             font-weight: 500;
+            white-space: nowrap;
         }
         
         .phone i {
             margin-right: 5px;
-            color: var(--secondary);
+            color: #EF4444;
+        }
+        
+        .phone span {
+            white-space: nowrap;
         }
         
         .btn {
@@ -998,13 +1139,53 @@
         }
         
         .btn-primary {
-            background-color: #000000;
-            color: white;
-            border: none;
+            background-color: #FFFFFF;
+            color: #000000;
+            border: 1px solid #E0E0E0;
         }
         
         .btn-primary:hover {
-            background-color: #c0392b;
+            background-color: #EF4444;
+            color: #FFFFFF;
+            border-color: #EF4444;
+        }
+
+        /* Обновленные стили кнопок связаться и в корзину */
+        .btn-contact {
+            background-color: #FFFFFF;
+            color: #000000;
+            border: 1px solid #E0E0E0;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-contact:hover {
+            background-color: #EF4444;
+            color: #FFFFFF;
+            border-color: #EF4444;
+        }
+
+        .btn-cart {
+            background-color: #000000;
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cart:hover {
+            background-color: #EF4444;
+            color: #FFFFFF;
         }
         
         /* Мобильное меню */
@@ -1013,7 +1194,7 @@
             background: none;
             border: none;
             font-size: 24px;
-            color: var(--primary);
+            color: #000000;
             cursor: pointer;
         }
         
@@ -1021,6 +1202,29 @@
         @media (max-width: 992px) {
             .nav {
                 display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: white;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                border-radius: 0 0 8px 8px;
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .nav.active {
+                display: flex;
+            }
+            
+            .nav-list {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .nav-item {
+                margin-right: 0;
+                margin-bottom: 15px;
             }
             
             .mobile-menu-btn {
@@ -1036,6 +1240,13 @@
         @media (max-width: 576px) {
             .phone span {
                 display: none;
+            }
+            
+            .phone {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 150px;
             }
             
             .btn {
