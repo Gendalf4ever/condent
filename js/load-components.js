@@ -439,18 +439,30 @@ function initCompanyDetails(container) {
   if (toggleBtn && content) {
     console.log('Initializing company details toggle');
     
-    // Изначально контент показан
-    let isExpanded = true;
+    // Определяем начальное состояние по иконке
+    const currentIcon = toggleBtn.querySelector('i');
+    let isExpanded = currentIcon && currentIcon.classList.contains('fa-times');
+    
+    console.log('Initial state - isExpanded:', isExpanded);
     
     // Убираем все предыдущие обработчики
     toggleBtn.replaceWith(toggleBtn.cloneNode(true));
     const newToggleBtn = container.querySelector('.company-details__toggle');
     
+    // Устанавливаем начальное состояние контента
+    if (isExpanded) {
+      content.style.display = 'block';
+      content.classList.remove('hidden');
+    } else {
+      content.style.display = 'none';
+      content.classList.add('hidden');
+    }
+    
     newToggleBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       
-      console.log('Toggle clicked, isExpanded:', isExpanded);
+      console.log('Toggle clicked, current isExpanded:', isExpanded);
       
       isExpanded = !isExpanded;
       
@@ -459,13 +471,13 @@ function initCompanyDetails(container) {
         content.classList.remove('hidden');
         newToggleBtn.innerHTML = '<i class="fas fa-times"></i>';
         newToggleBtn.setAttribute('aria-label', 'Скрыть реквизиты');
-        console.log('Showing content');
+        console.log('Showing content, new state:', isExpanded);
       } else {
         content.style.display = 'none';
         content.classList.add('hidden');
         newToggleBtn.innerHTML = '<i class="fas fa-plus"></i>';
         newToggleBtn.setAttribute('aria-label', 'Показать реквизиты');
-        console.log('Hiding content');
+        console.log('Hiding content, new state:', isExpanded);
       }
     });
     

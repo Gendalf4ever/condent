@@ -53,10 +53,16 @@
     padding-top: 1rem;
     margin-top: 1rem;
     animation: fadeIn 0.3s ease;
+    display: block;
 }
 
 .company-details__content.hidden {
     display: none !important;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
 
 .company-details__text {
