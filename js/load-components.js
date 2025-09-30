@@ -10,18 +10,18 @@ const CONFIG = {
   
   paths: {
     components: {
-      header: 'condent/header.html',
-      footer: 'condent/footer.html',
-      supportForm: 'condent/includes/support-form.html', 
-      helpButton: 'condent/includes/help-button.html',
-      attentionBanner: 'condent/includes/attention-banner.html',
-      companyDetails: 'condent/includes/company-details.html',
-      relatedArticles: 'condent/includes/related-articles.html',
-      testMeButton: 'condent/includes/test-me-button.html',
-      mighty8kTable: 'condent/includes/tables/phrozen-sonic-mighty8k.html',
-      mini8kTable: 'condent/includes/tables/phrozen-sonic-mini 8k.html',
-      postProcessingTable: 'condent/includes/tables/post-processing-table.html',
-      millingProducts: 'condent/milling.html'
+      header: 'header.html',
+      footer: 'footer.html',
+      supportForm: 'includes/support-form.html', 
+      helpButton: 'includes/help-button.html',
+      attentionBanner: 'includes/attention-banner.html',
+      companyDetails: 'includes/company-details.html',
+      relatedArticles: 'includes/related-articles.html',
+      testMeButton: 'includes/test-me-button.html',
+      mighty8kTable: 'includes/tables/phrozen-sonic-mighty8k.html',
+      mini8kTable: 'includes/tables/phrozen-sonic-mini 8k.html',
+      postProcessingTable: 'includes/tables/post-processing-table.html',
+      millingProducts: 'milling.html'
     },
     content: 'content/'
   }

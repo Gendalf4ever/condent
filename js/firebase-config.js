@@ -23,6 +23,11 @@ if (typeof firebase === 'undefined') {
         const db = firebase.firestore();
         const storage = firebase.storage(); 
         
+        // Настройка Firestore для работы в режиме реального времени
+        db.settings({
+            timestampsInSnapshots: true
+        });
+        
         // Экспорт для использования
         window.firebaseServices = { 
             auth: auth,
@@ -31,6 +36,16 @@ if (typeof firebase === 'undefined') {
         };
         
         console.log('Firebase успешно инициализирован');
+        
+        // Проверяем подключение к Firestore
+        db.collection('test').limit(1).get()
+            .then(() => {
+                console.log('Подключение к Firestore установлено');
+            })
+            .catch(error => {
+                console.warn('Предупреждение: не удалось подключиться к Firestore:', error);
+            });
+            
     } catch (error) {
         console.error('Ошибка инициализации Firebase сервисов:', error);
     }

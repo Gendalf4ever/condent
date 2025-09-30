@@ -6,10 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
-    <script src="js/sheet-config.js"></script>
+    <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 </head>
 <body>
-    <div id="page-header" class="page-header"></div>
+    <!-- Компоненты будут загружены автоматически через load-components.js -->
+    
+    <!-- Заголовок страницы -->
+    <div id="page-header" class="page-header">
+        <div class="page-header__container">
+            <h1 class="page-header__title">3D Сканеры</h1>
+            <p class="page-header__subtitle">Высокоточные 3D сканеры для стоматологии</p>
+        </div>
+    </div>
+    
     <div id="products-container" class="products-grid">
         <div class="loading">Загружаем каталог сканеров...</div>
     </div>
@@ -71,7 +85,30 @@
         </div>
     </div>
     
+    <script src="js/firebase-config.js"></script>
     <script src="js/load-components.js"></script>
-    <script src="js/catalog.js"></script>
+    <script src="js/catalog-firebase.js"></script>
+    
+    <script>
+        // Дополнительная инициализация для страницы сканеров
+        document.addEventListener('DOMContentLoaded', () => {
+            // Загружаем товары категории "scanners"
+            if (window.catalogFirebase) {
+                window.catalogFirebase.loadProductsFromFirebase('scanners');
+            }
+            
+            // Добавляем отступ при загрузке хедера
+            const checkHeader = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    clearInterval(checkHeader);
+                    document.documentElement.style.setProperty(
+                        '--header-height', 
+                        `${header.offsetHeight}px`
+                    );
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>
