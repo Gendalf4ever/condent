@@ -437,34 +437,48 @@ function initCompanyDetails(container) {
   const content = container.querySelector('.company-details__content');
   
   if (toggleBtn && content) {
-    // Сначала скрываем контент
-    content.style.display = 'none';
+    console.log('Initializing company details toggle');
     
-    toggleBtn.addEventListener('click', () => {
-      const isExpanded = content.style.display === 'block';
-      content.style.display = isExpanded ? 'none' : 'block';
+    // Изначально контент показан
+    let isExpanded = true;
+    
+    // Убираем все предыдущие обработчики
+    toggleBtn.replaceWith(toggleBtn.cloneNode(true));
+    const newToggleBtn = container.querySelector('.company-details__toggle');
+    
+    newToggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       
-      // Анимация появления
-      if (!isExpanded) {
-        content.style.opacity = '0';
-        content.style.transform = 'translateY(-10px)';
-        
-        setTimeout(() => {
-          content.style.transition = 'all 0.3s ease';
-          content.style.opacity = '1';
-          content.style.transform = 'translateY(0)';
-        }, 10);
+      console.log('Toggle clicked, isExpanded:', isExpanded);
+      
+      isExpanded = !isExpanded;
+      
+      if (isExpanded) {
+        content.style.display = 'block';
+        content.classList.remove('hidden');
+        newToggleBtn.innerHTML = '<i class="fas fa-times"></i>';
+        newToggleBtn.setAttribute('aria-label', 'Скрыть реквизиты');
+        console.log('Showing content');
+      } else {
+        content.style.display = 'none';
+        content.classList.add('hidden');
+        newToggleBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        newToggleBtn.setAttribute('aria-label', 'Показать реквизиты');
+        console.log('Hiding content');
       }
-      
-      // Меняем иконку
-      toggleBtn.innerHTML = isExpanded ? 
-        '<i class="fas fa-plus"></i>' : 
-        '<i class="fas fa-minus"></i>';
-      
-      // Меняем aria-label
-      toggleBtn.setAttribute('aria-label', 
-        isExpanded ? 'Показать реквизиты' : 'Скрыть реквизиты');
     });
+    
+    // Также добавляем обработчик на весь заголовок
+    const header = container.querySelector('.company-details__header');
+    if (header) {
+      header.style.cursor = 'pointer';
+      header.addEventListener('click', (e) => {
+        if (e.target !== newToggleBtn && !newToggleBtn.contains(e.target)) {
+          newToggleBtn.click();
+        }
+      });
+    }
   }
 }
 
@@ -665,13 +679,24 @@ async function initializePage() {
   try {
     console.log('Starting page initialization...');
     
+    // Проверяем, нужно ли загружать форму обратной связи
+    const excludeSupportFormPages = ['team.html', 'printers-set.html', 'post-processing.html', 'contacts.html'];
+    const currentPage = window.location.pathname;
+    const shouldLoadSupportForm = !excludeSupportFormPages.some(page => currentPage.includes(page));
+    
     // 1. Основные компоненты
-    await Promise.all([
+    const componentsToLoad = [
       loadComponent(CONFIG.paths.components.header, 'body', 'afterbegin'),
       loadComponent(CONFIG.paths.components.footer, 'body', 'beforeend'),
-      loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend'),
-      loadComponent(CONFIG.paths.components.supportForm, 'body', 'beforeend')
-    ]);
+      loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend')
+    ];
+    
+    // Добавляем форму обратной связи только если нужно
+    if (shouldLoadSupportForm) {
+      componentsToLoad.push(loadComponent(CONFIG.paths.components.supportForm, 'body', 'beforeend'));
+    }
+    
+    await Promise.all(componentsToLoad);
     
     console.log('Basic components loaded');
     

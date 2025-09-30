@@ -49,15 +49,135 @@
             <button id="logout-btn" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> Выйти
             </button>
-            <button id="add-article-btn" class="add-article-btn">
-                <i class="fas fa-plus"></i> Добавить статью
+        </div>
+
+        <!-- Вкладки -->
+        <div class="admin-tabs">
+            <button class="tab-button active" data-tab="articles">
+                <i class="fas fa-newspaper"></i> Статьи
+            </button>
+            <button class="tab-button" data-tab="products">
+                <i class="fas fa-box"></i> Товары
             </button>
         </div>
 
-        <section class="articles-section">
-            <h2>Статьи</h2>
+        <!-- Содержимое вкладки Статьи -->
+        <section id="articles-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Управление статьями</h2>
+                <button id="add-article-btn" class="add-article-btn">
+                    <i class="fas fa-plus"></i> Добавить статью
+                </button>
+            </div>
             <div id="articles-list" class="articles-list">
                 <!-- Статьи будут загружены здесь -->
+            </div>
+        </section>
+
+        <!-- Содержимое вкладки Товары -->
+        <section id="products-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Управление товарами</h2>
+                <div class="header-actions">
+                    <button id="import-sheets-btn" class="import-sheets-btn">
+                        <i class="fas fa-file-import"></i> Импорт из Google Sheets
+                    </button>
+                    <button id="add-product-btn" class="add-product-btn">
+                        <i class="fas fa-plus"></i> Добавить товар
+                    </button>
+                </div>
+            </div>
+
+            <!-- Панель импорта из Google Sheets -->
+            <div id="import-panel" class="import-panel" style="display: none;">
+                <div class="import-header">
+                    <h3><i class="fas fa-table"></i> Импорт данных из Google Sheets</h3>
+                    <button id="close-import-panel" class="close-import-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="import-content">
+                    <div class="import-info">
+                        <p><strong>Текущая таблица:</strong> <a href="https://docs.google.com/spreadsheets/d/1Hxmx_tznE64ifvKON4-waL6x7BYQ7plf1nWta5nsMlI/edit" target="_blank">Codent Products</a></p>
+                        <p><small>Система автоматически загрузит данные из вашей Google Sheets таблицы и синхронизирует их с Firebase</small></p>
+                    </div>
+
+                    <div class="import-actions">
+                        <button id="preview-import-btn" class="preview-btn">
+                            <i class="fas fa-eye"></i> Предпросмотр данных
+                        </button>
+                        <button id="start-import-btn" class="import-btn" disabled>
+                            <i class="fas fa-download"></i> Импортировать в Firebase
+                        </button>
+                    </div>
+
+                    <div id="import-progress" class="import-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                        <div id="progress-text" class="progress-text">Подготовка к импорту...</div>
+                    </div>
+
+                    <div id="import-preview" class="import-preview" style="display: none;">
+                        <h4>Предпросмотр данных (первые 5 товаров):</h4>
+                        <div id="preview-table" class="preview-table"></div>
+                        <div class="preview-stats">
+                            <span id="total-products">0</span> товаров готово к импорту
+                        </div>
+                    </div>
+
+                    <div id="import-results" class="import-results" style="display: none;">
+                        <h4>Результаты импорта:</h4>
+                        <div class="results-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Успешно:</span>
+                                <span id="success-count" class="stat-value success">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Ошибки:</span>
+                                <span id="error-count" class="stat-value error">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Обновлено:</span>
+                                <span id="updated-count" class="stat-value updated">0</span>
+                            </div>
+                        </div>
+                        <div id="import-log" class="import-log"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Фильтры категорий -->
+            <div class="category-filters">
+                <button class="category-filter active" data-category="all">
+                    <i class="fas fa-th"></i> Все категории
+                </button>
+                <button class="category-filter" data-category="printers">
+                    <i class="fas fa-print"></i> Принтеры
+                </button>
+                <button class="category-filter" data-category="scanners">
+                    <i class="fas fa-scanner"></i> Сканеры
+                </button>
+                <button class="category-filter" data-category="milling">
+                    <i class="fas fa-cog"></i> Фрезерные
+                </button>
+                <button class="category-filter" data-category="post-processing">
+                    <i class="fas fa-tools"></i> Постобработка
+                </button>
+                <button class="category-filter" data-category="materials">
+                    <i class="fas fa-vial"></i> Материалы
+                </button>
+                <button class="category-filter" data-category="zirkon">
+                    <i class="fas fa-gem"></i> Цирконий
+                </button>
+                <button class="category-filter" data-category="other">
+                    <i class="fas fa-ellipsis-h"></i> Прочее
+                </button>
+            </div>
+            
+            <div id="products-list" class="products-list">
+                <!-- Товары будут загружены здесь -->
             </div>
         </section>
 
@@ -158,6 +278,130 @@
         </label>
     </div>
 </div>
+        </div>
+
+        <!-- Модальное окно добавления товара -->
+        <div id="add-product-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Добавить новый товар</h3>
+                    <span id="close-add-product-modal" class="close">&times;</span>
+                </div>
+                <form id="add-product-form" class="modal-form">
+                    <div class="form-group">
+                        <label for="product-name">Название товара *</label>
+                        <input type="text" id="product-name" placeholder="Введите название" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-type">Тип товара *</label>
+                        <select id="product-type" required>
+                            <option value="">Выберите тип</option>
+                            <option value="printers">Принтер</option>
+                            <option value="scanners">Сканер</option>
+                            <option value="milling">Фрезерный станок</option>
+                            <option value="post-processing">Постобработка</option>
+                            <option value="materials">Материалы</option>
+                            <option value="zirkon">Цирконий</option>
+                            <option value="other">Прочее</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-img-url">URL изображения *</label>
+                        <input type="url" id="product-img-url" placeholder="https://example.com/image.jpg" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-description">Описание</label>
+                        <textarea id="product-description" rows="4" placeholder="Описание товара"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-characteristics">Характеристики</label>
+                        <textarea id="product-characteristics" rows="6" placeholder="Введите характеристики (каждая с новой строки)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-price">Цена</label>
+                        <input type="text" id="product-price" placeholder="По запросу">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-price-skidka">Цена со скидкой</label>
+                        <input type="text" id="product-price-skidka" placeholder="Цена со скидкой">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancel-add-product-btn" class="cancel-btn">Отмена</button>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-save"></i> Сохранить товар
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно редактирования товара -->
+        <div id="edit-product-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Редактировать товар</h3>
+                    <span id="close-edit-product-modal" class="close">&times;</span>
+                </div>
+                <form id="edit-product-form" class="modal-form">
+                    <div class="form-group">
+                        <label for="edit-product-name">Название товара *</label>
+                        <input type="text" id="edit-product-name" placeholder="Введите название" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-type">Тип товара *</label>
+                        <select id="edit-product-type" required>
+                            <option value="">Выберите тип</option>
+                            <option value="printers">Принтер</option>
+                            <option value="scanners">Сканер</option>
+                            <option value="milling">Фрезерный станок</option>
+                            <option value="post-processing">Постобработка</option>
+                            <option value="materials">Материалы</option>
+                            <option value="zirkon">Цирконий</option>
+                            <option value="other">Прочее</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-img-url">URL изображения *</label>
+                        <input type="url" id="edit-product-img-url" placeholder="https://example.com/image.jpg" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-description">Описание</label>
+                        <textarea id="edit-product-description" rows="4" placeholder="Описание товара"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-characteristics">Характеристики</label>
+                        <textarea id="edit-product-characteristics" rows="6" placeholder="Введите характеристики (каждая с новой строки)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-price">Цена</label>
+                        <input type="text" id="edit-product-price" placeholder="По запросу">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-price-skidka">Цена со скидкой</label>
+                        <input type="text" id="edit-product-price-skidka" placeholder="Цена со скидкой">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancel-edit-product-btn" class="cancel-btn">Отмена</button>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-save"></i> Обновить товар
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -321,6 +565,164 @@
                     closeAddArticleModal();
                 }
             });
+
+
+            // ===== УПРАВЛЕНИЕ ВКЛАДКАМИ =====
+            function initTabs() {
+                const tabButtons = document.querySelectorAll('.tab-button');
+                const tabContents = document.querySelectorAll('.tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const targetTab = this.getAttribute('data-tab');
+                        
+                        // Убираем активность со всех кнопок и контента
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        
+                        // Активируем текущую вкладку
+                        this.classList.add('active');
+                        const targetContent = document.getElementById(targetTab + '-tab');
+                        if (targetContent) {
+                            targetContent.classList.add('active');
+                        }
+                        
+                        // Если переключились на товары, загружаем их
+                        if (targetTab === 'products' && window.loadProducts) {
+                            window.loadProducts();
+                        }
+                    });
+                });
+            }
+
+            // ===== МОДАЛЬНЫЕ ОКНА ТОВАРОВ =====
+            function initProductModals() {
+                // Добавление товара
+                const addProductBtn = document.getElementById('add-product-btn');
+                const addProductModal = document.getElementById('add-product-modal');
+                const closeAddProductModal = document.getElementById('close-add-product-modal');
+                const cancelAddProductBtn = document.getElementById('cancel-add-product-btn');
+
+                if (addProductBtn) {
+                    addProductBtn.addEventListener('click', () => {
+                        if (addProductModal) addProductModal.style.display = 'block';
+                    });
+                }
+
+                if (closeAddProductModal) {
+                    closeAddProductModal.addEventListener('click', () => {
+                        if (addProductModal) addProductModal.style.display = 'none';
+                    });
+                }
+
+                if (cancelAddProductBtn) {
+                    cancelAddProductBtn.addEventListener('click', () => {
+                        if (addProductModal) addProductModal.style.display = 'none';
+                    });
+                }
+
+                // Редактирование товара
+                const editProductModal = document.getElementById('edit-product-modal');
+                const closeEditProductModal = document.getElementById('close-edit-product-modal');
+                const cancelEditProductBtn = document.getElementById('cancel-edit-product-btn');
+
+                if (closeEditProductModal) {
+                    closeEditProductModal.addEventListener('click', () => {
+                        if (editProductModal) editProductModal.style.display = 'none';
+                    });
+                }
+
+                if (cancelEditProductBtn) {
+                    cancelEditProductBtn.addEventListener('click', () => {
+                        if (editProductModal) editProductModal.style.display = 'none';
+                    });
+                }
+
+                // Закрытие по клику вне окна
+                window.addEventListener('click', function(event) {
+                    if (event.target === addProductModal) {
+                        addProductModal.style.display = 'none';
+                    }
+                    if (event.target === editProductModal) {
+                        editProductModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // ===== ФИЛЬТРЫ КАТЕГОРИЙ =====
+            function initCategoryFilters() {
+                const categoryFilters = document.querySelectorAll('.category-filter');
+                
+                categoryFilters.forEach(filter => {
+                    filter.addEventListener('click', function() {
+                        // Убираем активность со всех фильтров
+                        categoryFilters.forEach(f => f.classList.remove('active'));
+                        // Активируем текущий
+                        this.classList.add('active');
+                        
+                        const category = this.getAttribute('data-category');
+                        if (window.filterProductsByCategory) {
+                            window.filterProductsByCategory(category);
+                        }
+                    });
+                });
+            }
+
+            // ===== ИМПОРТ ИЗ GOOGLE SHEETS =====
+            function initSheetsImport() {
+                const importBtn = document.getElementById('import-sheets-btn');
+                const importPanel = document.getElementById('import-panel');
+                const closeImportPanel = document.getElementById('close-import-panel');
+                const previewBtn = document.getElementById('preview-import-btn');
+                const startImportBtn = document.getElementById('start-import-btn');
+
+                if (importBtn) {
+                    importBtn.addEventListener('click', () => {
+                        if (importPanel) importPanel.style.display = 'block';
+                    });
+                }
+
+                if (closeImportPanel) {
+                    closeImportPanel.addEventListener('click', () => {
+                        if (importPanel) importPanel.style.display = 'none';
+                        resetImportPanel();
+                    });
+                }
+
+                if (previewBtn) {
+                    previewBtn.addEventListener('click', () => {
+                        if (window.previewSheetsData) {
+                            window.previewSheetsData();
+                        }
+                    });
+                }
+
+                if (startImportBtn) {
+                    startImportBtn.addEventListener('click', () => {
+                        if (window.importSheetsData) {
+                            window.importSheetsData();
+                        }
+                    });
+                }
+            }
+
+            function resetImportPanel() {
+                const preview = document.getElementById('import-preview');
+                const progress = document.getElementById('import-progress');
+                const results = document.getElementById('import-results');
+                const startBtn = document.getElementById('start-import-btn');
+
+                if (preview) preview.style.display = 'none';
+                if (progress) progress.style.display = 'none';
+                if (results) results.style.display = 'none';
+                if (startBtn) startBtn.disabled = true;
+            }
+
+            // Инициализируем новую функциональность
+            initTabs();
+            initProductModals();
+            initCategoryFilters();
+            initSheetsImport();
 
             // Делаем функции глобальными
             window.openAddArticleModal = openAddArticleModal;

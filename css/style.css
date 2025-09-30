@@ -920,7 +920,7 @@ body > div:first-child:not(.page-header):not(header) {
             color: var(--text);
             padding-top: 80px; /*для хедера*/
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
         /* Стили футера*/
          footer {
@@ -928,21 +928,29 @@ body > div:first-child:not(.page-header):not(header) {
                 color: #fff;
                 padding: 40px 0;
                 font-family: Arial, sans-serif;
+                margin: 0;
             }
             
             .footer-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 20px;
+                max-width: 100%;
+                margin: 0;
+                padding: 0 40px;
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: space-between;
+                gap: 40px;
             }
             
             .footer-column {
                 flex: 1;
                 min-width: 200px;
-                margin-bottom: 20px;
+                margin-bottom: 0;
+            }
+            
+            .footer-column-right {
+                text-align: right;
+                flex: 0 0 auto;
+                min-width: 250px;
             }
             
             .footer-title {
@@ -954,6 +962,8 @@ body > div:first-child:not(.page-header):not(header) {
             
             .footer-list {
                 list-style: none;
+                padding: 0;
+                margin: 0;
             }
             
             .footer-list li {
@@ -971,8 +981,18 @@ body > div:first-child:not(.page-header):not(header) {
             }
             
             @media (max-width: 768px) {
+                .footer-container {
+                    padding: 0 20px;
+                    gap: 20px;
+                }
+                
                 .footer-column {
-                    min-width: 50%;
+                    min-width: 100%;
+                }
+                
+                .footer-column-right {
+                    text-align: left;
+                    min-width: 100%;
                 }
             }
         /* Стили хедера */
