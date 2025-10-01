@@ -57,7 +57,7 @@ window.setPageHeader = function(title, subtitle = '') {
   }
   
   const titleElement = header.querySelector('.page-header__title');
-  if (titleElement) titleElement.textContent = title;
+  if (titleElement) titleElement.innerHTML = title;
   
   const subtitleElement = header.querySelector('.page-header__subtitle');
   if (subtitleElement && subtitle) {
@@ -155,8 +155,7 @@ function initPopupForm() {
   }
   
   if (!openPopupBtn) {
-    console.warn('Open popup button not found');
-    return;
+    console.log('Open popup button not found - this is normal for some pages');
   }
 
   console.log('Popup elements found:', { popup, openPopupBtn, closePopupBtn });
@@ -333,17 +332,19 @@ function closeCountryDropdown() {
   }
 
   // Открытие попапа по клику на кнопку
-  openPopupBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    console.log('Popup button clicked');
-    openPopup();
-    
-    // Фокусируемся на первом поле после открытия
-    setTimeout(() => {
-      const nameInput = document.getElementById('popup-name');
-      if (nameInput) nameInput.focus();
-    }, 300);
-  });
+  if (openPopupBtn) {
+    openPopupBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('Popup button clicked');
+      openPopup();
+      
+      // Фокусируемся на первом поле после открытия
+      setTimeout(() => {
+        const nameInput = document.getElementById('popup-name');
+        if (nameInput) nameInput.focus();
+      }, 300);
+    });
+  }
 
   // Закрытие попапа по клику на крестик
   if (closePopupBtn) {

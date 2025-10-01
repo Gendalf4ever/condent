@@ -6,8 +6,14 @@
  * - gid: идентификатор листа в Google Sheets
  */
 window.sheetConfig = {
-  // ID основной таблицы Google Sheets
-  spreadsheetId: '1Hxmx_tznE64ifvKON4-waL6x7BYQ7plf1nWta5nsMlI',
+  // Получаем ID основной таблицы Google Sheets из api-keys.js
+  get spreadsheetId() {
+    if (typeof window.getGoogleSheetsId === 'undefined') {
+      console.error('API ключи не загружены. Убедитесь, что api-keys.js подключен.');
+      return '1Hxmx_tznE64ifvKON4-waL6x7BYQ7plf1nWta5nsMlI'; // fallback
+    }
+    return window.getGoogleSheetsId();
+  },
   
   // Настройки для всех разделов каталога
   pages: {

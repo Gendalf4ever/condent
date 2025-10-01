@@ -1,9 +1,24 @@
-/* Подключение шрифта Tilda Sans */
+/* Подключение шрифта Tilda Sans с fallback */
 @import url('https://fonts.googleapis.com/css2?family=Tilda+Sans:wght@400;700&display=swap');
+
+/* Fallback для случаев, когда Google Fonts недоступен */
+@font-face {
+  font-family: 'Tilda Sans Fallback';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arial'), local('Helvetica'), local('sans-serif');
+}
+
+@font-face {
+  font-family: 'Tilda Sans Fallback';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Arial Bold'), local('Helvetica Bold'), local('sans-serif');
+}
 
 /* Глобальные стили заголовков с Tilda Sans */
 h1 {
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-size: 42px;
     font-weight: 400;
 }
@@ -13,7 +28,7 @@ h1.bold {
 }
 
 h2 {
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-size: 32px;
     font-weight: 400;
 }
@@ -703,6 +718,23 @@ h2.bold {
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blog-header-logo {
+  height: 40px;
+  width: auto;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+
+.team-header-logo {
+  height: 40px;
+  width: auto;
+  margin-right: 15px;
+  vertical-align: middle;
 }
 
 @media (max-width: 768px) {
@@ -714,6 +746,16 @@ h2.bold {
   
   .page-header__title {
     font-size: 1.5rem;
+  }
+  
+  .blog-header-logo {
+    height: 30px;
+    margin-right: 10px;
+  }
+  
+  .team-header-logo {
+    height: 30px;
+    margin-right: 10px;
   }
 }
 
@@ -744,49 +786,53 @@ h2.bold {
   bottom: 20px;
   left: 20px;
   z-index: 1000;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .help-button {
-  display: flex;
-  align-items: center;
-  background-color: #2c3e50; 
-  color: white;
-  padding: 10px 15px;
-  border-radius: 30px;
+  display: block;
   text-decoration: none;
-  font-family: inherit;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .help-button:hover {
-  background-color: #1a252f; 
   transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
-.help-icon {
-  background: white;
-  color: #2c3e50;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 8px;
-  font-weight: bold;
+.help-button-image {
+  width: auto;
+  height: 160px;
+  display: block;
+  border-radius: 0;
+  box-shadow: none;
+  transition: all 0.3s ease;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
 
-.help-text {
-  font-size: 14px;
+.help-button:hover .help-button-image {
+  box-shadow: none;
+  filter: brightness(1.1);
 }
 
 @media (max-width: 768px) {
-  .help-button {
-    padding: 8px 12px;
-  }
-  .help-text {
-    font-size: 12px;
+  .help-button-image {
+    height: 120px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 }
  /* Базовые стили */
@@ -823,7 +869,7 @@ body > div:first-child:not(.page-header):not(header) {
 }
 
 .education-header h1 {
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-size: 42px;
     font-weight: 400;
     color: #000000;
@@ -1006,6 +1052,29 @@ body > div:first-child:not(.page-header):not(header) {
             border-radius: 0 0 8px 8px;
         }
         
+        /* Основные стили логотипа */
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-image {
+            height: 45px;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: #000000;
+        }
+        
+        .logo-text .bracket {
+            color: #EF4444;
+        }
+        
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -1025,6 +1094,12 @@ body > div:first-child:not(.page-header):not(header) {
         .logo-img {
             height: 40px;
             margin-right: 10px;
+        }
+        
+        .logo-image {
+            height: 40px;
+            margin-right: 10px;
+            vertical-align: middle;
         }
         
         .logo {

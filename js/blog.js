@@ -61,9 +61,9 @@ async function loadAndDisplayArticles() {
     if (!container) return;
 
     try {
-        // Устанавливаем заголовок для списка статей
+        // Устанавливаем заголовок для списка статей с логотипом
         if (typeof setPageHeader === 'function') {
-            setPageHeader('Блог CO[D]ENT');
+            setPageHeader('<img src="https://i.ibb.co/hJWrPVFG/blog-logo.png" alt="blog-logo" border="0" class="blog-header-logo"> Блог CO[D]ENT');
         }
         
         showLoading();

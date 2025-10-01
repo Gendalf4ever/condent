@@ -6,15 +6,14 @@ function initializeFirebase() {
         return false;
     }
 
-    // Конфигурация
-    const firebaseConfig = {
-        apiKey: "",
-        authDomain: "codent-7814d.firebaseapp.com",
-        projectId: "codent-7814d",
-        storageBucket: "codent-7814d.firebasestorage.app",
-        messagingSenderId: "855160903983",
-        appId: "1:855160903983:web:44401cc9d2ab5d79e0e9da"
-    };
+    // Проверяем, что API ключи загружены
+    if (typeof window.getFirebaseConfig === 'undefined') {
+        console.error('API ключи не загружены. Убедитесь, что api-keys.js подключен.');
+        return false;
+    }
+
+    // Получаем конфигурацию из api-keys.js
+    const firebaseConfig = window.getFirebaseConfig();
 
     try {
         // Инициализация Firebase

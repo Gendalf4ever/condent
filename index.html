@@ -17,27 +17,27 @@
     
     <!-- основной контент -->
     <main class="main-content-wrapper">
-        <div class="content-main">
-            <div class="content-with-image">
-                <div class="image-container">
-                    <img src="src/img/index/robot.png" alt="CO[D]ENT - CAD/CAM системы для профессионалов">
+        <div class="images-gallery">
+            <div class="gallery-image">
+                <img src="https://i.ibb.co/Qvz7xTWy/image1.png" alt="image1" border="0">
+            </div>
+            <div class="gallery-image">
+                <img src="https://i.ibb.co/v7xB4Kd/image2.png" alt="image2" border="0">
+            </div>
+            <div class="gallery-image">
+                <img src="https://i.ibb.co/G48kTwFf/image3.png" alt="image3" border="0">
+            </div>
+            <div class="gallery-image">
+                <img src="https://i.ibb.co/PZyYvNrs/image4.png" alt="image4" border="0">
+            </div>
+            <div class="gallery-image-with-button">
+                <div class="gallery-image">
+                    <img src="https://i.ibb.co/8DvD2L3h/image5.png" alt="image5" border="0">
                 </div>
-                <div class="text-content">
-                    <div class="content-item">CO[D]ENT - лучшее цифровое оборудование CO[D]ENT - это лучшее цифровое оборудование и материалы, персонально адаптируемое под ваши цели</div>
-                    <p>CO[D]ENT - это поддержка и обучение по всем направлениям цифровой стоматологии:</p>
-                    <ul class="content-main-list">
-                        <li>3D моделирование</li>
-                        <li>Навигационная хирургия</li>
-                        <li>Моделирование элайнеров</li>
-                    </ul>
-                    <p>CO[D]ENT - это оптимизация CAM-процессов, таких как печать и фрезеровка.</p>
-                    <p>CO[D]ENT - лучшее оборудование для интроорального и лабораторного сканирования!</p>
+                <div class="ask-question-container">
+                    <button class="ask-question-btn" id="ask-question-btn">Задать вопрос</button>
                 </div>
             </div>
-        </div>
-
-        <div class="codent-slogan">
-            <p>Выходите за собственные рамки с CO[D]ENT. А мы обеспечим настройку и сервис Ваших цифровых протоколов</p>
         </div>
     </main>
 
@@ -62,6 +62,19 @@
                     );
                 }
             }, 100);
+            
+            // Обработчик кнопки "Задать вопрос"
+            const askQuestionBtn = document.getElementById('ask-question-btn');
+            if (askQuestionBtn) {
+                askQuestionBtn.addEventListener('click', () => {
+                    // Открываем попап связи с нами
+                    const contactPopup = document.getElementById('contact-popup');
+                    if (contactPopup) {
+                        contactPopup.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            }
         });
     </script>
 </body>

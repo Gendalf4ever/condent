@@ -1,5 +1,20 @@
-/* Подключение шрифта Tilda Sans */
+/* Подключение шрифта Tilda Sans с fallback */
 @import url('https://fonts.googleapis.com/css2?family=Tilda+Sans:wght@400;700&display=swap');
+
+/* Fallback для случаев, когда Google Fonts недоступен */
+@font-face {
+  font-family: 'Tilda Sans Fallback';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arial'), local('Helvetica'), local('sans-serif');
+}
+
+@font-face {
+  font-family: 'Tilda Sans Fallback';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Arial Bold'), local('Helvetica Bold'), local('sans-serif');
+}
 
 /* Стили для полноэкранного попапа */
 .popup-overlay {
@@ -78,7 +93,7 @@
 
 /* Стили заголовков с Tilda Sans */
 h1 {
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-size: 42px;
     font-weight: 400;
 }
@@ -88,7 +103,7 @@ h1.bold {
 }
 
 h2 {
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-size: 32px;
     font-weight: 400;
 }
@@ -102,7 +117,7 @@ h2.bold {
     margin-bottom: 10px;
     color: #fff;
     font-size: 2.5rem;
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-weight: 400;
 }
 
@@ -111,7 +126,7 @@ h2.bold {
     margin-bottom: 10px;
     color: #fff;
     font-size: 2.5rem;
-    font-family: 'Tilda Sans', sans-serif;
+    font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
     font-weight: 400;
 }
 

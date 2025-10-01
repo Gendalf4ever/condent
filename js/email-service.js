@@ -1,15 +1,21 @@
-// EmailJS конфигурация для отправки писем
-const EMAIL_CONFIG = {
-    serviceId: 'service_codent', // Service ID
-    templateId: 'template_support', // Template ID
-    publicKey: 'your-public-key', // Public Key
-    recipientEmail: 'chelovek438@gmail.com'
-};
+// Получаем EmailJS конфигурацию из api-keys.js
+function getEmailConfig() {
+    if (typeof window.getEmailJSConfig === 'undefined') {
+        console.error('API ключи не загружены. Убедитесь, что api-keys.js подключен.');
+        return null;
+    }
+    return window.getEmailJSConfig();
+}
 
 // Инициализация EmailJS
 function initializeEmailJS() {
+    const emailConfig = getEmailConfig();
+    if (!emailConfig) {
+        return false;
+    }
+    
     if (typeof emailjs !== 'undefined') {
-        emailjs.init(EMAIL_CONFIG.publicKey);
+        emailjs.init(emailConfig.publicKey);
         console.log('EmailJS инициализирован');
         return true;
     } else {
@@ -25,9 +31,14 @@ async function sendSupportEmail(formData) {
             throw new Error('EmailJS не инициализирован');
         }
 
+        const emailConfig = getEmailConfig();
+        if (!emailConfig) {
+            throw new Error('Конфигурация EmailJS недоступна');
+        }
+
         // Подготавливаем данные для отправки
         const templateParams = {
-            to_email: EMAIL_CONFIG.recipientEmail,
+            to_email: emailConfig.recipientEmail,
             from_name: formData.name,
             from_email: formData.email,
             phone: formData.phone,
@@ -38,8 +49,8 @@ async function sendSupportEmail(formData) {
 
         // Отправляем письмо
         const response = await emailjs.send(
-            EMAIL_CONFIG.serviceId,
-            EMAIL_CONFIG.templateId,
+            emailConfig.serviceId,
+            emailConfig.templateId,
             templateParams
         );
 

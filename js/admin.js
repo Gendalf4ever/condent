@@ -453,7 +453,7 @@ function initializeAdminInterface() {
 
     async function uploadImage(file) {
         try {
-            const API_KEY = 'бебебе'; //  ключ
+            const API_KEY = '0b770dfcb1e3a1958a8d0a7cb7ae1962'; //  ключ
             
             const formData = new FormData();
             formData.append('image', file);
@@ -850,7 +850,13 @@ function initializeAdminInterface() {
 
     // ================= ИМПОРТ ИЗ GOOGLE SHEETS =================
 
-    const SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1Hxmx_tznE64ifvKON4-waL6x7BYQ7plf1nWta5nsMlI/export?format=csv&gid=0';
+    // Получаем URL для Google Sheets из api-keys.js
+    function getSheetsCSVUrl() {
+        const spreadsheetId = typeof window.getGoogleSheetsId !== 'undefined' 
+            ? window.getGoogleSheetsId() 
+            : '1Hxmx_tznE64ifvKON4-waL6x7BYQ7plf1nWta5nsMlI'; // fallback
+        return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=0`;
+    }
     
     let previewData = [];
 
@@ -946,7 +952,7 @@ function initializeAdminInterface() {
             previewBtn.disabled = true;
             previewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка...';
             
-            const response = await fetch(SHEETS_CSV_URL);
+            const response = await fetch(getSheetsCSVUrl());
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
