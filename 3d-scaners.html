@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
+    <link rel="stylesheet" href="css/reviews.css">
     <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
     
     <!-- Firebase SDK -->
@@ -59,6 +60,10 @@
                         </div>
                         <button class="add-to-cart">Добавить в корзину</button>
                     </div>
+                    <!-- Контейнер для отзывов -->
+                    <div id="modal-product-reviews" class="modal-product-reviews">
+                        <!-- Отзывы будут загружены динамически -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,6 +94,7 @@
     <script src="js/api-keys.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/load-components.js"></script>
+    <script src="js/reviews.js"></script>
     <script src="js/catalog-firebase.js"></script>
     
     <script>

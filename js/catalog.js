@@ -260,6 +260,13 @@ function openProductModal(product) {
     // Сбрасываем количество на 1 при открытии модального окна
     document.getElementById('param-quantity').value = 1;
     
+    // Инициализируем отзывы для товара
+    const reviewsContainer = document.getElementById('modal-product-reviews');
+    if (reviewsContainer && window.reviewsManager) {
+        reviewsContainer.innerHTML = '';
+        window.reviewsManager.initProductReviews(product.id, product.name, reviewsContainer);
+    }
+    
     modal.style.display = 'block';
 }
 

@@ -1069,3 +1069,187 @@
         font-size: 0.9rem;
     }
 }
+
+/* Стили для модерации отзывов */
+.reviews-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.filter-btn:hover {
+    border-color: #2c3e50;
+    background: #f8f9fa;
+}
+
+.filter-btn.active {
+    background: #2c3e50;
+    color: white;
+    border-color: #2c3e50;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-review-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.admin-review-info {
+    flex: 1;
+}
+
+.admin-review-product {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.admin-review-user {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.admin-review-date {
+    color: #999;
+    font-size: 12px;
+}
+
+.admin-review-rating {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 10px;
+}
+
+.admin-review-rating .star {
+    color: #ffc107;
+    font-size: 16px;
+}
+
+.admin-review-rating .star.empty {
+    color: #e0e0e0;
+}
+
+.admin-review-text {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #2c3e50;
+    margin: 15px 0;
+    line-height: 1.6;
+    color: #333;
+}
+
+.admin-review-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.admin-review-actions .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-approve {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-approve:hover {
+    background: #219a52;
+}
+
+.btn-reject {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-reject:hover {
+    background: #c0392b;
+}
+
+.btn-delete {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #7f8c8d;
+}
+
+.admin-review-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.admin-review-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.admin-review-status.approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.admin-review-status.rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+@media (max-width: 768px) {
+    .reviews-filters {
+        flex-wrap: wrap;
+    }
+    
+    .admin-review-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .admin-review-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}

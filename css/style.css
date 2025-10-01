@@ -786,23 +786,16 @@ h2.bold {
   bottom: 20px;
   left: 20px;
   z-index: 1000;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  background: transparent;
 }
 
 .help-button {
   display: block;
   text-decoration: none;
   transition: all 0.3s ease;
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .help-button:hover {
@@ -814,25 +807,19 @@ h2.bold {
   width: auto;
   height: 160px;
   display: block;
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
+  background: transparent;
 }
 
 .help-button:hover .help-button-image {
-  box-shadow: none;
-  filter: brightness(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 @media (max-width: 768px) {
   .help-button-image {
     height: 120px;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
   }
 }
  /* Базовые стили */
@@ -1282,6 +1269,39 @@ body > div:first-child:not(.page-header):not(header) {
             background-color: #EF4444;
             color: #FFFFFF;
         }
+
+        .btn-profile {
+            background-color: #2c3e50;
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .btn-profile:hover {
+            background-color: #EF4444;
+            color: #FFFFFF;
+        }
+
+        .btn-profile i {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+
+        .btn-profile.authenticated {
+            background-color: #27ae60;
+        }
+
+        .btn-profile.authenticated:hover {
+            background-color: #219a52;
+        }
         
         /* Мобильное меню */
         .mobile-menu-btn {
@@ -1349,3 +1369,10 @@ body > div:first-child:not(.page-header):not(header) {
                 font-size: 14px;
             }
         }
+.catalog-arrow {
+  font-size: 1.1em;
+  margin-left: 4px;
+  vertical-align: middle;
+  display: inline-block;
+  font-weight: normal;
+}

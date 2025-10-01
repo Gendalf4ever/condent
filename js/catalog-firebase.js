@@ -279,6 +279,34 @@ function openProductModal(product) {
     // Сбрасываем количество на 1
     document.getElementById('param-quantity').value = 1;
     
+    // Инициализируем отзывы для товара
+    const reviewsContainer = document.getElementById('modal-product-reviews');
+    if (reviewsContainer) {
+        reviewsContainer.innerHTML = '<div class="loading">Загрузка отзывов...</div>';
+        
+        // Пытаемся инициализировать отзывы
+        let attempts = 0;
+        const maxAttempts = 10; // Максимум 5 секунд ожидания
+        
+        const initReviews = () => {
+            attempts++;
+            if (window.reviewsManager) {
+                console.log('Инициализируем отзывы для товара:', product.name);
+                reviewsContainer.innerHTML = '';
+                window.reviewsManager.initProductReviews(product.id, product.name, reviewsContainer);
+            } else if (attempts < maxAttempts) {
+                console.log('reviewsManager еще не готов, ждем... (попытка', attempts, 'из', maxAttempts, ')');
+                // Если reviewsManager еще не готов, попробуем через 500мс
+                setTimeout(initReviews, 500);
+            } else {
+                console.error('reviewsManager не инициализировался за 5 секунд');
+                reviewsContainer.innerHTML = '<div class="error">Не удалось загрузить систему отзывов</div>';
+            }
+        };
+        
+        initReviews();
+    }
+    
     modal.style.display = 'block';
 }
 

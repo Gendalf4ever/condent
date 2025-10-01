@@ -721,6 +721,23 @@ async function initializePage() {
       loadComponent(CONFIG.paths.components.footer, 'body', 'beforeend')
     ];
     
+    // Загружаем скрипт управления авторизацией
+    const authScript = document.createElement('script');
+    authScript.src = 'js/auth-state.js';
+    authScript.async = true;
+    
+    // После загрузки скрипта пытаемся быстро обновить кнопку
+    authScript.onload = () => {
+      // Даем время на загрузку хедера, затем обновляем кнопку
+      setTimeout(() => {
+        if (window.quickUpdateProfileButton) {
+          window.quickUpdateProfileButton();
+        }
+      }, 100);
+    };
+    
+    document.head.appendChild(authScript);
+    
     // Добавляем кнопку помощи только если это не страница каталога
     const excludeHelpButtonPages = [
       '3d-printers.html',
@@ -750,6 +767,13 @@ async function initializePage() {
     await Promise.all(componentsToLoad);
     
     console.log('Basic components loaded');
+    
+    // Быстро обновляем кнопку профиля после загрузки хедера
+    setTimeout(() => {
+      if (window.quickUpdateProfileButton) {
+        window.quickUpdateProfileButton();
+      }
+    }, 50);
     
     // 2. Баннеры
     await BannerSystem.loadAttentionBanner();

@@ -57,6 +57,9 @@
             <button class="tab-button active" data-tab="articles">
                 <i class="fas fa-newspaper"></i> Статьи
             </button>
+            <button class="tab-button" data-tab="reviews">
+                <i class="fas fa-star"></i> Модерация отзывов
+            </button>
             <button class="tab-button" data-tab="products">
                 <i class="fas fa-box"></i> Товары
             </button>
@@ -72,6 +75,27 @@
             </div>
             <div id="articles-list" class="articles-list">
                 <!-- Статьи будут загружены здесь -->
+            </div>
+        </section>
+
+        <!-- Содержимое вкладки Модерация отзывов -->
+        <section id="reviews-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Модерация отзывов</h2>
+                <div class="reviews-filters">
+                    <button class="filter-btn active" data-status="pending">
+                        <i class="fas fa-clock"></i> На модерации
+                    </button>
+                    <button class="filter-btn" data-status="approved">
+                        <i class="fas fa-check"></i> Одобренные
+                    </button>
+                    <button class="filter-btn" data-status="rejected">
+                        <i class="fas fa-times"></i> Отклоненные
+                    </button>
+                </div>
+            </div>
+            <div id="reviews-list" class="reviews-list">
+                <!-- Отзывы будут загружены здесь -->
             </div>
         </section>
 
@@ -416,6 +440,26 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing admin interface...');
             
+            // Переменные Firebase
+            let auth, db;
+            
+            // Ждем инициализации Firebase
+            const waitForFirebase = () => {
+                return new Promise((resolve) => {
+                    const checkFirebase = () => {
+                        if (window.firebaseServices && window.firebaseServices.auth && window.firebaseServices.db) {
+                            auth = window.firebaseServices.auth;
+                            db = window.firebaseServices.db;
+                            console.log('Firebase инициализирован в админ-панели');
+                            resolve();
+                        } else {
+                            setTimeout(checkFirebase, 100);
+                        }
+                    };
+                    checkFirebase();
+                });
+            };
+            
             let quillAdd, quillEdit;
             
             // Инициализация редакторов
@@ -593,6 +637,11 @@
                         if (targetTab === 'products' && window.loadProducts) {
                             window.loadProducts();
                         }
+                        
+                        // Если переключились на отзывы, загружаем их
+                        if (targetTab === 'reviews') {
+                            loadReviews('pending');
+                        }
                     });
                 });
             }
@@ -720,17 +769,222 @@
                 if (startBtn) startBtn.disabled = true;
             }
 
-            // Инициализируем новую функциональность
-            initTabs();
-            initProductModals();
-            initCategoryFilters();
-            initSheetsImport();
+            // Инициализируем новую функциональность после загрузки Firebase
+            waitForFirebase().then(() => {
+                initTabs();
+                initProductModals();
+                initCategoryFilters();
+                initSheetsImport();
+                initReviewsModeration();
+            }).catch(error => {
+                console.error('Ошибка инициализации Firebase:', error);
+            });
+
+            // ===== МОДЕРАЦИЯ ОТЗЫВОВ =====
+            function initReviewsModeration() {
+                // Обработчики фильтров
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const status = this.getAttribute('data-status');
+                        
+                        // Обновляем активную кнопку
+                        filterButtons.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Загружаем отзывы с выбранным статусом
+                        loadReviews(status);
+                    });
+                });
+            }
+            
+            async function loadReviews(status = 'pending') {
+                const reviewsList = document.getElementById('reviews-list');
+                reviewsList.innerHTML = '<div class="loading">Загрузка отзывов...</div>';
+                
+                try {
+                    const reviews = await db.collection('reviews')
+                        .where('status', '==', status)
+                        .get();
+                    
+                    if (reviews.empty) {
+                        reviewsList.innerHTML = `<div class="no-reviews">Нет отзывов со статусом "${getStatusText(status)}"</div>`;
+                        return;
+                    }
+                    
+                    // Сортируем отзывы по дате создания (новые первыми)
+                    const reviewsArray = [];
+                    reviews.forEach(doc => {
+                        reviewsArray.push({ id: doc.id, data: doc.data() });
+                    });
+                    
+                    reviewsArray.sort((a, b) => {
+                        const dateA = a.data.createdAt ? a.data.createdAt.toDate() : new Date(0);
+                        const dateB = b.data.createdAt ? b.data.createdAt.toDate() : new Date(0);
+                        return dateB - dateA; // Новые первыми
+                    });
+
+                    let reviewsHtml = '';
+                    reviewsArray.forEach(item => {
+                        reviewsHtml += renderAdminReviewItem(item.id, item.data);
+                    });
+                    
+                    reviewsList.innerHTML = reviewsHtml;
+                } catch (error) {
+                    console.error('Ошибка загрузки отзывов:', error);
+                    reviewsList.innerHTML = '<div class="error">Ошибка загрузки отзывов</div>';
+                }
+            }
+            
+            function renderAdminReviewItem(reviewId, review) {
+                const stars = renderStars(review.rating);
+                const date = review.createdAt ? review.createdAt.toDate().toLocaleDateString('ru-RU') : '';
+                const status = review.status || 'pending';
+                
+                return `
+                    <div class="admin-review-item" data-review-id="${reviewId}">
+                        <div class="admin-review-header">
+                            <div class="admin-review-info">
+                                <div class="admin-review-product">${review.productName}</div>
+                                <div class="admin-review-user">Пользователь: ${review.userName}</div>
+                                <div class="admin-review-date">Дата: ${date}</div>
+                                <div class="admin-review-rating">${stars}</div>
+                            </div>
+                            <div class="admin-review-status ${status}">${getStatusText(status)}</div>
+                        </div>
+                        <div class="admin-review-text">${review.text}</div>
+                        <div class="admin-review-actions">
+                            ${status === 'pending' ? `
+                                <button class="btn btn-approve" onclick="approveReview('${reviewId}')">
+                                    <i class="fas fa-check"></i> Одобрить
+                                </button>
+                                <button class="btn btn-reject" onclick="rejectReview('${reviewId}')">
+                                    <i class="fas fa-times"></i> Отклонить
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-delete" onclick="deleteReview('${reviewId}')">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function renderStars(rating) {
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<span class="star ${i <= rating ? '' : 'empty'}">★</span>`;
+                }
+                return stars;
+            }
+            
+            function getStatusText(status) {
+                const statusTexts = {
+                    'pending': 'На модерации',
+                    'approved': 'Одобрен',
+                    'rejected': 'Отклонен'
+                };
+                return statusTexts[status] || status;
+            }
+            
+            async function approveReview(reviewId) {
+                try {
+                    await db.collection('reviews').doc(reviewId).update({
+                        status: 'approved',
+                        moderatedAt: new Date()
+                    });
+                    
+                    showMessage('Отзыв одобрен', 'success');
+                    
+                    // Перезагружаем текущий список
+                    const activeFilter = document.querySelector('.filter-btn.active');
+                    const currentStatus = activeFilter ? activeFilter.getAttribute('data-status') : 'pending';
+                    loadReviews(currentStatus);
+                } catch (error) {
+                    console.error('Ошибка одобрения отзыва:', error);
+                    showMessage('Ошибка при одобрении отзыва', 'error');
+                }
+            }
+            
+            async function rejectReview(reviewId) {
+                try {
+                    await db.collection('reviews').doc(reviewId).update({
+                        status: 'rejected',
+                        moderatedAt: new Date()
+                    });
+                    
+                    showMessage('Отзыв отклонен', 'success');
+                    
+                    // Перезагружаем текущий список
+                    const activeFilter = document.querySelector('.filter-btn.active');
+                    const currentStatus = activeFilter ? activeFilter.getAttribute('data-status') : 'pending';
+                    loadReviews(currentStatus);
+                } catch (error) {
+                    console.error('Ошибка отклонения отзыва:', error);
+                    showMessage('Ошибка при отклонении отзыва', 'error');
+                }
+            }
+            
+            async function deleteReview(reviewId) {
+                if (!confirm('Вы уверены, что хотите удалить этот отзыв?')) return;
+                
+                try {
+                    await db.collection('reviews').doc(reviewId).delete();
+                    
+                    showMessage('Отзыв удален', 'success');
+                    
+                    // Перезагружаем текущий список
+                    const activeFilter = document.querySelector('.filter-btn.active');
+                    const currentStatus = activeFilter ? activeFilter.getAttribute('data-status') : 'pending';
+                    loadReviews(currentStatus);
+                } catch (error) {
+                    console.error('Ошибка удаления отзыва:', error);
+                    showMessage('Ошибка при удалении отзыва', 'error');
+                }
+            }
+            
+            function showMessage(text, type = 'info') {
+                // Создаем элемент сообщения
+                const message = document.createElement('div');
+                message.className = `admin-message ${type}`;
+                message.textContent = text;
+                message.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 6px;
+                    color: white;
+                    font-weight: 500;
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease;
+                `;
+                
+                // Цвета в зависимости от типа
+                const colors = {
+                    success: '#27ae60',
+                    error: '#e74c3c',
+                    info: '#3498db'
+                };
+                message.style.backgroundColor = colors[type] || colors.info;
+                
+                document.body.appendChild(message);
+                
+                // Удаляем через 3 секунды
+                setTimeout(() => {
+                    message.remove();
+                }, 3000);
+            }
 
             // Делаем функции глобальными
             window.openAddArticleModal = openAddArticleModal;
             window.closeAddArticleModal = closeAddArticleModal;
             window.quillAdd = quillAdd;
             window.quillEdit = quillEdit;
+            window.loadReviews = loadReviews;
+            window.approveReview = approveReview;
+            window.rejectReview = rejectReview;
+            window.deleteReview = deleteReview;
 
             console.log('Admin interface initialized successfully');
         });

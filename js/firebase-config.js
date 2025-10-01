@@ -24,7 +24,16 @@ function initializeFirebase() {
         // Получаем сервисы
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage(); 
+        
+        // Storage опционально (может не быть подключен на всех страницах)
+        let storage = null;
+        try {
+            if (firebase.storage) {
+                storage = firebase.storage();
+            }
+        } catch (e) {
+            console.log('Firebase Storage не подключен');
+        }
         
         // Экспорт для использования
         window.firebaseServices = { 
