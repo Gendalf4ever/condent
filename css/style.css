@@ -690,7 +690,7 @@ h2.bold {
   color: #fff;
   padding: 30px 0;
   margin-bottom: 40px;
-  margin-top: 80px; /* Отступ под фиксированный хедер */
+  margin-top: 120px; /* Увеличенный отступ под фиксированный хедер */
 }
 
 .page-header__container {
@@ -709,7 +709,7 @@ h2.bold {
   .page-header {
     padding: 20px 0;
     margin-bottom: 30px;
-    margin-top: 60px; /* Меньший отступ для мобильных */
+    margin-top: 100px; /* Увеличенный отступ для мобильных */
   }
   
   .page-header__title {
@@ -801,12 +801,12 @@ h2.bold {
 
 /* Общие стили для страниц без page-header */
 body > div:first-child:not(.page-header):not(header) {
-    margin-top: 100px; /* Отступ под фиксированный хедер для первого элемента */
+    margin-top: 120px; /* Увеличенный отступ под фиксированный хедер для первого элемента */
 }
 
 @media (max-width: 768px) {
     body > div:first-child:not(.page-header):not(header) {
-        margin-top: 80px; /* Меньший отступ для мобильных */
+        margin-top: 100px; /* Увеличенный отступ для мобильных */
     }
 }
 

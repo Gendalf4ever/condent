@@ -692,16 +692,54 @@ async function initializePage() {
     console.log('Starting page initialization...');
     
     // Проверяем, нужно ли загружать форму обратной связи
-    const excludeSupportFormPages = ['team.html', 'printers-set.html', 'post-processing.html', 'contacts.html'];
+    const excludeSupportFormPages = [
+      'team.html', 
+      'printers-set.html', 
+      'post-processing.html', 
+      'contacts.html',
+      '3d-printers.html',
+      '3d-scaners.html',
+      'milling.html',
+      'frezy.html',
+      'photo-polymers.html',
+      '3d-consumables.html',
+      'post-obrabotka.html',
+      'sinterising.html',
+      'zirkon.html',
+      'compressors.html',
+      'catalog-firebase.html',
+      'support.html',
+      'blog.html'
+    ];
     const currentPage = window.location.pathname;
     const shouldLoadSupportForm = !excludeSupportFormPages.some(page => currentPage.includes(page));
     
     // 1. Основные компоненты
     const componentsToLoad = [
       loadComponent(CONFIG.paths.components.header, 'body', 'afterbegin'),
-      loadComponent(CONFIG.paths.components.footer, 'body', 'beforeend'),
-      loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend')
+      loadComponent(CONFIG.paths.components.footer, 'body', 'beforeend')
     ];
+    
+    // Добавляем кнопку помощи только если это не страница каталога
+    const excludeHelpButtonPages = [
+      '3d-printers.html',
+      '3d-scaners.html', 
+      'milling.html',
+      'frezy.html',
+      'photo-polymers.html',
+      '3d-consumables.html',
+      'post-obrabotka.html',
+      'sinterising.html',
+      'zirkon.html',
+      'compressors.html',
+      'catalog-firebase.html',
+      'support.html',
+      'blog.html'
+    ];
+    
+    if (!excludeHelpButtonPages.some(page => currentPage.includes(page))) {
+      componentsToLoad.push(loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend'));
+    }
     
     // Добавляем форму обратной связи только если нужно
     if (shouldLoadSupportForm) {

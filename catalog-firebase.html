@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="utf-8">
-    <title>CODENT - Фрезеровка</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CODENT - Каталог товаров</title>
+    <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
-    <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -20,13 +21,14 @@
     <!-- Заголовок страницы -->
     <div id="page-header" class="page-header">
         <div class="page-header__container">
-            <h1 class="page-header__title">Фрезерные станки</h1>
-            <p class="page-header__subtitle">Высокоточные фрезерные станки для стоматологии</p>
+            <h1 class="page-header__title" id="page-title">Каталог товаров</h1>
+            <p class="page-header__subtitle" id="page-subtitle">Выберите интересующую вас категорию</p>
         </div>
     </div>
-    
+
+    <!-- Контейнер для товаров -->
     <div id="products-container" class="products-grid">
-        <div class="loading">Загружаем каталог фрезеровки...</div>
+        <div class="loading">Загружаем каталог товаров...</div>
     </div>
 
     <!-- Кнопка корзины -->
@@ -86,16 +88,18 @@
         </div>
     </div>
     
+    <!-- Подключаем скрипты -->
     <script src="js/firebase-config.js"></script>
     <script src="js/load-components.js"></script>
     <script src="js/catalog-firebase.js"></script>
     
     <script>
-        // Дополнительная инициализация для страницы фрезеровки
+        // Дополнительная инициализация для страницы каталога
         document.addEventListener('DOMContentLoaded', () => {
-            // Загружаем товары категории "milling"
-            if (window.catalogFirebase) {
-                window.catalogFirebase.loadProductsFromFirebase('milling');
+            // Устанавливаем заголовок страницы в зависимости от категории
+            const category = getCategoryFromUrl();
+            if (category) {
+                setPageTitle(category);
             }
             
             // Добавляем отступ при загрузке хедера
@@ -110,6 +114,32 @@
                 }
             }, 100);
         });
+        
+        // Определяет категорию из URL параметров
+        function getCategoryFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('category');
+        }
+        
+        // Устанавливает заголовок страницы
+        function setPageTitle(category) {
+            const categoryNames = {
+                'printers': '3D Принтеры',
+                'scanners': '3D Сканеры',
+                'milling': 'Фрезерные станки',
+                'milling_tools': 'Фрезы',
+                'photopolymers': 'Фотополимеры',
+                'consumables': 'Расходные материалы',
+                'post_processing': 'Пост-обработка',
+                'sintering': 'Синтеризация',
+                'zirconia': 'Циркониевые диски',
+                'compressors': 'Компрессоры'
+            };
+            
+            const title = categoryNames[category] || 'Каталог товаров';
+            document.getElementById('page-title').textContent = title;
+            document.title = `CODENT - ${title}`;
+        }
     </script>
 </body>
 </html>

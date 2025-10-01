@@ -10,6 +10,9 @@
     </head>
     <body>
         <script src="js/load-components.js"></script>
+        <script src="js/email-service.js"></script>
+        <!-- EmailJS SDK -->
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
         <script>
             setPageHeader('Техническая поддержка');
             loadComponent('includes/help-button.html', 'body');
@@ -118,33 +121,35 @@
                         formData.append('attachments[]', file);
                     });
                     
-                    // Отправка данных
-                    fetch('mail.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Ошибка сети');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            showStatus('Ваш запрос успешно отправлен! Мы свяжемся с вами в ближайшее время.', 'status-success');
-                            form.reset();
-                            filePreview.innerHTML = '';
-                            files = [];
-                        } else {
-                            throw new Error(data.message || 'Неизвестная ошибка');
-                        }
-                    })
-                    .catch(error => {
-                        showStatus('Ошибка при отправке: ' + error.message, 'status-error');
-                        console.error('Error:', error);
-                    })
-                    .finally(() => {
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Отправить запрос';
-                    });
+                    // Отправка данных через новый сервис
+                    const formDataObject = {
+                        name: formData.get('name'),
+                        phone: formData.get('phone'),
+                        email: formData.get('email'),
+                        warranty: formData.get('warranty'),
+                        issue: formData.get('issue')
+                    };
+
+                    // Используем новый сервис отправки
+                    window.EmailService.sendSupportRequest(formDataObject)
+                        .then(data => {
+                            if (data.success) {
+                                showStatus(data.message, 'status-success');
+                                form.reset();
+                                filePreview.innerHTML = '';
+                                files = [];
+                            } else {
+                                throw new Error(data.message || 'Неизвестная ошибка');
+                            }
+                        })
+                        .catch(error => {
+                            showStatus('Ошибка при отправке: ' + error.message, 'status-error');
+                            console.error('Error:', error);
+                        })
+                        .finally(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Отправить запрос';
+                        });
                 });
                 
                 function showStatus(message, className) {

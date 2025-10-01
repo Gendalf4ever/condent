@@ -9,9 +9,10 @@
     <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body>
     <!-- Компоненты будут загружены автоматически через load-components.js -->
@@ -92,11 +93,6 @@
     <script>
         // Дополнительная инициализация для страницы принтеров
         document.addEventListener('DOMContentLoaded', () => {
-            // Загружаем товары категории "printers"
-            if (window.catalogFirebase) {
-                window.catalogFirebase.loadProductsFromFirebase('printers');
-            }
-            
             // Добавляем отступ при загрузке хедера
             const checkHeader = setInterval(() => {
                 const header = document.querySelector('header');

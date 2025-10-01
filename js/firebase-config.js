@@ -1,7 +1,11 @@
-// Проверяем, что Firebase загружен
-if (typeof firebase === 'undefined') {
-    console.error('Firebase SDK не загружен');
-} else {
+// Функция инициализации Firebase
+function initializeFirebase() {
+    // Проверяем, что Firebase загружен
+    if (typeof firebase === 'undefined') {
+        console.error('Firebase SDK не загружен');
+        return false;
+    }
+
     // Конфигурация
     const firebaseConfig = {
         apiKey: "",
@@ -12,21 +16,16 @@ if (typeof firebase === 'undefined') {
         appId: "1:855160903983:web:44401cc9d2ab5d79e0e9da"
     };
 
-    // Инициализация Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    // Проверяем доступность сервисов
     try {
+        // Инициализация Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Получаем сервисы
         const auth = firebase.auth();
         const db = firebase.firestore();
         const storage = firebase.storage(); 
-        
-        // Настройка Firestore для работы в режиме реального времени
-        db.settings({
-            timestampsInSnapshots: true
-        });
         
         // Экспорт для использования
         window.firebaseServices = { 
@@ -36,17 +35,18 @@ if (typeof firebase === 'undefined') {
         };
         
         console.log('Firebase успешно инициализирован');
+        return true;
         
-        // Проверяем подключение к Firestore
-        db.collection('test').limit(1).get()
-            .then(() => {
-                console.log('Подключение к Firestore установлено');
-            })
-            .catch(error => {
-                console.warn('Предупреждение: не удалось подключиться к Firestore:', error);
-            });
-            
     } catch (error) {
-        console.error('Ошибка инициализации Firebase сервисов:', error);
+        console.error('Ошибка инициализации Firebase:', error);
+        return false;
     }
 }
+
+// Инициализируем Firebase при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    // Ждем немного, чтобы все скрипты загрузились
+    setTimeout(() => {
+        initializeFirebase();
+    }, 100);
+});

@@ -1,6 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Admin.js loaded');
     
+    // Ждем инициализации Firebase
+    waitForFirebaseServices().then(() => {
+        initializeAdminInterface();
+    }).catch(error => {
+        console.error('Failed to initialize Firebase services:', error);
+    });
+});
+
+// Функция ожидания инициализации Firebase
+function waitForFirebaseServices() {
+    return new Promise((resolve, reject) => {
+        const checkFirebase = () => {
+            if (window.firebaseServices && window.firebaseServices.auth && window.firebaseServices.db) {
+                resolve();
+            } else {
+                setTimeout(checkFirebase, 100);
+            }
+        };
+        
+        // Таймаут через 10 секунд
+        setTimeout(() => {
+            reject(new Error('Firebase services not initialized in 10 seconds'));
+        }, 10000);
+        
+        checkFirebase();
+    });
+}
+
+// Инициализация админ-интерфейса
+function initializeAdminInterface() {
     // Инициализация Firebase
     const { auth, db, storage } = window.firebaseServices;
     if (!auth || !db) {
@@ -1242,4 +1272,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Экспортируем функции
     window.loadProducts = loadProducts;
     window.filterProductsByCategory = filterProductsByCategory;
-});
+}

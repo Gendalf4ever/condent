@@ -61,6 +61,11 @@ async function loadAndDisplayArticles() {
     if (!container) return;
 
     try {
+        // Устанавливаем заголовок для списка статей
+        if (typeof setPageHeader === 'function') {
+            setPageHeader('Блог CO[D]ENT');
+        }
+        
         showLoading();
 
         const { db } = window.firebaseServices;
@@ -90,12 +95,31 @@ function processArticles(snapshot) {
             id: doc.id,
             title: data.title || 'Без названия',
             content: data.content || '',
-            imageUrl: data.imageUrl || null,
+            imageUrl: validateImageUrl(data.imageUrl),
             date: data.createdAt?.toDate() || new Date(),
             formattedDate: formatDate(data.createdAt?.toDate() || new Date()),
             excerpt: getExcerpt(data.content || '', 120)
         };
     });
+}
+
+// Валидация URL изображений
+function validateImageUrl(url) {
+    if (!url || typeof url !== 'string') {
+        return null;
+    }
+    
+    // Проверяем, что URL не является некорректным
+    if (url.length < 10 || url.includes('ffffff') || url.includes('placeholder') || !url.includes('.')) {
+        return null;
+    }
+    
+    // Проверяем, что URL начинается с http или https
+    if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('data:')) {
+        return null;
+    }
+    
+    return url;
 }
 
 // Отображение статей в виде сетки
@@ -164,6 +188,15 @@ async function showSingleArticle(articleId) {
         }
 
         const article = doc.data();
+        
+        // Валидируем URL изображения
+        article.imageUrl = validateImageUrl(article.imageUrl);
+        
+        // Устанавливаем заголовок статьи
+        if (typeof setPageHeader === 'function') {
+            setPageHeader(article.title || 'Статья');
+        }
+        
         renderSingleArticle(articleId, article);
         
         // Обновляем URL
@@ -191,28 +224,27 @@ function renderSingleArticle(articleId, article) {
             <button class="back-button" onclick="showArticleList()">← Назад к списку</button>
             
             <article class="blog-article">
-                <header class="article-header">
+                <div class="article-layout">
                     ${article.imageUrl ? `
-                        <img src="${article.imageUrl}" 
-                             alt="${article.title}"
-                             class="article-image"
-                             onerror="this.src='${BLOG_CONFIG.defaultImage}'">
+                        <div class="article-image-container">
+                            <img src="${article.imageUrl}" 
+                                 alt="${article.title}"
+                                 class="article-image"
+                                 onerror="this.src='${BLOG_CONFIG.defaultImage}'">
+                        </div>
                     ` : ''}
                     
-                    <div class="article-meta">
-                        <h1>${escapeHtml(article.title || 'Без названия')}</h1>
-                        <time class="article-date">${formatDate(article.createdAt?.toDate() || new Date())}</time>
+                    <div class="article-content-wrapper">
+                        <header class="article-header">
+                            <time class="article-date">${formatDate(article.createdAt?.toDate() || new Date())}</time>
+                        </header>
+                        
+                        <div class="article-body">
+                            <div class="article-content ql-editor">
+                                ${article.content || 'Содержание отсутствует'}
+                            </div>
+                        </div>
                     </div>
-                </header>
-                
-                <div class="article-body">
-                    <div class="article-content ql-editor">
-                        ${article.content || 'Содержание отсутствует'}
-                    </div>
-                </div>
-                
-                <div class="article-footer">
-                    <button class="back-button" onclick="showArticleList()">← Назад к списку</button>
                 </div>
             </article>
         </div>

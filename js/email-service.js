@@ -1,0 +1,102 @@
+// EmailJS конфигурация для отправки писем
+const EMAIL_CONFIG = {
+    serviceId: 'service_codent', // Service ID
+    templateId: 'template_support', // Template ID
+    publicKey: 'your-public-key', // Public Key
+    recipientEmail: 'chelovek438@gmail.com'
+};
+
+// Инициализация EmailJS
+function initializeEmailJS() {
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init(EMAIL_CONFIG.publicKey);
+        console.log('EmailJS инициализирован');
+        return true;
+    } else {
+        console.error('EmailJS не загружен');
+        return false;
+    }
+}
+
+// Отправка письма через EmailJS
+async function sendSupportEmail(formData) {
+    try {
+        if (!initializeEmailJS()) {
+            throw new Error('EmailJS не инициализирован');
+        }
+
+        // Подготавливаем данные для отправки
+        const templateParams = {
+            to_email: EMAIL_CONFIG.recipientEmail,
+            from_name: formData.name,
+            from_email: formData.email,
+            phone: formData.phone,
+            warranty: formData.warranty || 'Не указан',
+            issue: formData.issue,
+            timestamp: new Date().toLocaleString('ru-RU')
+        };
+
+        // Отправляем письмо
+        const response = await emailjs.send(
+            EMAIL_CONFIG.serviceId,
+            EMAIL_CONFIG.templateId,
+            templateParams
+        );
+
+        console.log('Письмо отправлено:', response);
+        return {
+            success: true,
+            message: 'Ваш запрос успешно отправлен! Мы свяжемся с вами в ближайшее время.'
+        };
+
+    } catch (error) {
+        console.error('Ошибка отправки письма:', error);
+        return {
+            success: false,
+            message: 'Ошибка при отправке письма. Попробуйте позже или свяжитесь с нами по телефону.'
+        };
+    }
+}
+
+// Альтернативный метод через fetch к mail.php
+async function sendSupportEmailPHP(formData) {
+    try {
+        const response = await fetch('mail.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Ошибка сети');
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error('Ошибка отправки через PHP:', error);
+        return {
+            success: false,
+            message: 'Ошибка при отправке письма. Попробуйте позже или свяжитесь с нами по телефону.'
+        };
+    }
+}
+
+// Основная функция отправки (автоматически выбирает лучший метод)
+async function sendSupportRequest(formData) {
+    // Сначала пробуем EmailJS
+    if (typeof emailjs !== 'undefined') {
+        return await sendSupportEmail(formData);
+    }
+    
+    // Если EmailJS недоступен, используем PHP
+    return await sendSupportEmailPHP(formData);
+}
+
+// Экспортируем функции для использования
+window.EmailService = {
+    sendSupportRequest,
+    sendSupportEmail,
+    sendSupportEmailPHP,
+    initializeEmailJS
+};

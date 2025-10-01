@@ -24,11 +24,7 @@
         </div>
     </main>
 
-    <!-- Футер будет загружен динамически -->
-    <div id="page-footer"></div>
-
-    <!-- Кнопка помощи -->
-    <div id="help-button-container"></div>
+    <!-- Футер и кнопка помощи загружаются автоматически через load-components.js -->
 
     <!-- Подключаем скрипты в правильном порядке -->
     <script src="js/load-components.js"></script>
@@ -37,15 +33,10 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Загружаем компоненты
-            loadComponent('includes/header.html', '#page-header');
-            loadComponent('includes/footer.html', '#page-footer');
-            loadComponent('includes/help-button.html', '#help-button-container');
+            // Загружаем только хедер (футер загружается автоматически через load-components.js)
+            loadComponent('header.html', '#page-header');
             
-            // Устанавливаем заголовок страницы
-            if (typeof setPageHeader === 'function') {
-                setPageHeader('Блог CO[D]ENT');
-            }
+            // Заголовок будет устанавливаться динамически в blog.js
             
             // Добавляем отступ при загрузке хедера
             const checkHeader = setInterval(() => {
