@@ -1,0 +1,540 @@
+/* ===== СТИЛИ ДЛЯ БАННЕРОВ СО СКИДКАМИ ===== */
+
+/* Основной баннер со скидками для главной страницы */
+.sale-banner {
+    background: linear-gradient(135deg, #fff5f5, #ffebee);
+    border: 2px solid #e74c3c;
+    border-radius: 16px;
+    margin: 30px auto;
+    max-width: 1200px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.sale-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #e74c3c, #f39c12, #e74c3c);
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+.sale-banner-container {
+    position: relative;
+    z-index: 1;
+}
+
+.sale-banner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sale-banner-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sale-banner-link {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.sale-banner-link:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* Слайдер товаров */
+.sale-products-slider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.slider-btn {
+    background: white;
+    border: 2px solid #e74c3c;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #e74c3c;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.slider-btn:hover {
+    background: #e74c3c;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.slider-btn:active {
+    transform: scale(0.95);
+}
+
+.sale-products-container {
+    display: flex;
+    gap: 15px;
+    overflow: hidden;
+    flex: 1;
+    transition: transform 0.5s ease;
+}
+
+/* Карточки товаров в баннере */
+.sale-product-item {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    min-width: calc(25% - 11.25px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.sale-product-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+}
+
+.sale-product-image {
+    position: relative;
+    height: 120px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sale-product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.sale-discount-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+.sale-product-info {
+    text-align: center;
+}
+
+.sale-product-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 36px;
+}
+
+.sale-product-prices {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sale-old-price {
+    font-size: 12px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.sale-new-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e74c3c;
+}
+
+/* Состояния загрузки и ошибок */
+.sale-products-loading,
+.no-sales {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px;
+    color: #666;
+    font-size: 16px;
+    width: 100%;
+}
+
+.sale-products-loading i {
+    font-size: 20px;
+    color: #e74c3c;
+}
+
+/* ===== ВСПЛЫВАЮЩИЙ POPUP БАННЕР ===== */
+
+.sale-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.sale-popup-container {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: popupSlideIn 0.5s ease-out;
+}
+
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.sale-popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.sale-popup-close:hover {
+    background: #f0f0f0;
+    color: #333;
+    transform: rotate(90deg);
+}
+
+.sale-popup-content {
+    padding: 30px;
+}
+
+.sale-popup-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.sale-popup-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+}
+
+.sale-popup-subtitle {
+    color: #666;
+    margin: 0;
+    font-size: 1.1em;
+}
+
+/* Товар в popup */
+.sale-popup-product {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.popup-product-image {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.popup-product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.popup-discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.popup-product-info {
+    flex: 1;
+}
+
+.popup-product-name {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 15px 0;
+    line-height: 1.3;
+}
+
+.popup-product-prices {
+    margin-bottom: 10px;
+}
+
+.popup-old-price {
+    font-size: 16px;
+    color: #999;
+    text-decoration: line-through;
+    margin-bottom: 5px;
+}
+
+.popup-new-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #e74c3c;
+}
+
+.popup-savings {
+    color: #27ae60;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Кнопки popup */
+.sale-popup-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.sale-popup-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sale-popup-btn-primary {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+.sale-popup-btn-primary:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.sale-popup-btn-secondary {
+    background: #f8f9fa;
+    color: #2c3e50;
+    border: 2px solid #e9ecef;
+}
+
+.sale-popup-btn-secondary:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+}
+
+/* Таймер popup */
+.sale-popup-timer {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 15px;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+}
+
+.timer-text {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-right: 10px;
+}
+
+.timer-countdown {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+
+/* Загрузка в popup */
+.sale-popup-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 40px;
+    color: #666;
+}
+
+.sale-popup-loading i {
+    font-size: 24px;
+    color: #e74c3c;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .sale-banner {
+        margin: 20px 15px;
+        padding: 20px;
+    }
+    
+    .sale-banner-title {
+        font-size: 1.5em;
+    }
+    
+    .sale-banner-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .sale-product-item {
+        min-width: calc(50% - 7.5px);
+    }
+    
+    .slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+    
+    .sale-popup-container {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .sale-popup-content {
+        padding: 20px;
+    }
+    
+    .sale-popup-product {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .popup-product-image {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .sale-popup-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .sale-product-item {
+        min-width: 100%;
+    }
+    
+    .sale-products-container {
+        flex-direction: column;
+    }
+    
+    .sale-popup-title {
+        font-size: 1.5em;
+    }
+    
+    .popup-product-name {
+        font-size: 1.1em;
+    }
+}
+
+/* Анимации */
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.no-image {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    padding: 20px;
+}

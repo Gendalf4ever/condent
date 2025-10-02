@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Личный кабинет - CODENT.PRO</title>
+    <meta name="description" content="Личный кабинет пользователя CODENT.PRO">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Основной контент -->
+    <main class="main-content-wrapper">
+        <!-- Форма авторизации/регистрации -->
+        <div id="auth-container" class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Вход</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
+            </div>
+            
+            <!-- Форма входа -->
+            <div id="login-form" class="auth-form active">
+                <h2>Вход в личный кабинет</h2>
+                <form id="login-form-element">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Пароль</label>
+                        <input type="password" id="login-password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </form>
+                <p class="auth-link">
+                    <a href="#" id="forgot-password">Забыли пароль?</a>
+                </p>
+            </div>
+            
+            <!-- Форма регистрации -->
+            <div id="register-form" class="auth-form">
+                <h2>Регистрация</h2>
+                <form id="register-form-element">
+                    <div class="form-group">
+                        <label for="register-name">Имя</label>
+                        <input type="text" id="register-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Пароль</label>
+                        <input type="password" id="register-password" name="password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Подтвердите пароль</label>
+                        <input type="password" id="register-confirm-password" name="confirmPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Личный кабинет (скрыт по умолчанию) -->
+        <div id="profile-container" class="profile-container" style="display: none;">
+            <div class="profile-header">
+                <h1>Личный кабинет</h1>
+                <button id="logout-btn" class="btn btn-secondary">Выйти</button>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="profile-menu">
+                        <button class="profile-menu-item active" data-section="info">
+                            <i class="fas fa-user"></i>
+                            Личная информация
+                        </button>
+                        <button class="profile-menu-item" data-section="reviews">
+                            <i class="fas fa-star"></i>
+                            Мои отзывы
+                        </button>
+                        <button class="profile-menu-item" data-section="orders">
+                            <i class="fas fa-shopping-bag"></i>
+                            История заказов
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="profile-main">
+                    <!-- Личная информация -->
+                    <div id="info-section" class="profile-section active">
+                        <h2>Личная информация</h2>
+                        <form id="profile-info-form">
+                            <div class="form-group">
+                                <label for="profile-name">Имя</label>
+                                <input type="text" id="profile-name" name="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email">Email</label>
+                                <input type="email" id="profile-email" name="email" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-phone">Телефон</label>
+                                <input type="tel" id="profile-phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-company">Компания</label>
+                                <input type="text" id="profile-company" name="company">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Мои отзывы -->
+                    <div id="reviews-section" class="profile-section">
+                        <h2>Мои отзывы</h2>
+                        <div id="user-reviews-list" class="reviews-list">
+                            <p class="no-reviews">У вас пока нет отзывов</p>
+                        </div>
+                    </div>
+                    
+                    <!-- История заказов -->
+                    <div id="orders-section" class="profile-section">
+                        <h2>История заказов</h2>
+                        <div id="user-orders-list" class="orders-list">
+                            <p class="no-orders">У вас пока нет заказов</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Сообщения об ошибках/успехе -->
+        <div id="message-container" class="message-container"></div>
+    </main>
+
+    <!-- Подключаем скрипты -->
+    <script src="js/load-components.js"></script>
+    <script src="js/api-keys.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/profile.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Устанавливаем заголовок страницы
+            if (typeof setPageHeader === 'function') {
+                setPageHeader('Личный кабинет', 'Управление профилем и отзывами');
+            }
+            
+            // Добавляем отступ при загрузке хедера
+            const checkHeader = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    clearInterval(checkHeader);
+                    document.documentElement.style.setProperty(
+                        '--header-height', 
+                        `${header.offsetHeight}px`
+                    );
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Правила для коллекции пользователей
+    match /users/{userId} {
+      // Пользователи могут читать и изменять только свои данные
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Создание документа пользователя при регистрации
+      allow create: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Правила для коллекции отзывов
+    match /reviews/{reviewId} {
+      // Все могут читать одобренные отзывы
+      allow read: if resource.data.status == 'approved';
+      
+      // Пользователи могут читать свои отзывы (любого статуса)
+      allow read: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+      
+      // Авторизованные пользователи могут создавать отзывы
+      allow create: if request.auth != null 
+        && request.auth.uid == request.resource.data.userId
+        && request.resource.data.status == 'pending';
+      
+      // Пользователи могут редактировать и удалять только свои отзывы
+      allow update, delete: if request.auth != null 
+        && request.auth.uid == resource.data.userId;
+      
+      // Админы могут читать все отзывы и изменять их статус
+      allow read, write: if request.auth != null 
+        && request.auth.token.email in [
+          'admin@codent.pro',
+          'chelovek438@gmail.com'
+        ];
+    }
+    
+    // Правила для коллекции статей (блог)
+    match /articles/{articleId} {
+      // Все могут читать статьи
+      allow read: if true;
+      
+      // Только админы могут создавать, изменять и удалять статьи
+      allow write: if request.auth != null 
+        && request.auth.token.email in [
+          'admin@codent.pro',
+          'chelovek438@gmail.com'
+        ];
+    }
+    
+    // Правила для коллекции товаров
+    match /products/{productId} {
+      // Все могут читать товары
+      allow read: if true;
+      
+      // Только админы могут создавать, изменять и удалять товары
+      allow write: if request.auth != null 
+        && request.auth.token.email in [
+          'admin@codent.pro',
+          'chelovek438@gmail.com'
+        ];
+    }
+    
+    // Правила для коллекции админов
+    match /admins/{adminId} {
+      // Только админы могут читать список админов
+      allow read: if request.auth != null 
+        && request.auth.token.email in [
+          'admin@codent.pro',
+          'chelovek438@gmail.com'
+        ];
+    }
+    
+    // Запрещаем доступ ко всем остальным коллекциям
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

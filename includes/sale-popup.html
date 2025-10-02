@@ -1,0 +1,36 @@
+<!-- Всплывающий popup баннер со случайным товаром по скидке -->
+<div id="sale-popup" class="sale-popup-overlay">
+    <div class="sale-popup-container">
+        <button class="sale-popup-close" id="sale-popup-close">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="sale-popup-content">
+            <div class="sale-popup-header">
+                <h3 class="sale-popup-title">🔥 Специальное предложение!</h3>
+                <p class="sale-popup-subtitle">Не упустите выгодную скидку</p>
+            </div>
+            
+            <div class="sale-popup-product" id="sale-popup-product">
+                <div class="sale-popup-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Подбираем для вас лучшее предложение...</span>
+                </div>
+            </div>
+            
+            <div class="sale-popup-actions" id="sale-popup-actions" style="display: none;">
+                <button class="sale-popup-btn sale-popup-btn-primary" id="sale-popup-view">
+                    Посмотреть товар
+                </button>
+                <button class="sale-popup-btn sale-popup-btn-secondary" id="sale-popup-all-sales">
+                    Все акции
+                </button>
+            </div>
+        </div>
+        
+        <div class="sale-popup-timer" id="sale-popup-timer">
+            <span class="timer-text">Предложение действует:</span>
+            <span class="timer-countdown" id="timer-countdown">24:00:00</span>
+        </div>
+    </div>
+</div>

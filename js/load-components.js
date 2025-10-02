@@ -21,7 +21,9 @@ const CONFIG = {
       mighty8kTable: 'includes/tables/phrozen-sonic-mighty8k.html',
       mini8kTable: 'includes/tables/phrozen-sonic-mini 8k.html',
       postProcessingTable: 'includes/tables/post-processing-table.html',
-      millingProducts: 'milling.html'
+      millingProducts: 'milling.html',
+      saleBanner: 'includes/sale-banner.html',
+      salePopup: 'includes/sale-popup.html'
     },
     content: 'content/'
   }
@@ -710,7 +712,8 @@ async function initializePage() {
       'compressors.html',
       'catalog-firebase.html',
       'support.html',
-      'blog.html'
+      'blog.html',
+      'sale.html'
     ];
     const currentPage = window.location.pathname;
     const shouldLoadSupportForm = !excludeSupportFormPages.some(page => currentPage.includes(page));
@@ -738,6 +741,20 @@ async function initializePage() {
     
     document.head.appendChild(authScript);
     
+    // Подключаем FontAwesome если его еще нет
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      const fontAwesomeLink = document.createElement('link');
+      fontAwesomeLink.rel = 'stylesheet';
+      fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css';
+      document.head.appendChild(fontAwesomeLink);
+    }
+    
+    // Подключаем скрипт баннеров со скидками
+    const saleBannersScript = document.createElement('script');
+    saleBannersScript.src = 'js/sale-banners.js';
+    saleBannersScript.async = true;
+    document.head.appendChild(saleBannersScript);
+    
     // Добавляем кнопку помощи только если это не страница каталога
     const excludeHelpButtonPages = [
       '3d-printers.html',
@@ -758,6 +775,14 @@ async function initializePage() {
     if (!excludeHelpButtonPages.some(page => currentPage.includes(page))) {
       componentsToLoad.push(loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend'));
     }
+    
+    // Добавляем баннер со скидками только на главной странице
+    if (currentPage.includes('index.html') || currentPage === '' || currentPage === '/') {
+      componentsToLoad.push(loadComponent(CONFIG.paths.components.saleBanner, '.main-content-wrapper', 'beforeend'));
+    }
+    
+    // Добавляем popup баннер на всех страницах
+    componentsToLoad.push(loadComponent(CONFIG.paths.components.salePopup, 'body', 'beforeend'));
     
     // Добавляем форму обратной связи только если нужно
     if (shouldLoadSupportForm) {

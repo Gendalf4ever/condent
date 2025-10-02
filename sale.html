@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CODENT - Акции и скидки</title>
+    <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/catalog.css">
+    <link rel="stylesheet" href="css/sale.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Компоненты будут загружены автоматически через load-components.js -->
+    
+    <!-- Заголовок страницы -->
+    <div id="page-header" class="page-header">
+        <div class="page-header__container">
+            <h1 class="page-header__title">🔥 Акции и скидки</h1>
+            <p class="page-header__subtitle">Товары по специальным ценам - не упустите выгодные предложения!</p>
+        </div>
+    </div>
+
+    <!-- Контейнер для товаров -->
+    <div id="products-container" class="products-grid">
+        <div class="loading">Загружаем товары со скидками...</div>
+    </div>
+
+    <!-- Сообщение если нет товаров со скидками -->
+    <div id="no-sales-message" class="no-sales-message" style="display: none;">
+        <div class="no-sales-content">
+            <i class="fas fa-tag no-sales-icon"></i>
+            <h2>В данный момент нет активных акций</h2>
+            <p>Следите за обновлениями - скоро появятся новые выгодные предложения!</p>
+            <a href="index.html" class="btn-back-home">Вернуться на главную</a>
+        </div>
+    </div>
+
+    <!-- Кнопка корзины -->
+    <div class="cart-button-container">
+        <button id="cart-button" class="cart-button">
+            <span class="cart-icon">🛒</span>
+            <span id="cart-count" class="cart-count">0</span>
+        </button>
+    </div>
+
+    <!-- Модальное окно товара -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modal-product-name"></h2>
+                <div class="sale-badge">🔥 АКЦИЯ</div>
+            </div>
+            <div class="modal-body">
+                <div class="product-image-container">
+                    <img id="modal-product-image" class="product-image" src="" alt="">
+                </div>
+                <div class="product-info">
+                    <div class="product-price-container" id="modal-product-price"></div>
+                    <div class="product-description" id="modal-product-description"></div>
+                    <div class="specs-list" id="modal-product-specs"></div>
+                    <div class="product-params">
+                        <div class="param-group">
+                            <label class="param-label">Количество:</label>
+                            <input type="number" id="param-quantity" class="param-quantity" min="1" value="1">
+                        </div>
+                        <button class="add-to-cart">Добавить в корзину</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно корзины -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Ваша корзина</h2>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items-container" class="cart-items-container">
+                    <div class="empty-cart-message">Ваша корзина пуста</div>
+                </div>
+                <div class="cart-total">
+                    <div class="total-row">
+                        <span>Итого:</span>
+                        <span id="cart-total-price">0 ₽</span>
+                    </div>
+                    <button id="checkout-button" class="checkout-button">Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Подключаем скрипты -->
+    <script src="js/api-keys.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/load-components.js"></script>
+    <script src="js/sale.js"></script>
+    
+    <script>
+        // Дополнительная инициализация для страницы акций
+        document.addEventListener('DOMContentLoaded', () => {
+            // Добавляем отступ при загрузке хедера
+            const checkHeader = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    clearInterval(checkHeader);
+                    document.documentElement.style.setProperty(
+                        '--header-height', 
+                        `${header.offsetHeight}px`
+                    );
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

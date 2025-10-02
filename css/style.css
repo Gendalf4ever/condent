@@ -1,6 +1,9 @@
 /* Подключение шрифта Tilda Sans с fallback */
 @import url('https://fonts.googleapis.com/css2?family=Tilda+Sans:wght@400;700&display=swap');
 
+/* Подключение стилей баннеров со скидками */
+@import url('sale-banners.css');
+
 /* Fallback для случаев, когда Google Fonts недоступен */
 @font-face {
   font-family: 'Tilda Sans Fallback';
@@ -715,7 +718,7 @@ h2.bold {
 }
 
 .page-header__title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   margin: 0;
   display: flex;
@@ -724,14 +727,14 @@ h2.bold {
 }
 
 .blog-header-logo {
-  height: 40px;
+  height: 55px;
   width: auto;
   margin-right: 15px;
   vertical-align: middle;
 }
 
 .team-header-logo {
-  height: 40px;
+  height: 55px;
   width: auto;
   margin-right: 15px;
   vertical-align: middle;
@@ -745,16 +748,16 @@ h2.bold {
   }
   
   .page-header__title {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
   
   .blog-header-logo {
-    height: 30px;
+    height: 45px;
     margin-right: 10px;
   }
   
   .team-header-logo {
-    height: 30px;
+    height: 45px;
     margin-right: 10px;
   }
 }
@@ -787,6 +790,9 @@ h2.bold {
   left: 20px;
   z-index: 1000;
   background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .help-button {
@@ -796,6 +802,8 @@ h2.bold {
   background: transparent;
   border: none;
   padding: 0;
+  outline: none;
+  box-shadow: none;
 }
 
 .help-button:hover {
@@ -805,21 +813,23 @@ h2.bold {
 
 .help-button-image {
   width: auto;
-  height: 160px;
+  height: 100px;
   display: block;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   transition: all 0.3s ease;
   background: transparent;
+  border: none;
+  outline: none;
 }
 
 .help-button:hover .help-button-image {
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 @media (max-width: 768px) {
   .help-button-image {
-    height: 120px;
+    height: 80px;
   }
 }
  /* Базовые стили */
@@ -1369,10 +1379,30 @@ body > div:first-child:not(.page-header):not(header) {
                 font-size: 14px;
             }
         }
-.catalog-arrow {
-  font-size: 1.1em;
-  margin-left: 4px;
-  vertical-align: middle;
+/* Стили для стрелок в выпадающих меню */
+.nav-link .fa-chevron-down {
+  font-size: 0.8em;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
   display: inline-block;
-  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* Поворот стрелки при наведении на выпадающее меню */
+.nav-item:hover .fa-chevron-down {
+  transform: rotate(180deg);
+}
+
+/* Fallback для случаев, когда FontAwesome не загрузился */
+.nav-link .fa-chevron-down:before {
+  content: "▼";
+  font-family: inherit;
+  font-size: 0.7em;
+}
+
+/* Когда FontAwesome загружен, используем его иконку */
+.fa-chevron-down.fa:before {
+  content: "\f078";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
 }
