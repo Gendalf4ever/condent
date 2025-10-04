@@ -15,7 +15,6 @@ const CONFIG = {
       supportForm: 'includes/support-form.html', 
       helpButton: 'includes/help-button.html',
       attentionBanner: 'includes/attention-banner.html',
-      companyDetails: 'includes/company-details.html',
       relatedArticles: 'includes/related-articles.html',
       testMeButton: 'includes/test-me-button.html',
       mighty8kTable: 'includes/tables/phrozen-sonic-mighty8k.html',
@@ -117,10 +116,6 @@ function initComponentAfterLoad(componentPath, targetSelector) {
   const target = document.querySelector(targetSelector);
   if (!target) return;
   
-  // Инициализация реквизитов компании
-  if (componentPath.includes('company-details')) {
-    initCompanyDetails(target);
-  }
   
   // Инициализация тестовой кнопки
   if (componentPath.includes('test-me-button')) {
@@ -434,68 +429,6 @@ function closeCountryDropdown() {
   console.log('Popup form initialization complete');
 }
 
-// Инициализация реквизитов компании
-function initCompanyDetails(container) {
-  const toggleBtn = container.querySelector('.company-details__toggle');
-  const content = container.querySelector('.company-details__content');
-  
-  if (toggleBtn && content) {
-    console.log('Initializing company details toggle');
-    
-    // Определяем начальное состояние по иконке
-    const currentIcon = toggleBtn.querySelector('i');
-    let isExpanded = currentIcon && currentIcon.classList.contains('fa-times');
-    
-    console.log('Initial state - isExpanded:', isExpanded);
-    
-    // Убираем все предыдущие обработчики
-    toggleBtn.replaceWith(toggleBtn.cloneNode(true));
-    const newToggleBtn = container.querySelector('.company-details__toggle');
-    
-    // Устанавливаем начальное состояние контента
-    if (isExpanded) {
-      content.style.display = 'block';
-      content.classList.remove('hidden');
-    } else {
-      content.style.display = 'none';
-      content.classList.add('hidden');
-    }
-    
-    newToggleBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      console.log('Toggle clicked, current isExpanded:', isExpanded);
-      
-      isExpanded = !isExpanded;
-      
-      if (isExpanded) {
-        content.style.display = 'block';
-        content.classList.remove('hidden');
-        newToggleBtn.innerHTML = '<i class="fas fa-times"></i>';
-        newToggleBtn.setAttribute('aria-label', 'Скрыть реквизиты');
-        console.log('Showing content, new state:', isExpanded);
-      } else {
-        content.style.display = 'none';
-        content.classList.add('hidden');
-        newToggleBtn.innerHTML = '<i class="fas fa-plus"></i>';
-        newToggleBtn.setAttribute('aria-label', 'Показать реквизиты');
-        console.log('Hiding content, new state:', isExpanded);
-      }
-    });
-    
-    // Также добавляем обработчик на весь заголовок
-    const header = container.querySelector('.company-details__header');
-    if (header) {
-      header.style.cursor = 'pointer';
-      header.addEventListener('click', (e) => {
-        if (e.target !== newToggleBtn && !newToggleBtn.contains(e.target)) {
-          newToggleBtn.click();
-        }
-      });
-    }
-  }
-}
 
 // Инициализация тестовой кнопки
 function initTestMeButton(container) {
@@ -579,24 +512,6 @@ const PrinterTables = {
   }
 };
 
-// Модуль для контактной информации компании
-const CompanyDetails = {
-  async load() {
-    if (!this.shouldLoad()) return false;
-    
-    // Загружаем в контейнер на странице контактов
-    const loaded = await loadComponent(
-      CONFIG.paths.components.companyDetails,
-      '#company-details-container'
-    );
-    
-    return loaded;
-  },
-
-  shouldLoad() {
-    return window.location.pathname.includes('contacts.html');
-  }
-};
 
 // Модуль для таблицы постобработки
 const PostProcessingTable = {
@@ -778,7 +693,7 @@ async function initializePage() {
     
     // Добавляем баннер со скидками только на главной странице
     if (currentPage.includes('index.html') || currentPage === '' || currentPage === '/') {
-      componentsToLoad.push(loadComponent(CONFIG.paths.components.saleBanner, '.main-content-wrapper', 'beforeend'));
+      componentsToLoad.push(loadComponent(CONFIG.paths.components.saleBanner, 'body', 'afterbegin'));
     }
     
     // Добавляем popup баннер на всех страницах
@@ -805,7 +720,6 @@ async function initializePage() {
     
     // 3. Специальные компоненты
     await Promise.all([
-      CompanyDetails.load(),
       TestMeButton.load(),
       PrinterTables.load(),
       PostProcessingTable.load(),
@@ -838,6 +752,5 @@ if (document.readyState === 'complete') {
 }
 
 // Экспортируем функции для глобального использования
-window.initCompanyDetails = initCompanyDetails;
 window.initTestMeButton = initTestMeButton;
 window.initPopupForm = initPopupForm;

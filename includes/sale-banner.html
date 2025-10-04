@@ -1,26 +1,18 @@
-<!-- Баннер с актуальными скидками для главной страницы -->
-<div id="sale-banner" class="sale-banner">
-    <div class="sale-banner-container">
-        <div class="sale-banner-header">
-            <h3 class="sale-banner-title">🔥 Актуальные скидки</h3>
-            <a href="sale.html" class="sale-banner-link">Все акции</a>
+<!-- Баннер с актуальными скидками в виде бегущей строки -->
+<div id="sale-banner" class="sale-ticker">
+    <div class="sale-ticker-container">
+        <div class="sale-ticker-header">
+            <span class="sale-ticker-title">🔥 АКЦИИ</span>
+            <a href="sale.html" class="sale-ticker-link">Все акции</a>
         </div>
         
-        <div class="sale-products-slider">
-            <button class="slider-btn slider-btn-prev" id="sale-slider-prev">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            
-            <div class="sale-products-container" id="sale-products-container">
-                <div class="sale-products-loading">
+        <div class="sale-ticker-track">
+            <div class="sale-ticker-content" id="sale-ticker-content">
+                <div class="sale-ticker-loading">
                     <i class="fas fa-spinner fa-spin"></i>
                     <span>Загружаем актуальные скидки...</span>
                 </div>
             </div>
-            
-            <button class="slider-btn slider-btn-next" id="sale-slider-next">
-                <i class="fas fa-chevron-right"></i>
-            </button>
         </div>
     </div>
 </div>

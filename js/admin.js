@@ -44,6 +44,7 @@ function initializeAdminInterface() {
     const articlesList = document.getElementById('articles-list');
     const productsList = document.getElementById('products-list');
     const logoutBtn = document.getElementById('logout-btn');
+    const backToHomeBtn = document.getElementById('back-to-home-btn');
     const addArticleForm = document.getElementById('add-article-form');
     const editArticleForm = document.getElementById('edit-article-form');
     const addProductForm = document.getElementById('add-product-form');
@@ -184,6 +185,13 @@ function initializeAdminInterface() {
                 console.error('Logout error:', error);
                 alert('Ошибка при выходе из системы');
             }
+        });
+    }
+
+    // ================= ВОЗВРАТ НА ГЛАВНУЮ =================
+    if (backToHomeBtn) {
+        backToHomeBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
         });
     }
 

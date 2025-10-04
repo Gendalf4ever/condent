@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CODENT - Каталог товаров</title>
+    <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/catalog.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Компоненты будут загружены автоматически через load-components.js -->
+    
+    <!-- Заголовок страницы -->
+    <div id="page-header" class="page-header">
+        <div class="page-header__container">
+            <h1 class="page-header__title">Каталог товаров</h1>
+            <p class="page-header__subtitle">Полный ассортимент оборудования и материалов</p>
+        </div>
+    </div>
+
+    <!-- Фильтры по категориям -->
+    <div class="catalog-filters">
+        <div class="catalog-filters-container">
+            <h3>Категории товаров:</h3>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">Все товары</button>
+                <button class="filter-btn" data-category="3d-printers">3D-принтеры</button>
+                <button class="filter-btn" data-category="3d-scanners">3D-сканеры</button>
+                <button class="filter-btn" data-category="milling">Фрезерные станки</button>
+                <button class="filter-btn" data-category="sinterising">Синтеризация</button>
+                <button class="filter-btn" data-category="consumables">Расходные материалы</button>
+                <button class="filter-btn" data-category="other">Прочее</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Контейнер для товаров -->
+    <div id="products-container" class="products-grid">
+        <div class="loading">Загружаем каталог товаров...</div>
+    </div>
+
+    <!-- Кнопка корзины -->
+    <div class="cart-button-container">
+        <button id="cart-button" class="cart-button">
+            <span class="cart-icon">🛒</span>
+            <span id="cart-count" class="cart-count">0</span>
+        </button>
+    </div>
+
+    <!-- Модальное окно товара -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modal-product-name"></h2>
+            </div>
+            <div class="modal-body">
+                <div class="product-image-container">
+                    <img id="modal-product-image" class="product-image" src="" alt="">
+                </div>
+                <div class="product-info">
+                    <div class="product-price-container" id="modal-product-price"></div>
+                    <div class="product-description" id="modal-product-description"></div>
+                    <div class="specs-list" id="modal-product-specs"></div>
+                    <div class="product-params">
+                        <div class="param-group">
+                            <label class="param-label">Количество:</label>
+                            <input type="number" id="param-quantity" class="param-quantity" min="1" value="1">
+                        </div>
+                        <button class="add-to-cart">Добавить в корзину</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно корзины -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Ваша корзина</h2>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items-container" class="cart-items-container">
+                    <div class="empty-cart-message">Ваша корзина пуста</div>
+                </div>
+                <div class="cart-total">
+                    <div class="total-row">
+                        <span>Итого:</span>
+                        <span id="cart-total-price">0 ₽</span>
+                    </div>
+                    <button id="checkout-button" class="checkout-button">Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Подключаем скрипты -->
+    <script src="js/api-keys.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/load-components.js"></script>
+    <script src="js/catalog-firebase.js"></script>
+    <script src="js/catalog.js"></script>
+</body>
+</html>
+

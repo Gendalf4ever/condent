@@ -10,7 +10,7 @@ class SaleBannersManager {
     constructor() {
         this.saleProducts = [];
         this.currentSlideIndex = 0;
-        this.slidesToShow = 4; // Количество товаров для показа одновременно
+        this.slidesToShow = 5; // Количество товаров для показа одновременно
         this.popupTimer = null;
         this.countdownTimer = null;
         this.popupShown = false;
@@ -131,53 +131,47 @@ class SaleBannersManager {
         if (!banner) return;
 
         this.renderSaleBanner();
-        this.setupSliderControls();
-        
-        // Автопрокрутка каждые 5 секунд
-        setInterval(() => {
-            this.nextSlide();
-        }, 5000);
     }
 
     /**
-     * Отображает товары в баннере
+     * Отображает товары в бегущей строке
      */
     renderSaleBanner() {
-        const container = document.getElementById('sale-products-container');
+        const container = document.getElementById('sale-ticker-content');
         if (!container) return;
 
         if (this.saleProducts.length === 0) {
-            container.innerHTML = '<div class="no-sales">Нет активных акций</div>';
+            container.innerHTML = '<div class="sale-ticker-loading">Нет активных акций</div>';
             return;
         }
 
-        // Берем первые 8 товаров для слайдера
-        const productsToShow = this.saleProducts.slice(0, 8);
+        // Берем все товары для бегущей строки
+        const productsToShow = this.saleProducts;
         
-        container.innerHTML = productsToShow.map(product => {
+        // Создаем элементы для бегущей строки (дублируем для непрерывности)
+        const tickerItems = productsToShow.map(product => {
             const discountPercentage = this.calculateDiscountPercentage(product);
-            const originalPrice = parseFloat(product.price) || 0;
             const salePrice = parseFloat(product.price_skidka) || 0;
             
             return `
-                <div class="sale-product-item" data-product-id="${product.id}">
-                    <div class="sale-product-image">
-                        ${product.img_url ? `<img src="${product.img_url}" alt="${product.name}" loading="lazy">` : '<div class="no-image">Нет фото</div>'}
-                        <div class="sale-discount-badge">-${discountPercentage}%</div>
+                <div class="sale-ticker-item" data-product-id="${product.id}">
+                    <div class="sale-ticker-item-image">
+                        ${product.img_url ? `<img src="${product.img_url}" alt="${product.name}" loading="lazy">` : '<div class="no-image">📦</div>'}
                     </div>
-                    <div class="sale-product-info">
-                        <h4 class="sale-product-name">${product.name}</h4>
-                        <div class="sale-product-prices">
-                            <span class="sale-old-price">${originalPrice.toLocaleString('ru-RU')} ₽</span>
-                            <span class="sale-new-price">${salePrice.toLocaleString('ru-RU')} ₽</span>
-                        </div>
+                    <div class="sale-ticker-item-info">
+                        <div class="sale-ticker-item-name">${product.name}</div>
+                        <div class="sale-ticker-item-price">${salePrice.toLocaleString('ru-RU')} ₽</div>
                     </div>
+                    <div class="sale-ticker-discount">-${discountPercentage}%</div>
                 </div>
             `;
         }).join('');
 
+        // Дублируем элементы для непрерывной прокрутки
+        container.innerHTML = tickerItems + tickerItems;
+
         // Добавляем обработчики кликов
-        container.querySelectorAll('.sale-product-item').forEach(item => {
+        container.querySelectorAll('.sale-ticker-item').forEach(item => {
             item.addEventListener('click', () => {
                 const productId = item.dataset.productId;
                 const product = this.saleProducts.find(p => p.id === productId);
@@ -283,14 +277,12 @@ class SaleBannersManager {
         const randomProduct = this.saleProducts[Math.floor(Math.random() * this.saleProducts.length)];
         this.renderPopupProduct(randomProduct);
         
-        popup.style.display = 'flex';
+        popup.style.display = 'block';
         this.popupShown = true;
         
         // Сохраняем время показа
         localStorage.setItem('lastSalePopupTime', Date.now().toString());
         
-        // Запускаем таймер
-        this.startPopupTimer();
         
         // Настраиваем обработчики
         this.setupPopupHandlers(randomProduct);
@@ -308,20 +300,15 @@ class SaleBannersManager {
         const discountPercentage = this.calculateDiscountPercentage(product);
         const originalPrice = parseFloat(product.price) || 0;
         const salePrice = parseFloat(product.price_skidka) || 0;
-        const savings = originalPrice - salePrice;
 
         container.innerHTML = `
-            <div class="popup-product-image">
+            <div class="sale-chat-product-image" style="position: relative;">
                 ${product.img_url ? `<img src="${product.img_url}" alt="${product.name}">` : '<div class="no-image">Нет фото</div>'}
-                <div class="popup-discount-badge">-${discountPercentage}%</div>
+                <div class="sale-chat-discount-badge">-${discountPercentage}%</div>
             </div>
-            <div class="popup-product-info">
-                <h4 class="popup-product-name">${product.name}</h4>
-                <div class="popup-product-prices">
-                    <div class="popup-old-price">${originalPrice.toLocaleString('ru-RU')} ₽</div>
-                    <div class="popup-new-price">${salePrice.toLocaleString('ru-RU')} ₽</div>
-                </div>
-                <div class="popup-savings">Экономия: ${savings.toLocaleString('ru-RU')} ₽</div>
+            <div class="sale-chat-product-info">
+                <h4 class="sale-chat-product-name">${product.name}</h4>
+                <div class="sale-chat-product-price">${salePrice.toLocaleString('ru-RU')} ₽</div>
             </div>
         `;
 
@@ -368,32 +355,9 @@ class SaleBannersManager {
                 window.location.href = 'sale.html';
             });
         }
+
     }
 
-    /**
-     * Запуск таймера popup
-     */
-    startPopupTimer() {
-        const timerElement = document.getElementById('timer-countdown');
-        if (!timerElement) return;
-
-        let timeLeft = this.popupSettings.timerDuration;
-        
-        this.countdownTimer = setInterval(() => {
-            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            timeLeft -= 1000;
-
-            if (timeLeft < 0) {
-                this.stopPopupTimer();
-                timerElement.textContent = '00:00:00';
-            }
-        }, 1000);
-    }
 
     /**
      * Остановка таймера popup
