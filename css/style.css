@@ -332,6 +332,9 @@ h2.bold {
   z-index: 1000;
   background: white;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 0;
+  border: none;
+  padding-bottom: 0;
 }
 
 /* Основной контент */
@@ -712,7 +715,7 @@ h2.bold {
   color: #fff;
   padding: 30px 0;
   margin-bottom: 40px;
-  margin-top: 120px; /* Увеличенный отступ под фиксированный хедер */
+  margin-top: 170px; /* Отступ под хедер (120px) + бегущую строку (50px) */
 }
 
 .page-header__container {
@@ -748,7 +751,7 @@ h2.bold {
   .page-header {
     padding: 20px 0;
     margin-bottom: 30px;
-    margin-top: 100px; /* Увеличенный отступ для мобильных */
+    margin-top: 150px; /* Отступ под хедер + бегущую строку для мобильных */
   }
   
   .page-header__title {
@@ -1050,7 +1053,9 @@ body > div:first-child:not(.page-header):not(header) {
             width: 100%;
             top: 0;
             z-index: 1000;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
         
         /* Основные стили логотипа */

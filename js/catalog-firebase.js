@@ -178,16 +178,29 @@ function createProductCard(product) {
         priceHtml = '<div class="product-price">Цена по запросу</div>';
     }
     
-    // Формируем HTML для изображения
+    // Формируем HTML для изображения с контейнером
     let imageHtml = '';
-    if (product.img_url) {
-        imageHtml = `<img src="${product.img_url}" alt="${product.name}" class="product-thumbnail" loading="lazy">`;
+    if (product.img_url && product.img_url.trim() !== '') {
+        imageHtml = `
+            <div class="product-image-wrapper">
+                <img src="${product.img_url}" alt="${product.name}" class="product-thumbnail" loading="lazy" 
+                     onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div class=\\'no-image\\'>Нет фото</div>';">
+            </div>
+        `;
+    } else {
+        imageHtml = `
+            <div class="product-image-wrapper">
+                <div class="no-image">Нет фото</div>
+            </div>
+        `;
     }
     
     card.innerHTML = `
         ${imageHtml}
-        <div class="product-name">${product.name}</div>
-        ${priceHtml}
+        <div class="product-info">
+            <div class="product-name">${product.name}</div>
+            ${priceHtml}
+        </div>
     `;
     
     // Добавляем обработчик клика

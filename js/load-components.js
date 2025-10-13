@@ -33,9 +33,22 @@ window.setPageHeader = function(title, subtitle = '') {
   let header = document.getElementById('dynamic-page-header');
   
   if (!header) {
-    // Вставляем заголовок после хедера, а не в начало body
+    // Вставляем заголовок после бегущей строки (если есть) или после хедера
+    const runningText = document.getElementById('running-text-banner');
     const existingHeader = document.querySelector('header');
-    if (existingHeader) {
+    
+    if (runningText) {
+      // Вставляем после бегущей строки
+      runningText.insertAdjacentHTML('afterend', `
+        <section class="page-header" id="dynamic-page-header">
+          <div class="page-header__container">
+            <h1 class="page-header__title">${title}</h1>
+            ${subtitle ? `<p class="page-header__subtitle">${subtitle}</p>` : ''}
+          </div>
+        </section>
+      `);
+    } else if (existingHeader) {
+      // Вставляем после хедера, если нет бегущей строки
       existingHeader.insertAdjacentHTML('afterend', `
         <section class="page-header" id="dynamic-page-header">
           <div class="page-header__container">
@@ -626,6 +639,7 @@ async function initializePage() {
       'zirkon.html',
       'compressors.html',
       'catalog-firebase.html',
+      'catalog.html',
       'support.html',
       'blog.html',
       'sale.html'
@@ -683,6 +697,7 @@ async function initializePage() {
       'zirkon.html',
       'compressors.html',
       'catalog-firebase.html',
+      'catalog.html',
       'support.html',
       'blog.html'
     ];

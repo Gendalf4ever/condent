@@ -92,3 +92,50 @@
         </button>
     </div>
 </header>
+
+<!-- Контейнер для баннера с акциями -->
+<div id="sale-banner-container"></div>
+
+<script>
+// Загружаем баннер с акциями
+(function() {
+    const currentPage = window.location.pathname;
+    
+    // Список страниц, где не нужен баннер
+    const excludePages = ['sale.html', 'sales.html'];
+    
+    // Проверяем, нужно ли загружать баннер
+    if (excludePages.some(page => currentPage.includes(page))) {
+        return;
+    }
+    
+    // Проверяем, был ли баннер закрыт ранее
+    if (localStorage.getItem('saleBannerClosed') === 'true') {
+        return;
+    }
+    
+    // Загружаем баннер
+    fetch('includes/sale-banner.html')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('sale-banner-container').innerHTML = html;
+            
+            // Устанавливаем позицию баннера под хедером
+            function updateBannerPosition() {
+                const header = document.querySelector('header');
+                const saleBanner = document.getElementById('sale-banner');
+                
+                if (header && saleBanner) {
+                    const headerHeight = header.getBoundingClientRect().height;
+                    document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+                    saleBanner.style.top = `${headerHeight}px`;
+                }
+            }
+            
+            // Обновляем позицию
+            updateBannerPosition();
+            window.addEventListener('resize', updateBannerPosition);
+        })
+        .catch(error => console.error('Ошибка загрузки баннера с акциями:', error));
+})();
+</script>

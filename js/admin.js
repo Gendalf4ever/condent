@@ -721,6 +721,7 @@ function initializeAdminInterface() {
                 'post-processing': 'Постобработка',
                 'materials': 'Материалы',
                 'zirkon': 'Цирконий',
+                'sinterising': 'Синтеризация',
                 'other': 'Прочее'
             };
 
@@ -890,6 +891,9 @@ function initializeAdminInterface() {
         if (name.includes('цирконий') || name.includes('zirkon') || name.includes('циркон')) {
             return 'zirkon';
         }
+        if (name.includes('синтер') || name.includes('sinter') || name.includes('печь') || name.includes('furnace')) {
+            return 'sinterising';
+        }
         if (name.includes('компрессор') || name.includes('compressor')) {
             return 'other';
         }
@@ -1001,6 +1005,7 @@ function initializeAdminInterface() {
             'post-processing': 'Постобработка',
             'materials': 'Материалы',
             'zirkon': 'Цирконий',
+            'sinterising': 'Синтеризация',
             'other': 'Прочее'
         };
         
@@ -1181,6 +1186,7 @@ function initializeAdminInterface() {
                 'post-processing': 'Постобработка',
                 'materials': 'Материалы',
                 'zirkon': 'Цирконий',
+                'sinterising': 'Синтеризация',
                 'other': 'Прочее'
             };
 

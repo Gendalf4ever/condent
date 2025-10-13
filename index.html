@@ -16,6 +16,16 @@
 <body>
     <!-- Компоненты будут загружены автоматически через load-components.js -->
     
+    <!-- Видео секция -->
+    <div class="video-section-top">
+        <div class="video-container">
+            <video controls preload="metadata" poster="">
+                <source src="src/vid/Курс по Dolphin Imaging.mp4" type="video/mp4">
+                Ваш браузер не поддерживает воспроизведение видео.
+            </video>
+        </div>
+    </div>
+
     <!-- основной контент -->
     <main class="main-content-wrapper">
         <div class="images-gallery">
@@ -42,6 +52,7 @@
         </div>
     </main>
 
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -59,18 +70,6 @@
             if (typeof setPageHeader === 'function') {
                 setPageHeader('CAD/CAM системы для профессионалов', 'Лучшее цифровое оборудование');
             }
-            
-            // Добавляем отступ при загрузке хедера
-            const checkHeader = setInterval(() => {
-                const header = document.querySelector('header');
-                if (header) {
-                    clearInterval(checkHeader);
-                    document.documentElement.style.setProperty(
-                        '--header-height', 
-                        `${header.offsetHeight}px`
-                    );
-                }
-            }, 100);
             
             // Обработчик кнопки "Задать вопрос"
             const askQuestionBtn = document.getElementById('ask-question-btn');
