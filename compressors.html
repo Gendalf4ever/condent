@@ -2,19 +2,19 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>CODENT - Компрессоры</title>
+    <title>CODENT - Дополнительное оборудование CAD/CAM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="src/codent-logo-light.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/catalog.css">
     <link rel="stylesheet" href="css/reviews.css">
-    <script src="js/api-keys.js"></script>
-    <script src="js/sheet-config.js"></script>
+    <link rel="stylesheet" href="css/popup.css">
 </head>
 <body>
     <div id="page-header" class="page-header"></div>
     <div id="products-container" class="products-grid">
-        <div class="loading">Загружаем каталог компрессоров...</div>
+        <div class="loading">Загружаем каталог дополнительного оборудования...</div>
     </div>
 
     <!-- Кнопка корзины -->
@@ -74,8 +74,29 @@
         </div>
     </div>
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Подключаем скрипты -->
+    <script src="js/api-keys.js"></script>
+    <script src="js/firebase-config.js"></script>
     <script src="js/load-components.js"></script>
+    <script src="js/auth-state.js"></script>
     <script src="js/reviews.js"></script>
-    <script src="js/catalog.js"></script>
+    <script src="js/catalog-firebase.js"></script>
+    
+    <script>
+        // Устанавливаем категорию для фильтрации
+        window.CATALOG_CATEGORY = 'equipment';
+        
+        // Устанавливаем заголовок страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setPageHeader === 'function') {
+                setPageHeader('Дополнительное оборудование CAD/CAM', 'Компрессоры и другое вспомогательное оборудование');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -722,6 +722,7 @@ function initializeAdminInterface() {
                 'materials': 'Материалы',
                 'zirkon': 'Цирконий',
                 'sinterising': 'Синтеризация',
+                'equipment': 'Доп. оборудование',
                 'other': 'Прочее'
             };
 
@@ -895,7 +896,7 @@ function initializeAdminInterface() {
             return 'sinterising';
         }
         if (name.includes('компрессор') || name.includes('compressor')) {
-            return 'other';
+            return 'equipment';
         }
         
         return 'other'; // По умолчанию
@@ -1006,6 +1007,7 @@ function initializeAdminInterface() {
             'materials': 'Материалы',
             'zirkon': 'Цирконий',
             'sinterising': 'Синтеризация',
+            'equipment': 'Доп. оборудование',
             'other': 'Прочее'
         };
         
@@ -1187,6 +1189,7 @@ function initializeAdminInterface() {
                 'materials': 'Материалы',
                 'zirkon': 'Цирконий',
                 'sinterising': 'Синтеризация',
+                'equipment': 'Доп. оборудование',
                 'other': 'Прочее'
             };
 

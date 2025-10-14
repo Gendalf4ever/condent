@@ -146,11 +146,10 @@
 /* ===== ВИДЕО СЕКЦИЯ ПОД ЗАГОЛОВКОМ ===== */
 
 .video-section-top {
-    max-width: 1200px;
-    margin: 30px auto 40px auto;
-    padding: 0 20px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
     background: transparent;
-    border-radius: 12px;
     overflow: hidden;
 }
 
@@ -266,8 +265,8 @@
 
 @media (max-width: 1024px) {
     .video-section-top {
-        margin: 25px auto 35px auto;
-        padding: 0 15px;
+        margin: 0;
+        padding: 0;
     }
     
     .running-text {
@@ -277,8 +276,8 @@
 
 @media (max-width: 768px) {
     .video-section-top {
-        margin: 20px auto 30px auto;
-        padding: 0 10px;
+        margin: 0;
+        padding: 0;
     }
     
     .video-container video {
@@ -308,8 +307,8 @@
 
 @media (max-width: 480px) {
     .video-section-top {
-        margin: 15px auto 25px auto;
-        padding: 0 8px;
+        margin: 0;
+        padding: 0;
     }
     
     .video-container video {

@@ -13,9 +13,9 @@ const CATEGORY_MAPPING = {
     '3d-consumables': 'consumables',
     'post-obrabotka': 'post_processing',
     'post-processing': 'post_processing',
-    'sinterising': 'sintering',
-    'zirkon': 'zirconia',
-    'compressors': 'compressors'
+    'sinterising': 'sinterising',
+    'zirkon': 'zirkon',
+    'compressors': 'equipment'
 };
 
 // Обратный маппинг для определения категории по странице
@@ -71,6 +71,11 @@ function waitForFirebase() {
  * Определяет категорию товаров по текущей странице
  */
 function getCurrentCategory() {
+    // Если категория задана явно через window.CATALOG_CATEGORY, используем её
+    if (window.CATALOG_CATEGORY) {
+        return window.CATALOG_CATEGORY;
+    }
+    
     const pageId = window.location.pathname
         .split('/')
         .pop()
