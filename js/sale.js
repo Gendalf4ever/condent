@@ -191,7 +191,6 @@ function createSaleProductCard(product) {
         <div class="product-info">
             <div class="product-name">${product.name}</div>
             ${priceHtml}
-            <div class="sale-label">🔥 АКЦИЯ</div>
         </div>
     `;
     

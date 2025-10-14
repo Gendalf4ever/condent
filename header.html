@@ -132,12 +132,23 @@
                     const headerHeight = header.getBoundingClientRect().height;
                     document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
                     saleBanner.style.top = `${headerHeight}px`;
+                    
+                    // Обновляем позицию видео, если оно есть на странице
+                    const videoSection = document.querySelector('.video-section-top');
+                    if (videoSection) {
+                        const totalOffset = headerHeight + 50; // хедер + высота бегущей строки
+                        videoSection.style.marginTop = `${totalOffset}px`;
+                        videoSection.style.height = `calc(100vh - ${totalOffset}px)`;
+                    }
+                    
+                    console.log('Banner position updated. Header height:', headerHeight);
                 }
             }
             
-            // Обновляем позицию
-            updateBannerPosition();
+            // Обновляем позицию с небольшой задержкой для надёжности
+            setTimeout(updateBannerPosition, 100);
             window.addEventListener('resize', updateBannerPosition);
+            window.addEventListener('load', updateBannerPosition);
         })
         .catch(error => console.error('Ошибка загрузки баннера с акциями:', error));
 })();
