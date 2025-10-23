@@ -221,39 +221,77 @@ function createProductCard(product) {
  * Открывает модальное окно с детальной информацией о товаре
  */
 function openProductModal(product) {
+    // Используем новый менеджер промоакций для рендеринга модального окна
+    if (window.promotionsManager && typeof window.promotionsManager.renderProductModal === 'function') {
+        window.currentProduct = product;
+        window.promotionsManager.renderProductModal(product);
+    } else {
+        console.error('PromotionsManager не инициализирован или не имеет метода renderProductModal');
+        // Fallback: используем старую логику с новой структурой
+        openProductModalFallback(product);
+    }
+}
+
+/**
+ * Fallback функция для открытия модального окна (если PromotionsManager недоступен)
+ */
+function openProductModalFallback(product) {
     const modal = document.getElementById('productModal');
+    if (!modal) return;
     
-    // Заполняем данные товара
+    // Заполняем основную информацию
     document.getElementById('modal-product-name').textContent = product.name;
+    
+    // Код товара
+    const productCodeElement = document.getElementById('modal-product-code');
+    if (productCodeElement) {
+        productCodeElement.textContent = `(Код товара: ${product.id})`;
+    }
     
     // Изображение товара
     const productImage = document.getElementById('modal-product-image');
-    if (product.img_url) {
+    if (product.img_url && product.img_url.trim() !== '') {
         productImage.src = product.img_url;
         productImage.alt = product.name;
         productImage.style.display = 'block';
+        productImage.onerror = function() {
+            this.style.display = 'none';
+            this.parentElement.innerHTML = '<div class="no-image-modal">Изображение недоступно</div>';
+        };
+        
+        // Добавляем обработчик клика для увеличения изображения
+        productImage.onclick = function() {
+            openImageModal(this.src, this.alt);
+        };
     } else {
         productImage.style.display = 'none';
+        productImage.parentElement.innerHTML = '<div class="no-image-modal">Изображение недоступно</div>';
+    }
+    
+    // Бренд
+    const brandElement = document.getElementById('modal-product-brand');
+    if (brandElement) {
+        const brand = extractBrandFromName(product.name);
+        brandElement.textContent = brand ? `Бренд: ${brand}` : '';
     }
     
     // Цена товара
     const priceContainer = document.getElementById('modal-product-price');
-    const price = parseFloat(product.price) || 0;
-    const promoPrice = parseFloat(product.price_skidka) || 0;
+    const originalPrice = parseFloat(product.price) || 0;
+    const salePrice = parseFloat(product.price_skidka) || 0;
     
-    if (price > 0) {
-        const formattedPrice = price.toLocaleString('ru-RU') + ' ₽';
-        
-        if (promoPrice > 0) {
-            const formattedPromoPrice = promoPrice.toLocaleString('ru-RU') + ' ₽';
+    if (originalPrice > 0) {
+        if (salePrice > 0 && salePrice < originalPrice) {
+            const discountPercentage = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
             priceContainer.innerHTML = `
                 <div class="product-price">
-                    <span class="product-old-price">${formattedPrice}</span>
-                    ${formattedPromoPrice}
+                    <span class="product-old-price">${originalPrice.toLocaleString('ru-RU')} ₽</span>
+                    <span class="product-new-price">${salePrice.toLocaleString('ru-RU')} ₽</span>
+                    <span class="discount-badge">-${discountPercentage}%</span>
                 </div>
             `;
         } else {
-            priceContainer.innerHTML = `<div class="product-price">${formattedPrice}</div>`;
+            priceContainer.innerHTML = `<div class="product-price">${originalPrice.toLocaleString('ru-RU')} ₽</div>`;
         }
     } else {
         priceContainer.innerHTML = '<div class="product-price">Цена по запросу</div>';
@@ -263,69 +301,174 @@ function openProductModal(product) {
     document.getElementById('modal-product-description').textContent = product.description || 'Описание отсутствует';
     
     // Характеристики товара
+    renderProductSpecsFallback(product);
+    
+    // Похожие товары (заглушка)
+    const similarProductsGrid = document.getElementById('similar-products-grid');
+    if (similarProductsGrid) {
+        similarProductsGrid.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Похожие товары загружаются...</div>';
+    }
+    
+    // Настраиваем табы
+    setupTabsFallback();
+    
+    // Сбрасываем количество на 1
+    const quantityInput = document.getElementById('param-quantity');
+    if (quantityInput) quantityInput.value = 1;
+    
+    // Сохраняем текущий товар
+    window.currentProduct = product;
+    
+    // Показываем модальное окно
+    modal.style.display = 'block';
+}
+
+/**
+ * Извлекает бренд из названия товара
+ */
+function extractBrandFromName(productName) {
+    if (!productName) return null;
+    
+    const brands = [
+        'Medit', 'Phrozen', 'Elegoo', 'Anycubic', 'Formlabs', 'NextDent', 
+        'KeyPrint', 'Detax', 'Asiga', 'SprintRay', 'Roland', 'Imes-icore',
+        'Amann Girrbach', 'Sirona', 'Straumann', 'Nobel Biocare', 'Zimmer',
+        'Carestream', '3Shape', 'Planmeca', 'Dentsply', 'Ivoclar', 'GC',
+        'Shofu', 'Vita', 'Kulzer', 'Heraeus', 'Kuraray', 'Tokuyama'
+    ];
+    
+    for (const brand of brands) {
+        if (productName.toLowerCase().includes(brand.toLowerCase())) {
+            return brand;
+        }
+    }
+    
+    // Если не найден известный бренд, попробуем взять первое слово
+    const firstWord = productName.split(' ')[0];
+    if (firstWord && firstWord.length > 2) {
+        return firstWord;
+    }
+    
+    return null;
+}
+
+/**
+ * Рендерит характеристики товара (fallback версия)
+ */
+function renderProductSpecsFallback(product) {
     const specsContainer = document.getElementById('modal-product-specs');
+    if (!specsContainer) return;
+    
     specsContainer.innerHTML = '';
     
+    // Собираем характеристики из разных полей
+    const specs = [];
+    
     if (product.characteristics && product.characteristics.trim() !== '') {
-        // Парсим характеристики из текста
         const characteristics = product.characteristics.split('\n').filter(line => line.trim() !== '');
-        
-        characteristics.forEach(characteristic => {
-            const specItem = document.createElement('div');
-            specItem.className = 'spec-item';
-            
-            // Пытаемся разделить на название и значение по двоеточию
-            const colonIndex = characteristic.indexOf(':');
-            if (colonIndex > 0) {
-                const specName = characteristic.substring(0, colonIndex).trim();
-                const specValue = characteristic.substring(colonIndex + 1).trim();
-                specItem.innerHTML = `
-                    <div class="spec-name">${specName}:</div>
-                    <div class="spec-value">${specValue}</div>
-                `;
+        characteristics.forEach(char => {
+            if (char.includes(':')) {
+                const [name, value] = char.split(':').map(s => s.trim());
+                specs.push({ name, value });
             } else {
-                // Если нет двоеточия, выводим как есть
-                specItem.innerHTML = `
-                    <div class="spec-value">${characteristic}</div>
-                `;
+                specs.push({ name: 'Характеристика', value: char.trim() });
             }
-            
-            specsContainer.appendChild(specItem);
         });
     }
     
-    // Сбрасываем количество на 1
-    document.getElementById('param-quantity').value = 1;
-    
-    // Инициализируем отзывы для товара
-    const reviewsContainer = document.getElementById('modal-product-reviews');
-    if (reviewsContainer) {
-        reviewsContainer.innerHTML = '<div class="loading">Загрузка отзывов...</div>';
-        
-        // Пытаемся инициализировать отзывы
-        let attempts = 0;
-        const maxAttempts = 10; // Максимум 5 секунд ожидания
-        
-        const initReviews = () => {
-            attempts++;
-            if (window.reviewsManager) {
-                console.log('Инициализируем отзывы для товара:', product.name);
-                reviewsContainer.innerHTML = '';
-                window.reviewsManager.initProductReviews(product.id, product.name, reviewsContainer);
-            } else if (attempts < maxAttempts) {
-                console.log('reviewsManager еще не готов, ждем... (попытка', attempts, 'из', maxAttempts, ')');
-                // Если reviewsManager еще не готов, попробуем через 500мс
-                setTimeout(initReviews, 500);
-            } else {
-                console.error('reviewsManager не инициализировался за 5 секунд');
-                reviewsContainer.innerHTML = '<div class="error">Не удалось загрузить систему отзывов</div>';
-            }
-        };
-        
-        initReviews();
+    // Добавляем базовые характеристики
+    if (product.category) {
+        specs.push({ name: 'Категория', value: product.category });
     }
     
-    modal.style.display = 'block';
+    if (product.brand) {
+        specs.push({ name: 'Бренд', value: product.brand });
+    }
+    
+    if (product.model) {
+        specs.push({ name: 'Модель', value: product.model });
+    }
+    
+    if (specs.length === 0) {
+        specsContainer.innerHTML = '<div class="no-specs">Характеристики не указаны</div>';
+        return;
+    }
+    
+    specs.forEach(spec => {
+        const specItem = document.createElement('div');
+        specItem.className = 'spec-item';
+        specItem.innerHTML = `
+            <div class="spec-name">${spec.name}:</div>
+            <div class="spec-value">${spec.value}</div>
+        `;
+        specsContainer.appendChild(specItem);
+    });
+}
+
+/**
+ * Настраивает табы (fallback версия)
+ */
+function setupTabsFallback() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            
+            // Убираем активный класс со всех кнопок и панелей
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            
+            // Добавляем активный класс к выбранной кнопке и панели
+            button.classList.add('active');
+            const targetPane = document.getElementById(`tab-${targetTab}`);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+        });
+    });
+}
+
+/**
+ * Открывает модальное окно с увеличенным изображением
+ */
+function openImageModal(imageSrc, imageAlt) {
+    const imageModal = document.getElementById('imageModal');
+    const imageModalImg = document.getElementById('imageModalImg');
+    const imageModalClose = document.getElementById('imageModalClose');
+    
+    if (!imageModal || !imageModalImg) return;
+
+    imageModalImg.src = imageSrc;
+    imageModalImg.alt = imageAlt;
+    imageModal.classList.add('active');
+
+    // Обработчики закрытия
+    const closeImageModal = () => {
+        imageModal.classList.remove('active');
+    };
+
+    // Закрытие по клику на крестик
+    if (imageModalClose) {
+        imageModalClose.onclick = closeImageModal;
+    }
+
+    // Закрытие по клику вне изображения
+    imageModal.onclick = (event) => {
+        if (event.target === imageModal) {
+            closeImageModal();
+        }
+    };
+
+    // Закрытие по Escape
+    const handleEscape = (event) => {
+        if (event.key === 'Escape') {
+            closeImageModal();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
 }
 
 /**

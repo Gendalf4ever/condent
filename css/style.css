@@ -655,28 +655,16 @@ h2.bold {
                 color: #ffffff;
             }
             
-            .map-container {
-                height: 400px;
-                margin-top: 30px;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-            
             @media (max-width: 768px) {
                 .footer-contacts-container {
                     grid-template-columns: 1fr;
-                }
-                
-                .map-container {
-                    height: 300px;
                 }
             }
 /*Карта в contacts.html*/
 .map-container {
   width: 100%;
-  max-width: 1200px; /* Максимальная ширина контейнера */
-  margin: 30px auto;
+  height: 500px; /* Фиксированная высота вместо соотношения сторон */
+  margin: 30px 0; /* Убираем auto для центрирования */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -684,8 +672,8 @@ h2.bold {
 
 .map-wrapper {
   position: relative;
-  padding-bottom: 75%; /* Соотношение сторон (высота/ширина) */
-  height: 0;
+  width: 100%;
+  height: 100%; /* Занимает всю высоту контейнера */
   overflow: hidden;
 }
 
@@ -701,12 +689,15 @@ h2.bold {
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
   .map-container {
-    margin: 20px auto;
+    height: 400px; /* Меньшая высота на мобильных */
+    margin: 20px 0;
     border-radius: 4px;
   }
-  
-  .map-wrapper {
-    padding-bottom: 100%; /* Более квадратное соотношение на мобильных */
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 300px; /* Еще меньшая высота на очень маленьких экранах */
   }
 }
  /* Cтили для page-header.html*/

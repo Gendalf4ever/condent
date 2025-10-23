@@ -707,9 +707,10 @@ async function initializePage() {
     }
     
     // Добавляем баннер со скидками только на главной странице
-    if (currentPage.includes('index.html') || currentPage === '' || currentPage === '/') {
-      componentsToLoad.push(loadComponent(CONFIG.paths.components.saleBanner, 'body', 'afterbegin'));
-    }
+    // ОТКЛЮЧЕНО: Бегущая строка заменена на блок акций
+    // if (currentPage.includes('index.html') || currentPage === '' || currentPage === '/') {
+    //   componentsToLoad.push(loadComponent(CONFIG.paths.components.saleBanner, 'body', 'afterbegin'));
+    // }
     
     // Добавляем popup баннер на всех страницах
     componentsToLoad.push(loadComponent(CONFIG.paths.components.salePopup, 'body', 'beforeend'));
