@@ -54,11 +54,16 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="product-tabs">
+            </div>
+            
+            <div class="product-tabs">
                     <div class="tab-buttons">
                         <button class="tab-button active" data-tab="description">Описание</button>
                         <button class="tab-button" data-tab="characteristics">Характеристики</button>
+                        <button class="tab-button" data-tab="reviews">Отзывы</button>
+                        <button class="tab-button" data-tab="questions">Вопросы</button>
+                        <button class="tab-button" data-tab="delivery">Оплата и доставка</button>
+                        <button class="tab-button" data-tab="documents">Документы</button>
                     </div>
                     
                     <div class="tab-content">
@@ -68,15 +73,89 @@
                         <div class="tab-pane" id="tab-characteristics">
                             <div class="specs-list" id="modal-product-specs"></div>
                         </div>
+                        <div class="tab-pane" id="tab-reviews">
+                            <div class="product-reviews" id="modal-product-reviews">
+                                <div class="loading">Загружаем отзывы...</div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-questions">
+                            <div class="product-questions" id="modal-product-questions">
+                                <div class="questions-container">
+                                    <h4>Вопросы о товаре</h4>
+                                    <div class="questions-list">
+                                        <p class="no-questions">Пока нет вопросов о данном товаре</p>
+                                    </div>
+                                    <div class="question-form-container">
+                                        <h5>Задать вопрос</h5>
+                                        <form class="question-form">
+                                            <div class="form-group">
+                                                <label for="question-text">Ваш вопрос:</label>
+                                                <textarea id="question-text" name="questionText" rows="3" placeholder="Введите ваш вопрос о товаре..." required></textarea>
+                                            </div>
+                                            <div class="form-actions">
+                                                <button type="submit" class="btn btn-primary">Отправить вопрос</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-delivery">
+                            <div class="delivery-info">
+                                <h4>Оплата и доставка</h4>
+                                
+                                <div class="info-section">
+                                    <h5><i class="fas fa-credit-card"></i> Способы оплаты</h5>
+                                    <p>Оплата производится по 100% предоплате по безналичному расчету.</p>
+                                </div>
+                                
+                                <div class="info-section">
+                                    <h5><i class="fas fa-truck"></i> Доставка</h5>
+                                    <p>Доставка по Санкт-Петербургу осуществляется бесплатно при заказе от 15 000 ₽.</p>
+                                    <p style="margin-top: 15px;">Доставка по России выполняется транспортными компаниями СДЕК, Деловые Линии, Major Express. Стоимость доставки рассчитывается согласно тарифам перевозчика и оплачивается клиентом.</p>
+                                </div>
+                                
+                                <div class="info-section">
+                                    <h5><i class="fas fa-shield-alt"></i> Гарантии</h5>
+                                    <ul>
+                                        <li>Официальная гарантия производителя</li>
+                                        <li>Техническая поддержка и консультации</li>
+                                        <li>Возврат товара в течение 14 дней</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-documents">
+                            <div class="documents-info">
+                                <h4>Документы</h4>
+                                <div class="documents-list" id="modal-product-documents">
+                                    <div class="document-item">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>Техническая документация</span>
+                                        <a href="#" class="btn btn-sm">Скачать</a>
+                                    </div>
+                                    <div class="document-item">
+                                        <i class="fas fa-file-alt"></i>
+                                        <span>Инструкция по эксплуатации</span>
+                                        <a href="#" class="btn btn-sm">Скачать</a>
+                                    </div>
+                                    <div class="document-item">
+                                        <i class="fas fa-certificate"></i>
+                                        <span>Сертификат соответствия</span>
+                                        <a href="#" class="btn btn-sm">Скачать</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Блок похожих товаров -->
-            <div class="similar-products-section" id="similar-products-section">
-                <h3 class="similar-products-title">Похожие товары</h3>
-                <div class="similar-products-grid" id="similar-products-grid">
-                    <!-- Похожие товары будут загружены динамически -->
+                
+                <!-- Блок похожих товаров -->
+                <div class="similar-products-section" id="similar-products-section">
+                    <h3 class="similar-products-title">Похожие товары</h3>
+                    <div class="similar-products-grid" id="similar-products-grid">
+                        <!-- Похожие товары будут загружены динамически -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,6 +216,121 @@
                     console.log('Всего товаров загружено:', window.promotionsManager.allProducts.length);
                 }).catch(error => {
                     console.error('Ошибка инициализации PromotionsManager:', error);
+                });
+            }
+            
+            // Инициализируем обработчики для новых вкладок модального окна
+            initProductModalTabs();
+        });
+        
+        // Функция для инициализации новых вкладок модального окна
+        function initProductModalTabs() {
+            // Обработчик переключения вкладок
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('tab-button')) {
+                    const targetTab = e.target.getAttribute('data-tab');
+                    
+                    // Убираем активный класс со всех кнопок и панелей
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                    
+                    // Добавляем активный класс к выбранной кнопке и панели
+                    e.target.classList.add('active');
+                    const targetPane = document.getElementById(`tab-${targetTab}`);
+                    if (targetPane) {
+                        targetPane.classList.add('active');
+                        
+                        // Если переключились на вкладку отзывов, загружаем отзывы
+                        if (targetTab === 'reviews' && window.currentProduct) {
+                            loadProductReviews(window.currentProduct.id || window.currentProduct.code);
+                        }
+                        
+                        // Если переключились на вкладку вопросов, загружаем вопросы
+                        if (targetTab === 'questions' && window.currentProduct) {
+                            loadProductQuestions(window.currentProduct.id || window.currentProduct.code);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Функция для загрузки отзывов товара
+        function loadProductReviews(productId) {
+            const reviewsContainer = document.getElementById('modal-product-reviews');
+            if (!reviewsContainer || !window.reviewsManager) return;
+            
+            // Очищаем контейнер
+            reviewsContainer.innerHTML = '';
+            
+            // Загружаем отзывы через ReviewsManager
+            window.reviewsManager.loadProductReviews(productId, reviewsContainer).then(() => {
+                // Добавляем форму для написания отзыва, если пользователь авторизован
+                if (window.reviewsManager.currentUser) {
+                    const reviewButton = document.createElement('button');
+                    reviewButton.className = 'btn btn-review';
+                    reviewButton.innerHTML = '<i class="fas fa-star"></i> Оставить отзыв';
+                    reviewButton.onclick = () => {
+                        const productName = window.currentProduct.name || window.currentProduct.title;
+                        window.reviewsManager.showReviewForm(productId, productName, reviewsContainer);
+                    };
+                    reviewsContainer.appendChild(reviewButton);
+                } else {
+                    const loginPrompt = document.createElement('p');
+                    loginPrompt.className = 'login-prompt';
+                    loginPrompt.innerHTML = '<a href="profile.html">Войдите в систему</a>, чтобы оставить отзыв';
+                    reviewsContainer.appendChild(loginPrompt);
+                }
+            }).catch(error => {
+                console.error('Ошибка загрузки отзывов:', error);
+                reviewsContainer.innerHTML = '<p class="error">Ошибка загрузки отзывов</p>';
+            });
+        }
+        
+        // Обработчик отправки вопроса
+        document.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('question-form')) {
+                e.preventDefault();
+                const questionText = e.target.querySelector('#question-text').value;
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                
+                const auth = window.firebaseServices?.auth;
+                if (!auth || !auth.currentUser) {
+                    alert('Пожалуйста, войдите в систему, чтобы задать вопрос');
+                    return;
+                }
+                
+                if (!questionText.trim()) {
+                    alert('Пожалуйста, введите вопрос');
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+                
+                const db = firebase.firestore();
+                const productId = window.currentProduct.id || window.currentProduct.code;
+                const productName = window.currentProduct.name || window.currentProduct.title;
+                const userId = auth.currentUser.uid;
+                const userName = auth.currentUser.displayName || 'Пользователь';
+                
+                db.collection('questions').add({
+                    productId: productId,
+                    productName: productName,
+                    userId: userId,
+                    userName: userName,
+                    text: questionText,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    alert('Спасибо! Ваш вопрос отправлен на модерацию и скоро будет опубликован.');
+                    e.target.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-send"></i> Отправить вопрос';
+                }).catch(error => {
+                    console.error('Ошибка отправки вопроса:', error);
+                    alert('Ошибка при отправке вопроса. Пожалуйста, попробуйте еще раз.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-send"></i> Отправить вопрос';
                 });
             }
         });

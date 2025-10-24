@@ -69,6 +69,9 @@
             <button class="tab-button" data-tab="reviews">
                 <i class="fas fa-star"></i> Модерация отзывов
             </button>
+            <button class="tab-button" data-tab="questions">
+                <i class="fas fa-question-circle"></i> Модерация вопросов
+            </button>
             <button class="tab-button" data-tab="products">
                 <i class="fas fa-box"></i> Товары
             </button>
@@ -105,6 +108,27 @@
             </div>
             <div id="reviews-list" class="reviews-list">
                 <!-- Отзывы будут загружены здесь -->
+            </div>
+        </section>
+
+        <!-- Содержимое вкладки Модерация вопросов -->
+        <section id="questions-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Модерация вопросов о товарах</h2>
+                <div class="reviews-filters">
+                    <button class="filter-btn active" data-status="pending">
+                        <i class="fas fa-clock"></i> На модерации
+                    </button>
+                    <button class="filter-btn" data-status="approved">
+                        <i class="fas fa-check"></i> Одобренные
+                    </button>
+                    <button class="filter-btn" data-status="rejected">
+                        <i class="fas fa-times"></i> Отклоненные
+                    </button>
+                </div>
+            </div>
+            <div id="questions-list" class="questions-list">
+                <!-- Вопросы будут загружены здесь -->
             </div>
         </section>
 
@@ -661,6 +685,11 @@
                         if (targetTab === 'reviews') {
                             loadReviews('pending');
                         }
+                        
+                        // Если переключились на вопросы, загружаем их
+                        if (targetTab === 'questions') {
+                            loadQuestions('pending');
+                        }
                     });
                 });
             }
@@ -795,6 +824,7 @@
                 initCategoryFilters();
                 initSheetsImport();
                 initReviewsModeration();
+                initQuestionsModeration();
             }).catch(error => {
                 console.error('Ошибка инициализации Firebase:', error);
             });
@@ -906,6 +936,141 @@
                 return statusTexts[status] || status;
             }
             
+            // ===== МОДЕРАЦИЯ ВОПРОСОВ =====
+            function initQuestionsModeration() {
+                // Обработчики фильтров для вопросов
+                const filterButtons = document.querySelectorAll('#questions-tab .filter-btn');
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const status = this.getAttribute('data-status');
+                        
+                        // Обновляем активную кнопку
+                        filterButtons.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Загружаем вопросы с выбранным статусом
+                        loadQuestions(status);
+                    });
+                });
+            }
+            
+            async function loadQuestions(status = 'pending') {
+                const questionsList = document.getElementById('questions-list');
+                questionsList.innerHTML = '<div class="loading">Загрузка вопросов...</div>';
+                
+                try {
+                    const questions = await db.collection('questions')
+                        .where('status', '==', status)
+                        .get();
+                    
+                    if (questions.empty) {
+                        questionsList.innerHTML = `<div class="no-reviews">Нет вопросов со статусом "${getStatusText(status)}"</div>`;
+                        return;
+                    }
+                    
+                    // Сортируем вопросы по дате создания (новые первыми)
+                    const questionsArray = [];
+                    questions.forEach(doc => {
+                        questionsArray.push({ id: doc.id, data: doc.data() });
+                    });
+                    
+                    questionsArray.sort((a, b) => {
+                        const dateA = a.data.createdAt ? a.data.createdAt.toDate() : new Date(0);
+                        const dateB = b.data.createdAt ? b.data.createdAt.toDate() : new Date(0);
+                        return dateB - dateA; // Новые первыми
+                    });
+
+                    let questionsHtml = '';
+                    questionsArray.forEach(item => {
+                        questionsHtml += renderAdminQuestionItem(item.id, item.data);
+                    });
+                    
+                    questionsList.innerHTML = questionsHtml;
+                } catch (error) {
+                    console.error('Ошибка загрузки вопросов:', error);
+                    questionsList.innerHTML = '<div class="error">Ошибка загрузки вопросов</div>';
+                }
+            }
+            
+            function renderAdminQuestionItem(questionId, question) {
+                const date = question.createdAt ? question.createdAt.toDate().toLocaleDateString('ru-RU') : '';
+                const status = question.status || 'pending';
+                
+                const html = `
+                    <div class="admin-review-item" data-question-id="${questionId}">
+                        <div class="admin-review-header">
+                            <div class="admin-review-info">
+                                <div class="admin-review-product">${question.productName}</div>
+                                <div class="admin-review-user">Пользователь: ${question.userName}</div>
+                                <div class="admin-review-date">Дата: ${date}</div>
+                            </div>
+                            <div class="admin-review-status ${status}">${getStatusText(status)}</div>
+                        </div>
+                        <div class="admin-review-text">${question.text}</div>
+                        <div class="admin-review-actions">
+                            ${status === 'pending' ? `
+                                <button class="btn btn-approve" onclick="approveQuestion('${questionId}')">
+                                    <i class="fas fa-check"></i> Одобрить
+                                </button>
+                                <button class="btn btn-reject" onclick="rejectQuestion('${questionId}')">
+                                    <i class="fas fa-times"></i> Отклонить
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-delete" onclick="deleteQuestion('${questionId}')">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                            ${status === 'approved' ? `
+                                <button class="btn btn-primary" onclick="showAnswerForm('${questionId}')">
+                                    <i class="fas fa-reply"></i> Ответить
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div class="question-answers" id="answers-${questionId}"></div>
+                    </div>
+                `;
+                
+                // Загружаем ответы если вопрос одобрен
+                setTimeout(() => {
+                    if (status === 'approved') {
+                        loadAnswers(questionId);
+                    }
+                }, 100);
+                
+                return html;
+            }
+            
+            async function approveQuestion(questionId) {
+                try {
+                    await db.collection('questions').doc(questionId).update({ status: 'approved' });
+                    loadQuestions('pending');
+                } catch (error) {
+                    console.error('Ошибка одобрения вопроса:', error);
+                    alert('Ошибка при одобрении вопроса');
+                }
+            }
+            
+            async function rejectQuestion(questionId) {
+                try {
+                    await db.collection('questions').doc(questionId).update({ status: 'rejected' });
+                    loadQuestions('pending');
+                } catch (error) {
+                    console.error('Ошибка отклонения вопроса:', error);
+                    alert('Ошибка при отклонении вопроса');
+                }
+            }
+            
+            async function deleteQuestion(questionId) {
+                if (confirm('Вы уверены, что хотите удалить этот вопрос?')) {
+                    try {
+                        await db.collection('questions').doc(questionId).delete();
+                        loadQuestions(document.querySelector('#questions-tab .filter-btn.active').getAttribute('data-status'));
+                    } catch (error) {
+                        console.error('Ошибка удаления вопроса:', error);
+                        alert('Ошибка при удалении вопроса');
+                    }
+                }
+            }
+
             async function approveReview(reviewId) {
                 try {
                     await db.collection('reviews').doc(reviewId).update({
@@ -995,6 +1160,117 @@
                 }, 3000);
             }
 
+            // ===== УПРАВЛЕНИЕ ОТВЕТАМИ НА ВОПРОСЫ =====
+            function showAnswerForm(questionId) {
+                const answersContainer = document.getElementById(`answers-${questionId}`);
+                const existingForm = answersContainer.querySelector('.answer-form');
+                
+                if (existingForm) {
+                    answersContainer.removeChild(existingForm);
+                    return;
+                }
+                
+                const form = document.createElement('div');
+                form.className = 'answer-form';
+                form.innerHTML = `
+                    <div style="margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 6px;">
+                        <h5 style="margin-top: 0;">Добавить ответ</h5>
+                        <textarea id="answer-text-${questionId}" placeholder="Введите ответ на вопрос..." rows="4" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: Arial, sans-serif;"></textarea>
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="saveAnswer('${questionId}')">
+                                <i class="fas fa-save"></i> Сохранить ответ
+                            </button>
+                            <button class="btn btn-secondary" onclick="showAnswerForm('${questionId}')">
+                                <i class="fas fa-times"></i> Отменить
+                            </button>
+                        </div>
+                    </div>
+                `;
+                answersContainer.appendChild(form);
+                document.getElementById(`answer-text-${questionId}`).focus();
+            }
+            
+            async function saveAnswer(questionId) {
+                const answerText = document.getElementById(`answer-text-${questionId}`).value;
+                
+                if (!answerText.trim()) {
+                    alert('Пожалуйста, введите ответ');
+                    return;
+                }
+                
+                try {
+                    await db.collection('questions').doc(questionId)
+                        .collection('answers').add({
+                            text: answerText,
+                            adminEmail: window.firebaseServices.auth.currentUser.email,
+                            adminName: window.firebaseServices.auth.currentUser.displayName || 'Администратор',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    
+                    alert('Ответ успешно добавлен');
+                    showAnswerForm(questionId);
+                    loadAnswers(questionId);
+                } catch (error) {
+                    console.error('Ошибка сохранения ответа:', error);
+                    alert('Ошибка при сохранении ответа: ' + error.message);
+                }
+            }
+            
+            async function loadAnswers(questionId) {
+                const answersContainer = document.getElementById(`answers-${questionId}`);
+                if (!answersContainer) return;
+                
+                try {
+                    const answers = await db.collection('questions').doc(questionId)
+                        .collection('answers').orderBy('createdAt', 'desc').get();
+                    
+                    if (answers.empty) return;
+                    
+                    let answersHtml = '<div class="answers-list" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">';
+                    answersHtml += '<h5 style="color: #28a745; margin-top: 0;"><i class="fas fa-check-circle"></i> Ответы администратора:</h5>';
+                    
+                    answers.forEach(doc => {
+                        const answer = doc.data();
+                        const date = answer.createdAt ? answer.createdAt.toDate().toLocaleDateString('ru-RU') : '';
+                        answersHtml += `
+                            <div style="background-color: #e8f5e9; padding: 10px; margin: 10px 0; border-radius: 4px; border-left: 4px solid #28a745;">
+                                <div style="color: #666; font-size: 12px; margin-bottom: 5px;">
+                                    <strong>${answer.adminName}</strong> - ${date}
+                                </div>
+                                <div style="color: #333;">${answer.text}</div>
+                                <div style="margin-top: 8px;">
+                                    <button class="btn btn-sm btn-danger" onclick="deleteAnswer('${questionId}', '${doc.id}')" style="font-size: 11px; padding: 4px 8px;">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    answersHtml += '</div>';
+                    const existingAnswers = answersContainer.querySelector('.answers-list');
+                    if (existingAnswers) {
+                        answersContainer.removeChild(existingAnswers);
+                    }
+                    answersContainer.innerHTML += answersHtml;
+                } catch (error) {
+                    console.error('Ошибка загрузки ответов:', error);
+                }
+            }
+            
+            async function deleteAnswer(questionId, answerId) {
+                if (confirm('Удалить этот ответ?')) {
+                    try {
+                        await db.collection('questions').doc(questionId)
+                            .collection('answers').doc(answerId).delete();
+                        loadAnswers(questionId);
+                    } catch (error) {
+                        console.error('Ошибка удаления ответа:', error);
+                        alert('Ошибка при удалении ответа');
+                    }
+                }
+            }
+
             // Делаем функции глобальными
             window.openAddArticleModal = openAddArticleModal;
             window.closeAddArticleModal = closeAddArticleModal;
@@ -1004,6 +1280,14 @@
             window.approveReview = approveReview;
             window.rejectReview = rejectReview;
             window.deleteReview = deleteReview;
+            window.loadQuestions = loadQuestions;
+            window.approveQuestion = approveQuestion;
+            window.rejectQuestion = rejectQuestion;
+            window.deleteQuestion = deleteQuestion;
+            window.showAnswerForm = showAnswerForm;
+            window.saveAnswer = saveAnswer;
+            window.deleteAnswer = deleteAnswer;
+            window.loadAnswers = loadAnswers;
 
             console.log('Admin interface initialized successfully');
         });
