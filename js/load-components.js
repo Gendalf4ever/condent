@@ -624,10 +624,9 @@ async function initializePage() {
     
     // Проверяем, нужно ли загружать форму обратной связи
     const excludeSupportFormPages = [
-      'team.html', 
+      'team.html',
       'printers-set.html', 
       'post-processing.html', 
-      'contacts.html',
       '3d-printers.html',
       '3d-scaners.html',
       'milling.html',
@@ -770,3 +769,33 @@ if (document.readyState === 'complete') {
 // Экспортируем функции для глобального использования
 window.initTestMeButton = initTestMeButton;
 window.initPopupForm = initPopupForm;
+
+// Глобальная функция для открытия попапа контактов
+window.openContactPopup = function() {
+  const popup = document.getElementById('contact-popup');
+  if (popup) {
+    popup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // Фокусируемся на первом поле после открытия
+    setTimeout(() => {
+      const nameInput = document.getElementById('popup-name');
+      if (nameInput) nameInput.focus();
+    }, 300);
+  } else {
+    // Если форма еще не загружена, загружаем её динамически
+    loadComponent(CONFIG.paths.components.supportForm, 'body', 'beforeend').then(() => {
+      // После загрузки инициализируем форму
+      initPopupForm();
+      // Открываем форму
+      const newPopup = document.getElementById('contact-popup');
+      if (newPopup) {
+        newPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+          const nameInput = document.getElementById('popup-name');
+          if (nameInput) nameInput.focus();
+        }, 300);
+      }
+    });
+  }
+};
