@@ -667,9 +667,9 @@ h2.bold {
  .page-header {
   background-color: #000;
   color: #fff;
-  padding: 30px 0;
+  padding: 60px 0;
   margin-bottom: 40px;
-  margin-top: 170px; /* Отступ под хедер (120px) + бегущую строку (50px) */
+  margin-top: 30px; /*отступ сверху для page-header*/
 }
 
 .page-header__container {
@@ -679,7 +679,7 @@ h2.bold {
 }
 
 .page-header__title {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
   margin: 0;
   display: flex;
@@ -703,13 +703,13 @@ h2.bold {
 
 @media (max-width: 768px) {
   .page-header {
-    padding: 20px 0;
+    padding: 40px 0;
     margin-bottom: 30px;
-    margin-top: 150px; /* Отступ под хедер + бегущую строку для мобильных */
+    margin-top: 10px;
   }
   
   .page-header__title {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
   
   .blog-header-logo {

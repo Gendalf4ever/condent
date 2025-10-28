@@ -1,0 +1,771 @@
+/* ============================================================
+   АДАПТИВНЫЙ ДИЗАЙН ДЛЯ ВСЕХ УСТРОЙСТВ
+   Breakpoints:
+   - Desktop: > 1024px
+   - Tablet: 768px - 1024px
+   - Mobile: < 768px
+   - Small Mobile: < 480px
+============================================================ */
+
+/* ============================================================
+   ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ УСТРОЙСТВ
+============================================================ */
+
+:root {
+    --container-padding: 20px;
+    --base-font-size: 16px;
+    --heading-margin: 20px 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* ============================================================
+   ПЛАНШЕТЫ: 768px - 1024px
+============================================================ */
+
+@media (max-width: 1024px) {
+    :root {
+        --container-padding: 15px;
+        --base-font-size: 15px;
+    }
+
+    /* Основной контейнер */
+    .container,
+    .main-content-wrapper,
+    .page-header__container {
+        padding: 0 15px;
+    }
+
+    /* Заголовки */
+    h1 {
+        font-size: 2.5rem;
+        margin: 15px 0;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin: 15px 0;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        margin: 12px 0;
+    }
+
+    /* Текст */
+    p {
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    /* Кнопки */
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    /* Сетка товаров */
+    .products-grid,
+    .team-members,
+    .members-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    /* Каталог */
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    /* Отступы */
+    .section-padding {
+        padding: 40px 15px;
+    }
+
+    /* Модальные окна */
+    .modal-content {
+        max-width: 90vw;
+        margin: 20px auto;
+    }
+
+    /* Форма */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    /* Таблицы */
+    table {
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    /* Блог */
+    .blog-container {
+        padding: 0 15px;
+    }
+
+    .article-card {
+        margin-bottom: 20px;
+    }
+
+    /* Отзывы */
+    .reviews-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    /* Акции */
+    .sale-item {
+        margin-bottom: 15px;
+    }
+
+    .sale-banner-content {
+        padding: 20px 15px;
+    }
+}
+
+/* ============================================================
+   МОБИЛЬНЫЕ УСТРОЙСТВА: < 768px
+============================================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --container-padding: 12px;
+        --base-font-size: 14px;
+    }
+
+    /* Основной контейнер */
+    .container,
+    .main-content-wrapper,
+    .page-header__container {
+        padding: 0 12px;
+    }
+
+    /* Заголовки */
+    h1 {
+        font-size: 2rem;
+        margin: 12px 0;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        margin: 10px 0;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+        margin: 8px 0;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
+
+    /* Текст */
+    p, span, a {
+        font-size: 14px;
+    }
+
+    /* Хедер */
+    header {
+        padding: 10px 0;
+    }
+
+    .header-container {
+        padding: 10px 12px;
+    }
+
+    .logo-image {
+        height: 40px;
+    }
+
+    /* Навигация */
+    .nav-link {
+        font-size: 14px;
+        padding: 10px 0;
+    }
+
+    .nav {
+        padding: 15px;
+    }
+
+    /* Телефон */
+    .phone {
+        font-size: 13px;
+    }
+
+    /* Кнопки */
+    .btn {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+
+    .btn-profile {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    /* Page Header */
+    .page-header {
+        padding: 40px 0;
+        margin-bottom: 20px;
+    }
+
+    .page-header__title {
+        font-size: 2rem;
+    }
+
+    /* Сетка товаров */
+    .products-grid,
+    .team-members,
+    .members-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .product-card,
+    .team-card,
+    .member-card {
+        margin-bottom: 12px;
+    }
+
+    /* Каталог */
+    .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Модальные окна */
+    .modal-content {
+        max-width: 95vw;
+        max-height: 90vh;
+        margin: 10px auto;
+        padding: 15px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .product-image-container {
+        max-height: 200px;
+        margin-bottom: 15px;
+    }
+
+    /* Вкладки */
+    .tab-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* Формы */
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+        padding: 8px;
+        width: 100%;
+    }
+
+    label {
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    /* Таблицы */
+    table {
+        font-size: 12px;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    /* Блог */
+    .blog-container {
+        padding: 0 12px;
+    }
+
+    .article-card {
+        margin-bottom: 15px;
+        padding: 12px;
+    }
+
+    .article-title {
+        font-size: 1.1rem;
+    }
+
+    .article-excerpt {
+        font-size: 13px;
+    }
+
+    /* Отзывы */
+    .reviews-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .review-card {
+        padding: 12px;
+    }
+
+    .review-text {
+        font-size: 13px;
+    }
+
+    /* Акции/Баннеры */
+    .sale-banner {
+        padding: 15px;
+    }
+
+    .sale-banner-content {
+        padding: 15px;
+    }
+
+    .sale-item {
+        margin-bottom: 12px;
+    }
+
+    /* Контакты */
+    .map-info-block {
+        min-width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        left: 0;
+    }
+
+    .contact-info-item {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+    }
+
+    .contact-value {
+        font-size: 13px;
+    }
+
+    .contact-label {
+        font-size: 10px;
+    }
+
+    /* Видео */
+    .video-section {
+        padding: 20px 0;
+    }
+
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Флекс контейнеры */
+    .flex-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Отступы */
+    .section-padding {
+        padding: 30px 12px;
+    }
+
+    .section-margin {
+        margin: 20px 0;
+    }
+
+    /* Иконки */
+    .icon {
+        font-size: 1.2rem;
+    }
+
+    /* Изображения */
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Списки */
+    ul, ol {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 8px;
+    }
+
+    /* Скрыть элементы для мобильных */
+    .desktop-only {
+        display: none;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+}
+
+/* ============================================================
+   МАЛЕНЬКИЕ МОБИЛЬНЫЕ УСТРОЙСТВА: < 480px
+============================================================ */
+
+@media (max-width: 480px) {
+    :root {
+        --container-padding: 10px;
+        --base-font-size: 13px;
+    }
+
+    /* Основной контейнер */
+    .container,
+    .main-content-wrapper,
+    .page-header__container {
+        padding: 0 10px;
+    }
+
+    /* Заголовки */
+    h1 {
+        font-size: 1.5rem;
+        margin: 10px 0;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        margin: 8px 0;
+    }
+
+    h3 {
+        font-size: 1rem;
+        margin: 6px 0;
+    }
+
+    /* Текст */
+    p, span, a {
+        font-size: 13px;
+    }
+
+    /* Хедер */
+    header {
+        padding: 8px 0;
+    }
+
+    .header-container {
+        padding: 8px 10px;
+    }
+
+    .logo-image {
+        height: 35px;
+    }
+
+    /* Навигация */
+    .nav-link {
+        font-size: 13px;
+        padding: 8px 0;
+    }
+
+    .nav {
+        padding: 10px;
+    }
+
+    /* Телефон */
+    .phone {
+        font-size: 12px;
+    }
+
+    /* Кнопки */
+    .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: auto;
+    }
+
+    .btn-primary {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* Page Header */
+    .page-header {
+        padding: 30px 0;
+        margin-bottom: 15px;
+    }
+
+    .page-header__title {
+        font-size: 1.5rem;
+    }
+
+    /* Сетка товаров */
+    .products-grid,
+    .team-members,
+    .members-grid,
+    .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Модальные окна */
+    .modal-content {
+        max-width: 98vw;
+        max-height: 95vh;
+        margin: 5px auto;
+        padding: 12px;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .product-image-container {
+        max-height: 150px;
+        margin-bottom: 10px;
+    }
+
+    /* Вкладки */
+    .tab-buttons {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .tab-button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    /* Формы */
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+        padding: 6px;
+        width: 100%;
+    }
+
+    label {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    /* Таблицы */
+    table {
+        font-size: 11px;
+        overflow-x: auto;
+    }
+
+    th, td {
+        padding: 4px;
+    }
+
+    /* Блог */
+    .article-card {
+        margin-bottom: 12px;
+        padding: 10px;
+    }
+
+    .article-title {
+        font-size: 1rem;
+    }
+
+    .article-excerpt {
+        font-size: 12px;
+    }
+
+    /* Отзывы */
+    .review-card {
+        padding: 10px;
+    }
+
+    .review-text {
+        font-size: 12px;
+    }
+
+    /* Акции */
+    .sale-banner {
+        padding: 10px;
+    }
+
+    .sale-banner-content {
+        padding: 10px;
+    }
+
+    /* Контакты */
+    .map-info-block {
+        padding: 12px;
+    }
+
+    .contact-info-item {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .contact-value {
+        font-size: 12px;
+    }
+
+    .contact-label {
+        font-size: 9px;
+    }
+
+    /* Отступы */
+    .section-padding {
+        padding: 20px 10px;
+    }
+
+    .section-margin {
+        margin: 15px 0;
+    }
+
+    /* Скрыть лишние элементы */
+    .hide-mobile {
+        display: none;
+    }
+
+    /* Видео и медиа */
+    .video-container {
+        aspect-ratio: 16/9;
+    }
+
+    /* Спец - отступ для page-header */
+    .page-header {
+        margin-top: 30px;
+    }
+}
+
+/* ============================================================
+   ЭКСТРА МАЛЕНЬКИЕ УСТРОЙСТВА: < 360px
+============================================================ */
+
+@media (max-width: 360px) {
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    h2 {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    .page-header__title {
+        font-size: 1.2rem;
+    }
+
+    .modal-content {
+        padding: 10px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+    }
+}
+
+/* ============================================================
+   УТИЛИТЫ И ХЕЛПЕРЫ
+============================================================ */
+
+/* Скрыть для определённых размеров экрана */
+.hide-mobile {
+    display: none;
+}
+
+.hide-tablet {
+    display: none;
+}
+
+.hide-desktop {
+    display: block;
+}
+
+@media (max-width: 1024px) {
+    .hide-tablet {
+        display: block;
+    }
+
+    .hide-desktop {
+        display: none;
+    }
+}
+
+@media (min-width: 1025px) {
+    .hide-mobile {
+        display: block;
+    }
+
+    .hide-tablet {
+        display: none;
+    }
+
+    .hide-desktop {
+        display: none;
+    }
+}
+
+/* Улучшенная доступность */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Высокий контраст */
+@media (prefers-contrast: more) {
+    body {
+        font-weight: 500;
+    }
+
+    button {
+        border: 2px solid;
+    }
+}
+
+/* Тёмный режим (если браузер поддерживает) */
+@media (prefers-color-scheme: dark) {
+    /* Стили для тёмного режима могут быть добавлены здесь */
+}
