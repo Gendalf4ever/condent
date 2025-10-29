@@ -683,27 +683,9 @@ async function initializePage() {
     saleBannersScript.async = true;
     document.head.appendChild(saleBannersScript);
     
-    // Добавляем кнопку помощи только если это не страница каталога
-    const excludeHelpButtonPages = [
-      '3d-printers.html',
-      '3d-scaners.html', 
-      'milling.html',
-      'frezy.html',
-      'photo-polymers.html',
-      '3d-consumables.html',
-      'post-obrabotka.html',
-      'sinterising.html',
-      'zirkon.html',
-      'compressors.html',
-      'catalog-firebase.html',
-      'catalog.html',
-      'support.html',
-      'blog.html'
-    ];
-    
-    if (!excludeHelpButtonPages.some(page => currentPage.includes(page))) {
-      componentsToLoad.push(loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend'));
-    }
+    // Добавляем кнопку помощи ВЕЗДЕ (всегда, на всех страницах)
+    // Кнопка загружается первым делом, чтобы она была видна сразу
+    componentsToLoad.unshift(loadComponent(CONFIG.paths.components.helpButton, 'body', 'beforeend'));
     
     // Добавляем баннер со скидками только на главной странице
     // ОТКЛЮЧЕНО: Бегущая строка заменена на блок акций

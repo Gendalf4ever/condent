@@ -705,6 +705,72 @@ body {
 }
 
 /* ============================================================
+   КНОПКА HELP-BUTTON
+============================================================ */
+
+.help-button-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+    background: transparent;
+    visibility: visible !important;
+    display: block !important;
+}
+
+.help-button {
+    display: block;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    visibility: visible !important;
+}
+
+.help-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.help-button-image {
+    width: auto;
+    height: 100px;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    visibility: visible !important;
+    object-fit: cover;
+}
+
+.help-button:hover .help-button-image {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .help-button-container {
+        bottom: 15px;
+        left: 15px;
+    }
+
+    .help-button-image {
+        height: 80px;
+        width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .help-button-container {
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .help-button-image {
+        height: 70px;
+        width: auto;
+    }
+}
+
+/* ============================================================
    УТИЛИТЫ И ХЕЛПЕРЫ
 ============================================================ */
 

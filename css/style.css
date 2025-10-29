@@ -749,11 +749,13 @@ h2.bold {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  z-index: 1000;
+  z-index: 9999;
   background: transparent;
   border: none;
   outline: none;
   box-shadow: none;
+  visibility: visible !important;
+  display: block !important;
 }
 
 .help-button {
@@ -773,7 +775,7 @@ h2.bold {
 }
 
 .help-button-image {
-  width: auto;
+  width: 100px;
   height: 100px;
   display: block;
   border-radius: 8px;
@@ -782,15 +784,25 @@ h2.bold {
   background: transparent;
   border: none;
   outline: none;
+  object-fit: cover;
 }
 
 .help-button:hover .help-button-image {
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
   .help-button-image {
+    width: 80px;
     height: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .help-button-image {
+    width: 70px;
+    height: 70px;
   }
 }
  /* Базовые стили */
