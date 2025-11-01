@@ -1,0 +1,64 @@
+/* ===== ПОДКЛЮЧЕНИЕ ШРИФТОВ TILDA SANS ===== */
+
+/* Tilda Sans Regular (400) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Tilda Sans Light (300) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Tilda Sans Medium (500) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Tilda Sans Semibold (600) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-Semibold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Tilda Sans Bold (700) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Tilda Sans Extra Bold (800) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Tilda Sans Black (900) */
+@font-face {
+    font-family: 'Tilda Sans';
+    src: url('../src/fonts/TildaSans.07TTF/TildaSans-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}

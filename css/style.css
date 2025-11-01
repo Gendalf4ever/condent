@@ -317,37 +317,38 @@ h2.bold {
   --header-height: 80px; /* Будет обновлено JS */
 }
 
-.body {
+body {
+  font-family: 'Tilda Sans', 'Tilda Sans Fallback', Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
   padding: 0;
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-/* Хедер должен быть фиксированным или иметь правильные отступы */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  margin: 0;
-  border: none;
-  padding-bottom: 0;
+  padding-top: 0;
 }
 
 /* Основной контент */
-.main-content-wrapper {
-  padding-top: 0; /* Убираем отступ, так как page-header уже имеет margin-top */
-  min-height: calc(100vh - 100px); /* 100px - примерная высота футера */
+.content-main {
+  padding: 2rem 40px;
+  margin-top: 0;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
-.content-main {
-  padding: 2rem 1rem;
+/* Контейнеры должны быть 12 колонок */
+.container {
   max-width: 1200px;
   margin: 0 auto;
-  line-height: 1.6;
+  padding: 0 40px;
+  width: 100%;
+}
+
+/* Основной контент wrapper */
+.main-content-wrapper {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* Мобильные стили */
@@ -669,13 +670,14 @@ h2.bold {
   color: #fff;
   padding: 60px 0;
   margin-bottom: 40px;
-  margin-top: 30px; /*отступ сверху для page-header*/
+  margin-top: 0;
 }
 
 .page-header__container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 40px;
+  width: 100%;
 }
 
 .page-header__title {
@@ -685,6 +687,15 @@ h2.bold {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  flex-direction: column;
+}
+
+.page-header__subtitle {
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-top: 15px;
+  text-align: center;
 }
 
 .blog-header-logo {
@@ -750,12 +761,14 @@ h2.bold {
   bottom: 20px;
   left: 20px;
   z-index: 9999;
-  background: transparent;
+  background: #000;
   border: none;
   outline: none;
-  box-shadow: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   visibility: visible !important;
   display: block !important;
+  border-radius: 12px;
+  padding: 8px;
 }
 
 .help-button {
@@ -776,10 +789,10 @@ h2.bold {
 
 .help-button-image {
   width: 100px;
-  height: 100px;
+  height: auto;
   display: block;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 4px;
+  box-shadow: none;
   transition: all 0.3s ease;
   background: transparent;
   border: none;
@@ -788,21 +801,21 @@ h2.bold {
 }
 
 .help-button:hover .help-button-image {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: none;
   transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
   .help-button-image {
     width: 80px;
-    height: 80px;
+    height: auto;
   }
 }
 
 @media (max-width: 480px) {
   .help-button-image {
     width: 70px;
-    height: 70px;
+    height: auto;
   }
 }
  /* Базовые стили */
@@ -948,8 +961,8 @@ body > div:first-child:not(.page-header):not(header) {
             }
             
             .footer-container {
-                max-width: 100%;
-                margin: 0;
+                max-width: 1200px;
+                margin: 0 auto;
                 padding: 0 40px;
                 display: flex;
                 flex-wrap: wrap;
@@ -1051,9 +1064,10 @@ body > div:first-child:not(.page-header):not(header) {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px 20px;
+            max-width: 100%;
+            margin: 0;
+            padding: 15px 40px;
+            width: 100%;
         }
         
         /* Логотип */
@@ -1061,6 +1075,7 @@ body > div:first-child:not(.page-header):not(header) {
             display: flex;
             align-items: center;
             text-decoration: none;
+            flex-shrink: 0;
         }
         
         .logo-img {
@@ -1395,4 +1410,17 @@ body > div:first-child:not(.page-header):not(header) {
   content: "\f078";
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
+}
+
+.promotions-section {
+  width: 100%;
+  background: #f9f9f9;
+  padding: 40px 0;
+}
+
+.promotions-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
 }

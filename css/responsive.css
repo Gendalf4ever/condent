@@ -734,15 +734,15 @@ body {
     width: auto;
     height: 100px;
     display: block;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    box-shadow: none;
     transition: all 0.3s ease;
     visibility: visible !important;
     object-fit: cover;
 }
 
 .help-button:hover .help-button-image {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    box-shadow: none;
     transform: scale(1.05);
 }
 
@@ -750,6 +750,9 @@ body {
     .help-button-container {
         bottom: 15px;
         left: 15px;
+        background: #000;
+        border-radius: 12px;
+        padding: 8px;
     }
 
     .help-button-image {
@@ -762,6 +765,9 @@ body {
     .help-button-container {
         bottom: 10px;
         left: 10px;
+        background: #000;
+        border-radius: 12px;
+        padding: 8px;
     }
 
     .help-button-image {

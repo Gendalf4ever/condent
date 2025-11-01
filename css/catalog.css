@@ -1,5 +1,48 @@
 /* Стили для дополнительных вкладок в модальном окне товара */
 
+/* Фильтры каталога */
+.catalog-filters {
+  width: 100%;
+  background: #f9f9f9;
+  padding: 20px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.catalog-filters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.catalog-filters-container h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
 /* Вкладка отзывов */
 .product-reviews {
     padding: 20px 0;
@@ -493,8 +536,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 25px;
-  padding: 20px;
-  max-width: 1400px;
+  padding: 40px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
